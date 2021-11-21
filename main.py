@@ -13,7 +13,6 @@ from IPython import display
 from matplotlib import pyplot as plt
 from typing import Dict, List, Optional, Sequence, Tuple
 
-# %%
 seed = 42
 tf.random.set_seed(seed)
 np.random.seed(seed)
@@ -21,6 +20,7 @@ np.random.seed(seed)
 # Sampling rate for audio playback
 _SAMPLING_RATE = 16000
 
+# %%
 # -------------------------------------------------------------
 # download dataset Maestro, 1.200 file MIDI.
 # -------------------------------------------------------------
@@ -36,6 +36,7 @@ if not data_dir.exists():
 filenames = glob.glob(str(data_dir / '**/*.mid*'))
 print('Number of files:', len(filenames))
 
+# %%
 # -------------------------------------------------------------
 # Process MIDI files. Use of pretty_midi
 # -------------------------------------------------------------
@@ -46,7 +47,7 @@ print(sample_file)
 pm = pretty_midi.PrettyMIDI(sample_file)
 
 
-# reproduce it
+# Reproduce it
 def display_audio(pm: pretty_midi.PrettyMIDI, seconds=30):
     waveform = pm.fluidsynth(fs=_SAMPLING_RATE)
     # Take a sample of the generated waveform to mitigate kernel resets
@@ -62,10 +63,10 @@ instrument = pm.instruments[0]
 instrument_name = pretty_midi.program_to_instrument_name(instrument.program)
 print('Instrument name:', instrument_name)
 
+# %%
 # -------------------------------------------------------------
-# Note extraction
+# Note extraction. Pitch, step, duration will be the representative variables
 # -------------------------------------------------------------
-
 
 for i, note in enumerate(instrument.notes[:10]):
     note_name = pretty_midi.note_number_to_name(note.pitch)
@@ -99,11 +100,13 @@ def midi_to_notes(midi_file: str) -> pd.DataFrame:
 raw_notes = midi_to_notes(sample_file)
 raw_notes.head()
 
+# Convert note pitches to actual names of the notes
 get_note_names = np.vectorize(pretty_midi.note_number_to_name)
 sample_note_names = get_note_names(raw_notes['pitch'])
 sample_note_names[:10]
 
 
+# Function to plot the piano roll
 def plot_piano_roll(notes: pd.DataFrame, count: Optional[int] = None):
     if count:
         title = f'First {count} notes'
@@ -120,10 +123,12 @@ def plot_piano_roll(notes: pd.DataFrame, count: Optional[int] = None):
     _ = plt.title(title)
 
 
+# Plot of first 100 notes and whole song
 plot_piano_roll(raw_notes, count=100)
 plot_piano_roll(raw_notes)
 
 
+# Function to plot the statistic distribution of the notes of the MIDI file
 def plot_distributions(notes: pd.DataFrame, drop_percentile=2.5):
     plt.figure(figsize=[15, 5])
     plt.subplot(1, 3, 1)
@@ -141,17 +146,18 @@ def plot_distributions(notes: pd.DataFrame, drop_percentile=2.5):
 plot_distributions(raw_notes)
 
 
+# %%
 # -------------------------------------------------------------
 # Create a MIDI file
 # -------------------------------------------------------------
 
-
+# Generate your own MIDI file from a list of notes using the function below.
 def notes_to_midi(
         notes: pd.DataFrame,
         out_file: str,
         instrument_name: str,
         velocity: int = 100,  # note loudness
-) -> pretty_midi.PrettyMIDI:
+) -> pretty_midi.PrettyMIDI:  # questa sintassi significa che la funzione dovrebbe ritornare un PrettyMIDI
     pm = pretty_midi.PrettyMIDI()
     instrument = pretty_midi.Instrument(
         program=pretty_midi.instrument_name_to_program(
@@ -181,9 +187,12 @@ example_pm = notes_to_midi(
 
 display_audio(example_pm)
 
+# %%
 # -------------------------------------------------------------
 # Create Dataset
 # -------------------------------------------------------------
+
+# Start with small number of files
 num_files = 5
 all_notes = []
 for f in filenames[:num_files]:
@@ -195,6 +204,7 @@ all_notes = pd.concat(all_notes)
 n_notes = len(all_notes)
 print('Number of notes parsed:', n_notes)
 
+# Create a tf.data.Dataset from the parsed notes.
 key_order = ['pitch', 'step', 'duration']
 train_notes = np.stack([all_notes[key] for key in key_order], axis=1)
 
@@ -202,6 +212,9 @@ notes_ds = tf.data.Dataset.from_tensor_slices(train_notes)
 notes_ds.element_spec
 
 
+# Train the model on batches of sequences of notes. Each example will consist of a sequence of notes as the input
+# features, and next note as the label. In this way, the model will be trained to predict the next note in a sequence.
+# Use the handy window function with size seq_length to create the features and labels in this format.
 def create_sequences(
         dataset: tf.data.Dataset,
         seq_length: int,
@@ -239,6 +252,8 @@ vocab_size = 128
 seq_ds = create_sequences(notes_ds, seq_length, vocab_size)
 seq_ds.element_spec
 
+# The shape of the dataset is (100,1), meaning that the model will take 100 notes as input,
+# and learn to predict the following note as output.
 for seq, target in seq_ds.take(1):
     print('sequence shape:', seq.shape)
     print('sequence elements (first 10):', seq[0: 10])
@@ -259,6 +274,8 @@ train_ds.element_spec
 # -------------------------------------------------------------
 # Create and Train the model
 # -------------------------------------------------------------
+# The model will have three outputs, one for each note variable. For pitch and duration,
+# use a custom loss function based on mean squared error that encourages the model to output non-negative values.
 def mse_with_positive_pressure(y_true: tf.Tensor, y_pred: tf.Tensor):
     mse = (y_true - y_pred) ** 2
     positive_pressure = 10 * tf.maximum(-y_pred, 0.0)
@@ -292,9 +309,13 @@ model.compile(loss=loss, optimizer=optimizer)
 
 model.summary()
 
+# Testing the model.evaluate function, you can see that the pitch loss is significantly greater than the step and
+# duration losses. Note that loss is the total loss computed by summing all the other losses and is currently
+# dominated by the pitch loss.
 losses = model.evaluate(train_ds, return_dict=True)
 losses
 
+# One way balance this is to use the loss_weights argument to compile
 model.compile(
     loss=loss,
     loss_weights={
@@ -305,8 +326,10 @@ model.compile(
     optimizer=optimizer,
 )
 
+# The loss then becomes the weighted sum of the individual losses
 model.evaluate(train_ds, return_dict=True)
 
+# Train the model
 callbacks = [
     tf.keras.callbacks.ModelCheckpoint(
         filepath='./training_checkpoints/ckpt_{epoch}',
@@ -333,7 +356,8 @@ plt.show()
 # -------------------------------------------------------------
 # Generate notes
 # -------------------------------------------------------------
-
+# To use the model to generate notes, you will first need to provide a starting sequence of notes.
+# The function below generates one note from a sequence of notes.
 def predict_next_note(
         notes: np.ndarray,
         keras_model: tf.keras.Model,
@@ -395,7 +419,5 @@ out_pm = notes_to_midi(
     generated_notes, out_file=out_file, instrument_name=instrument_name)
 display_audio(out_pm)
 
-
 plot_piano_roll(generated_notes)
 plot_distributions(generated_notes)
-
