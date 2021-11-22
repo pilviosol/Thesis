@@ -46,8 +46,7 @@ sample_file = filenames[1]
 print(sample_file)
 pm = pretty_midi.PrettyMIDI(sample_file)
 
-
-# Reproduce it
+'''# Reproduce it
 def display_audio(pm: pretty_midi.PrettyMIDI, seconds=30):
     waveform = pm.fluidsynth(fs=_SAMPLING_RATE)
     # Take a sample of the generated waveform to mitigate kernel resets
@@ -56,7 +55,7 @@ def display_audio(pm: pretty_midi.PrettyMIDI, seconds=30):
 
 
 display_audio(pm)
-
+'''
 # inspect it
 print('Number of instruments:', len(pm.instruments))
 instrument = pm.instruments[0]
@@ -98,12 +97,12 @@ def midi_to_notes(midi_file: str) -> pd.DataFrame:
 
 
 raw_notes = midi_to_notes(sample_file)
-raw_notes.head()
+print("raw_notes.head():\n", raw_notes.head())
 
 # Convert note pitches to actual names of the notes
 get_note_names = np.vectorize(pretty_midi.note_number_to_name)
 sample_note_names = get_note_names(raw_notes['pitch'])
-sample_note_names[:10]
+print("sample_note_names[:10]::::\n", sample_note_names[:10])
 
 
 # Function to plot the piano roll
@@ -185,8 +184,6 @@ example_file = 'example.midi'
 example_pm = notes_to_midi(
     raw_notes, out_file=example_file, instrument_name=instrument_name)
 
-display_audio(example_pm)
-
 # %%
 # -------------------------------------------------------------
 # Create Dataset
@@ -209,7 +206,7 @@ key_order = ['pitch', 'step', 'duration']
 train_notes = np.stack([all_notes[key] for key in key_order], axis=1)
 
 notes_ds = tf.data.Dataset.from_tensor_slices(train_notes)
-notes_ds.element_spec
+print("notes_ds.element_spec::\n", notes_ds.element_spec)
 
 
 # Train the model on batches of sequences of notes. Each example will consist of a sequence of notes as the input
@@ -250,7 +247,7 @@ def create_sequences(
 seq_length = 25
 vocab_size = 128
 seq_ds = create_sequences(notes_ds, seq_length, vocab_size)
-seq_ds.element_spec
+print("seq_ds.element_spec:\n", seq_ds.element_spec)
 
 # The shape of the dataset is (100,1), meaning that the model will take 100 notes as input,
 # and learn to predict the following note as output.
@@ -268,9 +265,10 @@ train_ds = (seq_ds
             .cache()
             .prefetch(tf.data.experimental.AUTOTUNE))
 
-train_ds.element_spec
+print("train_ds.element_spec:\n", train_ds.element_spec)
 
 
+# %%
 # -------------------------------------------------------------
 # Create and Train the model
 # -------------------------------------------------------------
@@ -313,7 +311,7 @@ model.summary()
 # duration losses. Note that loss is the total loss computed by summing all the other losses and is currently
 # dominated by the pitch loss.
 losses = model.evaluate(train_ds, return_dict=True)
-losses
+print("losses:\n", losses)
 
 # One way balance this is to use the loss_weights argument to compile
 model.compile(
@@ -353,6 +351,7 @@ plt.plot(history.epoch, history.history['loss'], label='total loss')
 plt.show()
 
 
+# %%
 # -------------------------------------------------------------
 # Generate notes
 # -------------------------------------------------------------
@@ -412,12 +411,11 @@ for _ in range(num_predictions):
 generated_notes = pd.DataFrame(
     generated_notes, columns=(*key_order, 'start', 'end'))
 
-generated_notes.head(10)
+print("generated_notes.head(10):\n", generated_notes.head(10))
 
 out_file = 'output.mid'
 out_pm = notes_to_midi(
     generated_notes, out_file=out_file, instrument_name=instrument_name)
-display_audio(out_pm)
-
 plot_piano_roll(generated_notes)
 plot_distributions(generated_notes)
+plt.show()
