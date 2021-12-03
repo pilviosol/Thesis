@@ -5,18 +5,18 @@ import matplotlib.pyplot as plt
 import librosa.display
 import librosa
 
-path = "/nas/home/spol/Thesis/GTZAN/images"
-
+path_images = "/nas/home/spol/Thesis/GTZAN/images"
+genres = ['blues', 'classical', 'country', 'disco', 'jazz', 'metal', 'pop', 'reggae', 'rock']
 try:
-    os.mkdir(path)
+    os.mkdir(path_images)
 except OSError:
-    print("Creation of the directory %s failed" % path)
+    print("Creation of the directory %s failed" % path_images)
 else:
-    print("Successfully created the directory %s " % path)
+    print("Successfully created the directory %s " % path_images)
 
-_SAMPLING_RATE = 16000
+_SAMPLING_RATE = 22000
 print('ollare')
-data_dir = pathlib.Path('GTZAN/genres_original/blues')
+data_dir = pathlib.Path('GTZAN/genres_original')
 
 
 def extract_features(file_name):
@@ -31,21 +31,26 @@ def extract_features(file_name):
     return cqt
 
 
-files_in_basepath = data_dir.iterdir()
-i = 0
-for item in files_in_basepath:
 
-    if item.is_file():
-        print(item.name)
-        features = extract_features(item)
-        name = 'spectrogram' + str(i)
-        fig, ax = plt.subplots()
-        img = librosa.display.specshow(librosa.amplitude_to_db(features, ref=np.max),
-                                       sr=_SAMPLING_RATE, x_axis='time', y_axis='cqt_note', ax=ax)
-        ax.set_title('Constant-Q power spectrum')
-        fig.colorbar(img, ax=ax, format="%+2.0f dB")
-        fig.savefig('/nas/home/spol/Thesis/GTZAN/images/' + name)
-    i = i + 1
+for names in genres:
+
+    data_dir = data_dir + '/' + names
+    files_in_basepath = data_dir.iterdir()
+    print(files_in_basepath)
+    '''for item in files_in_basepath:
+        if item.is_file():
+            print(item.name)
+            features = extract_features(item)
+            name = item.name[0:-4] + '_CQT.png'
+            fig, ax = plt.subplots()
+            img = librosa.display.specshow(librosa.amplitude_to_db(features, ref=np.max),
+                                           sr=_SAMPLING_RATE, x_axis='time', y_axis='cqt_note', ax=ax)
+            ax.set_title(name)
+            fig.colorbar(img, ax=ax, format="%+2.0f dB")
+            fig.savefig(path_images + name)
+        else:
+            print('thats nota a file')'''
+
 
 
 
