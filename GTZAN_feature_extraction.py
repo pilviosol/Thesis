@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 import librosa.display
 import librosa
 
-path_images = "/nas/home/spol/Thesis/GTZAN/images"
-genres = ['blues', 'classical', 'country', 'disco', 'jazz', 'metal', 'pop', 'reggae', 'rock']
+path_images = "/nas/home/spol/Thesis/GTZAN/images/"
+genres = ['blues', 'classical', 'country', 'disco','hiphop', 'jazz', 'metal', 'pop', 'reggae', 'rock']
 try:
     os.mkdir(path_images)
 except OSError:
@@ -33,11 +33,10 @@ def extract_features(file_name):
 
 
 for names in genres:
-
-    data_dir = data_dir + '/' + names
+    data_dir = pathlib.Path('GTZAN/genres_original'+ '/' + names)
     files_in_basepath = data_dir.iterdir()
-    print(files_in_basepath)
-    '''for item in files_in_basepath:
+    print(str(files_in_basepath))
+    for item in files_in_basepath:
         if item.is_file():
             print(item.name)
             features = extract_features(item)
@@ -49,17 +48,6 @@ for names in genres:
             fig.colorbar(img, ax=ax, format="%+2.0f dB")
             fig.savefig(path_images + name)
         else:
-            print('thats nota a file')'''
+            print('thats nota a file')
 
 
-
-
-
-
-
-
-
-
-# sample = pathlib.Path('GTZAN/genres_original/blues/blues.00000.wav')
-
-# plt.show()
