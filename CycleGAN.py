@@ -115,46 +115,55 @@ test_zebras = dataset_test_zebras.map(
     preprocess_image_test, num_parallel_calls=AUTOTUNE).cache().shuffle(
     BUFFER_SIZE).batch(BATCH_SIZE)'''
 
-train_horses = train_horses.iterdir()
-for image in train_horses:
+train_horses_dir = train_horses.iterdir()
+for image in train_horses_dir:
     if image.is_file():
-        print(type(image))
-        image = cv2.imread(image)
+        image = cv2.imread(str(image))
         image = preprocess_image_train(image)
     else:
         print('not an image')
 
-for image in train_zebras:
+train_zebras_dir = train_zebras.iterdir()
+for image in train_zebras_dir:
     if image.is_file():
+        image = cv2.imread(str(image))
         image = preprocess_image_train(image)
     else:
         print('not an image')
 
-for image in test_horses:
+test_horses_dir = test_horses.iterdir()
+for image in test_horses_dir:
     if image.is_file():
+        image = cv2.imread(str(image))
         image = preprocess_image_test(image)
     else:
         print('not an image')
 
-for image in test_zebras:
+test_zebras_dir = test_zebras.iterdir()
+for image in test_zebras_dir:
     if image.is_file():
+        image = cv2.imread(str(image))
         image = preprocess_image_test(image)
     else:
         print('not an image')
 
-sample_horse = next(iter(train_horses))
-sample_zebra = next(iter(train_zebras))
+print(train_horses)
+
+
+
+sample_horse = image = cv2.imread('horse2zebra/testA/n02381460_20.jpg')
 
 plt.subplot(121)
 plt.title('Horse')
-plt.imshow(sample_horse[0] * 0.5 + 0.5)
+plt.imshow(sample_horse)
+
 
 plt.subplot(122)
 plt.title('Horse with random jitter')
-plt.imshow(random_jitter(sample_horse[0]) * 0.5 + 0.5)
-
+plt.imshow(random_jitter(sample_horse))
+plt.show()
 # Import and reuse the Pix2Pix models
-
+'''
 OUTPUT_CHANNELS = 3
 
 generator_g = pix2pix.unet_generator(OUTPUT_CHANNELS, norm_type='instancenorm')
@@ -362,3 +371,4 @@ for epoch in range(EPOCHS):
 # Run the trained model on the test dataset
 for inp in test_horses.take(5):
     generate_images(generator_g, inp)
+'''
