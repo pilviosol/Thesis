@@ -147,11 +147,23 @@ for image in test_zebras_dir:
     else:
         print('not an image')
 
-print(train_horses)
+print("train horses:::::::",train_horses)
+print("train horses type:::::::",type(train_horses))
+
+print("train horses DIR:::::::",train_horses)
+print("train horses DIR type:::::::",type(train_horses))
+for image in train_horses_dir:
+    if image.is_file():
+        print("image:::",image)
+        print("image.name:::", image.name)
+    else:
+        print('not an image')
 
 
+sample_horse = cv2.imread('horse2zebra/trainA/n02381460_2.jpg')
+sample_zebra = cv2.imread('horse2zebra/trainB/n02391049_2.jpg')
 
-sample_horse = image = cv2.imread('horse2zebra/testA/n02381460_20.jpg')
+
 
 plt.subplot(121)
 plt.title('Horse')
@@ -162,8 +174,23 @@ plt.subplot(122)
 plt.title('Horse with random jitter')
 plt.imshow(random_jitter(sample_horse))
 plt.show()
+
+
+plt.subplot(121)
+plt.title('Zebra')
+plt.imshow(sample_zebra)
+
+plt.subplot(122)
+plt.title('Zebra with random jitter')
+plt.imshow(random_jitter(sample_zebra))
+
+
+
+
+
+
 # Import and reuse the Pix2Pix models
-'''
+
 OUTPUT_CHANNELS = 3
 
 generator_g = pix2pix.unet_generator(OUTPUT_CHANNELS, norm_type='instancenorm')
@@ -171,6 +198,15 @@ generator_f = pix2pix.unet_generator(OUTPUT_CHANNELS, norm_type='instancenorm')
 
 discriminator_x = pix2pix.discriminator(norm_type='instancenorm', target=False)
 discriminator_y = pix2pix.discriminator(norm_type='instancenorm', target=False)
+
+sample_horse=tf.expand_dims(
+    sample_horse, axis=0, name=None
+)
+
+sample_zebra=tf.expand_dims(
+    sample_zebra, axis=0, name=None
+)
+
 
 to_zebra = generator_g(sample_horse)
 to_horse = generator_f(sample_zebra)
@@ -184,9 +220,9 @@ for i in range(len(imgs)):
     plt.subplot(2, 2, i + 1)
     plt.title(title[i])
     if i % 2 == 0:
-        plt.imshow(imgs[i][0] * 0.5 + 0.5)
+        plt.imshow(imgs[i][0])
     else:
-        plt.imshow(imgs[i][0] * 0.5 * contrast + 0.5)
+        plt.imshow(imgs[i][0] * contrast )
 plt.show()
 
 plt.figure(figsize=(8, 8))
@@ -201,6 +237,17 @@ plt.imshow(discriminator_x(sample_horse)[0, ..., -1], cmap='RdBu_r')
 
 plt.show()
 
+
+
+
+
+
+
+
+
+
+
+'''
 # Loss functions
 
 LAMBDA = 10
