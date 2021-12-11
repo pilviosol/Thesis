@@ -1,8 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="spol@ampere:22" autoUploadExternalChanges="true">
+  <component name="PublishConfigData" autoUpload="Always" serverName="spol@euler:22" autoUploadExternalChanges="true">
     <serverData>
       <paths name="spol@ampere:22">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/nas/home/spol/Thesis" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="spol@bayes:22">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/nas/home/spol/Thesis" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="spol@curie:22">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/nas/home/spol/Thesis" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="spol@dirac:22">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/nas/home/spol/Thesis" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="spol@euler:22">
         <serverdata>
           <mappings>
             <mapping deploy="/nas/home/spol/Thesis" local="$PROJECT_DIR$" />

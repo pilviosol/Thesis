@@ -222,7 +222,7 @@ for i in range(len(imgs)):
     if i % 2 == 0:
         plt.imshow(imgs[i][0])
     else:
-        plt.imshow(imgs[i][0] * contrast )
+        plt.imshow(imgs[i][0] * contrast)
 plt.show()
 
 plt.figure(figsize=(8, 8))
@@ -247,7 +247,7 @@ plt.show()
 
 
 
-'''
+
 # Loss functions
 
 LAMBDA = 10
@@ -286,6 +286,9 @@ generator_f_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_x_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_y_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 
+
+
+
 # CHECKPOINTS
 
 checkpoint_path = "./checkpoints/train"
@@ -306,6 +309,11 @@ if ckpt_manager.latest_checkpoint:
     ckpt.restore(ckpt_manager.latest_checkpoint)
     print('Latest checkpoint restored!!')
 
+
+
+
+
+
 # TRAINING
 
 EPOCHS = 40
@@ -323,7 +331,7 @@ def generate_images(model, test_input):
         plt.subplot(1, 2, i + 1)
         plt.title(title[i])
         # getting the pixel values between [0, 1] to plot it.
-        plt.imshow(display_list[i] * 0.5 + 0.5)
+        plt.imshow(display_list[i])
         plt.axis('off')
     plt.show()
 
@@ -394,7 +402,7 @@ for epoch in range(EPOCHS):
     start = time.time()
 
     n = 0
-    for image_x, image_y in tf.data.Dataset.zip((train_horses, train_zebras)):
+    for image_x, image_y in zip(train_horses_dir, train_zebras_dir):
         train_step(image_x, image_y)
         if n % 10 == 0:
             print('.', end='')
@@ -416,6 +424,9 @@ for epoch in range(EPOCHS):
 # GENERATE USING TEST DATASET
 
 # Run the trained model on the test dataset
-for inp in test_horses.take(5):
-    generate_images(generator_g, inp)
-'''
+#for inp in test_horses_dir.take(5):
+test = cv2.imread('horse2zebra/testA/n02381460_20.jpg')
+test=tf.expand_dims(
+    test, axis=0, name=None
+)
+generate_images(generator_g, test)
