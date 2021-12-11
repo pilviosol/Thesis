@@ -11,48 +11,15 @@ from IPython.display import clear_output
 import cv2
 
 AUTOTUNE = tf.data.AUTOTUNE
-
+for gpu in tf.config.experimental.list_physical_devices('GPU'):
+    tf.config.experimental.set_memory_growth(gpu, True)
 # INPUT PIPELINE
 
-'''dataset, metadata = tfds.load('cycle_gan/horse2zebra',
-                              with_info=True, as_supervised=True)
-
-
-
-train_horses, train_zebras = dataset['trainA'], dataset['trainB']
-test_horses, test_zebras = dataset['testA'], dataset['testB']'''
 
 train_horses = pathlib.Path('horse2zebra/trainA/')
-
-'''files_in_basepath = train_horses.iterdir()
-print(str(files_in_basepath))
-for item in files_in_basepath:
-    if item.is_file():
-        print(item.name)'''
-
-train_zebras = pathlib.Path("horse2zebra/trainB")
-test_horses = pathlib.Path("horse2zebra/testA")
-test_zebras = pathlib.Path("horse2zebra/testB")
-
-'''train_horses = tf.keras.utils.image_dataset_from_directory(
-  dataset_train_horses,
-  seed=123)
-
-train_zebras = tf.keras.utils.image_dataset_from_directory(
-  dataset_train_zebras,
-  seed=123)
-
-test_horses = tf.keras.utils.image_dataset_from_directory(
-  dataset_test_horses,
-  seed=123)
-
-test_zebras = tf.keras.utils.image_dataset_from_directory(
-  dataset_test_zebras,
-  seed=123)'''
-
-# train_horses, train_zebras = "/nas/home/spol/Thesis/horse2zebra/trainA", "/nas/home/spol/Thesis/horse2zebra/trainB"
-# test_horses, test_zebras = "/nas/home/spol/Thesis/horse2zebra/testA", "/nas/home/spol/Thesis/horse2zebra/testB"
-
+train_zebras = pathlib.Path("horse2zebra/trainB/")
+test_horses = pathlib.Path("horse2zebra/testA/")
+test_zebras = pathlib.Path("horse2zebra/testB/")
 
 BUFFER_SIZE = 1000
 BATCH_SIZE = 1
@@ -99,27 +66,22 @@ def preprocess_image_test(image):
     return image
 
 
-'''train_horses = dataset_train_horses.cache().map(
-    preprocess_image_train, num_parallel_calls=AUTOTUNE).shuffle(
-    BUFFER_SIZE).batch(BATCH_SIZE)
-
-train_zebras = dataset_train_zebras.cache().map(
-    preprocess_image_train, num_parallel_calls=AUTOTUNE).shuffle(
-    BUFFER_SIZE).batch(BATCH_SIZE)
-
-test_horses = dataset_test_horses.map(
-    preprocess_image_test, num_parallel_calls=AUTOTUNE).cache().shuffle(
-    BUFFER_SIZE).batch(BATCH_SIZE)
-
-test_zebras = dataset_test_zebras.map(
-    preprocess_image_test, num_parallel_calls=AUTOTUNE).cache().shuffle(
-    BUFFER_SIZE).batch(BATCH_SIZE)'''
+train_horses_images = []
+train_horses_images_processed = []
+train_zebras_images = []
+train_zebras_images_processed = []
+test_horses_images = []
+test_horses_images_processed = []
+test_zebras_images = []
+test_zebras_images_processed = []
 
 train_horses_dir = train_horses.iterdir()
 for image in train_horses_dir:
     if image.is_file():
         image = cv2.imread(str(image))
+        train_horses_images.append(image)
         image = preprocess_image_train(image)
+        train_horses_images_processed.append(image)
     else:
         print('not an image')
 
@@ -127,7 +89,9 @@ train_zebras_dir = train_zebras.iterdir()
 for image in train_zebras_dir:
     if image.is_file():
         image = cv2.imread(str(image))
+        train_zebras_images.append(image)
         image = preprocess_image_train(image)
+        train_zebras_images_processed.append(image)
     else:
         print('not an image')
 
@@ -135,7 +99,9 @@ test_horses_dir = test_horses.iterdir()
 for image in test_horses_dir:
     if image.is_file():
         image = cv2.imread(str(image))
+        test_horses_images.append(image)
         image = preprocess_image_test(image)
+        test_horses_images_processed.append(image)
     else:
         print('not an image')
 
@@ -143,51 +109,34 @@ test_zebras_dir = test_zebras.iterdir()
 for image in test_zebras_dir:
     if image.is_file():
         image = cv2.imread(str(image))
+        test_zebras_images.append(image)
         image = preprocess_image_test(image)
+        test_zebras_images_processed.append(image)
     else:
         print('not an image')
 
-print("train horses:::::::",train_horses)
-print("train horses type:::::::",type(train_horses))
+print('type(train_zebras_images_processed): ', type(train_zebras_images_processed))
+sample_horse = train_horses_images_processed[0]
+sample_zebra = train_zebras_images_processed[0]
 
-print("train horses DIR:::::::",train_horses)
-print("train horses DIR type:::::::",type(train_horses))
-for image in train_horses_dir:
-    if image.is_file():
-        print("image:::",image)
-        print("image.name:::", image.name)
-    else:
-        print('not an image')
-
-
-sample_horse = cv2.imread('horse2zebra/trainA/n02381460_2.jpg')
-sample_zebra = cv2.imread('horse2zebra/trainB/n02391049_2.jpg')
-
-
+print('sample_horse: ', sample_horse)
 
 plt.subplot(121)
 plt.title('Horse')
-plt.imshow(sample_horse)
-
+plt.imshow(sample_horse * 0.5 + 0.5)
 
 plt.subplot(122)
 plt.title('Horse with random jitter')
-plt.imshow(random_jitter(sample_horse))
+plt.imshow(random_jitter(sample_horse * 0.5 + 0.5))
 plt.show()
-
 
 plt.subplot(121)
 plt.title('Zebra')
-plt.imshow(sample_zebra)
+plt.imshow(sample_zebra * 0.5 + 0.5)
 
 plt.subplot(122)
 plt.title('Zebra with random jitter')
-plt.imshow(random_jitter(sample_zebra))
-
-
-
-
-
+plt.imshow(random_jitter(sample_zebra * 0.5 + 0.5))
 
 # Import and reuse the Pix2Pix models
 
@@ -199,14 +148,13 @@ generator_f = pix2pix.unet_generator(OUTPUT_CHANNELS, norm_type='instancenorm')
 discriminator_x = pix2pix.discriminator(norm_type='instancenorm', target=False)
 discriminator_y = pix2pix.discriminator(norm_type='instancenorm', target=False)
 
-sample_horse=tf.expand_dims(
+sample_horse = tf.expand_dims(
     sample_horse, axis=0, name=None
 )
 
-sample_zebra=tf.expand_dims(
+sample_zebra = tf.expand_dims(
     sample_zebra, axis=0, name=None
 )
-
 
 to_zebra = generator_g(sample_horse)
 to_horse = generator_f(sample_zebra)
@@ -220,9 +168,9 @@ for i in range(len(imgs)):
     plt.subplot(2, 2, i + 1)
     plt.title(title[i])
     if i % 2 == 0:
-        plt.imshow(imgs[i][0])
+        plt.imshow(imgs[i][0] * 0.5 + 0.5)
     else:
-        plt.imshow(imgs[i][0] * contrast)
+        plt.imshow(imgs[i][0] * 0.5 * contrast + 0.5)
 plt.show()
 
 plt.figure(figsize=(8, 8))
@@ -236,17 +184,6 @@ plt.title('Is a real horse?')
 plt.imshow(discriminator_x(sample_horse)[0, ..., -1], cmap='RdBu_r')
 
 plt.show()
-
-
-
-
-
-
-
-
-
-
-
 
 # Loss functions
 
@@ -286,9 +223,6 @@ generator_f_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_x_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_y_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 
-
-
-
 # CHECKPOINTS
 
 checkpoint_path = "./checkpoints/train"
@@ -309,11 +243,6 @@ if ckpt_manager.latest_checkpoint:
     ckpt.restore(ckpt_manager.latest_checkpoint)
     print('Latest checkpoint restored!!')
 
-
-
-
-
-
 # TRAINING
 
 EPOCHS = 40
@@ -331,7 +260,7 @@ def generate_images(model, test_input):
         plt.subplot(1, 2, i + 1)
         plt.title(title[i])
         # getting the pixel values between [0, 1] to plot it.
-        plt.imshow(display_list[i])
+        plt.imshow(display_list[i] * 0.5 + 0.5)
         plt.axis('off')
     plt.show()
 
@@ -402,7 +331,9 @@ for epoch in range(EPOCHS):
     start = time.time()
 
     n = 0
-    for image_x, image_y in zip(train_horses_dir, train_zebras_dir):
+    for image_x, image_y in zip(train_horses_images_processed, train_zebras_images_processed):
+        image_x = tf.expand_dims(image, axis=0, name=None)
+        image_y = tf.expand_dims(image, axis=0, name=None)
         train_step(image_x, image_y)
         if n % 10 == 0:
             print('.', end='')
@@ -424,9 +355,9 @@ for epoch in range(EPOCHS):
 # GENERATE USING TEST DATASET
 
 # Run the trained model on the test dataset
-#for inp in test_horses_dir.take(5):
+# for inp in test_horses_dir.take(5):
 test = cv2.imread('horse2zebra/testA/n02381460_20.jpg')
-test=tf.expand_dims(
+test = tf.expand_dims(
     test, axis=0, name=None
 )
 generate_images(generator_g, test)
