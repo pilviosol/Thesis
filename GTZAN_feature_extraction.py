@@ -4,16 +4,26 @@ import pathlib
 import matplotlib.pyplot as plt
 import librosa.display
 import librosa
+import shutil
 
 path_images = "/nas/home/spol/Thesis/GTZAN/images/"
 genres = ['blues', 'classical', 'country', 'disco', 'hiphop', 'jazz', 'metal', 'pop', 'reggae', 'rock']
+
+try:
+    shutil.rmtree(path_images, ignore_errors=True)
+except OSError:
+    print("Removal of the directory %s failed" % path_images)
+else:
+    print("Successfully removed the directory %s" % path_images)
+
 for genre in genres:
+    print(path_images + genre)
     try:
-        os.mkdir(path_images + genre)
+        os.makedirs(path_images + genre)
     except OSError:
-        print("Creation of the directory %s failed" % path_images + genre)
+        print("Creation of the directory %s failed" % (path_images + genre))
     else:
-        print("Successfully created the directory %s " % path_images + genre)
+        print("Successfully created the directory %s" % (path_images + genre))
 
 _SAMPLING_RATE = 22000
 print('ollare')
@@ -32,8 +42,8 @@ def extract_features(file_name):
     return cqt
 
 
-for names in genres:
-    data_dir = pathlib.Path('GTZAN/genres_original' + '/' + names)
+for genre in genres:
+    data_dir = pathlib.Path('GTZAN/genres_original' + '/' + genre)
     files_in_basepath = data_dir.iterdir()
     print(str(files_in_basepath))
     for item in files_in_basepath:
@@ -46,6 +56,6 @@ for names in genres:
                                            sr=_SAMPLING_RATE, x_axis='time', y_axis='cqt_note', ax=ax)
             ax.set_title(name)
             fig.colorbar(img, ax=ax, format="%+2.0f dB")
-            fig.savefig(path_images + names + name)
+            fig.savefig(path_images + genre + '/' + name)
         else:
-            print('thats nota a file')
+            print('That is not a file')
