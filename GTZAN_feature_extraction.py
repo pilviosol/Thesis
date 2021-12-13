@@ -19,7 +19,8 @@ else:
 for genre in genres:
     print(path_images + genre)
     try:
-        os.makedirs(path_images + genre)
+        os.makedirs(path_images + genre + "/train")
+        os.makedirs(path_images + genre + "/test")
     except OSError:
         print("Creation of the directory %s failed" % (path_images + genre))
     else:
@@ -45,7 +46,7 @@ def extract_features(file_name):
 for genre in genres:
     data_dir = pathlib.Path('GTZAN/genres_original' + '/' + genre)
     files_in_basepath = data_dir.iterdir()
-    print(str(files_in_basepath))
+    count = 0
     for item in files_in_basepath:
         if item.is_file():
             print(item.name)
@@ -56,6 +57,10 @@ for genre in genres:
                                            sr=_SAMPLING_RATE, x_axis='time', y_axis='cqt_note', ax=ax)
             ax.set_title(name)
             fig.colorbar(img, ax=ax, format="%+2.0f dB")
-            fig.savefig(path_images + genre + '/' + name)
+            if count < 80:
+                fig.savefig(path_images + genre + "/train/" + name)
+            else:
+                fig.savefig(path_images + genre + "/test/" + name)
         else:
             print('That is not a file')
+        count += 1
