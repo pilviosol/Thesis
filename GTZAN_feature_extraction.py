@@ -7,10 +7,12 @@ import librosa
 import shutil
 
 path_images = "/nas/home/spol/Thesis/GTZAN/images/"
+path_features = "/nas/home/spol/Thesis/GTZAN/features/"
 genres = ['blues', 'classical', 'country', 'disco', 'hiphop', 'jazz', 'metal', 'pop', 'reggae', 'rock']
 
 try:
     shutil.rmtree(path_images, ignore_errors=True)
+    shutil.rmtree(path_features, ignore_errors=True)
 except OSError:
     print("Removal of the directory %s failed" % path_images)
 else:
@@ -21,6 +23,8 @@ for genre in genres:
     try:
         os.makedirs(path_images + genre + "/train")
         os.makedirs(path_images + genre + "/test")
+        os.makedirs(path_features + genre + "/train")
+        os.makedirs(path_features + genre + "/test")
     except OSError:
         print("Creation of the directory %s failed" % (path_images + genre))
     else:
@@ -54,13 +58,13 @@ for genre in genres:
             name = item.name[0:-4] + '_CQT.png'
             fig, ax = plt.subplots()
             img = librosa.display.specshow(librosa.amplitude_to_db(features, ref=np.max),
-                                           sr=_SAMPLING_RATE, x_axis='time', y_axis='cqt_note', ax=ax)
-            ax.set_title(name)
-            fig.colorbar(img, ax=ax, format="%+2.0f dB")
+                                           sr=_SAMPLING_RATE, ax=ax)
             if count < 80:
-                fig.savefig(path_images + genre + "/train/" + name)
+                fig.savefig(path_images + genre + "/train/" + name, bbox_inches='tight', pad_inches=-0.1)
+                np.save(path_features + genre + "/train/" + item.name[0:-4], features)
             else:
-                fig.savefig(path_images + genre + "/test/" + name)
+                fig.savefig(path_images + genre + "/test/" + name, bbox_inches='tight', pad_inches=-0.1)
+                np.save(path_features + genre + "/test/" + item.name[0:-4], features)
         else:
             print('That is not a file')
         count += 1
