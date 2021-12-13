@@ -10,14 +10,6 @@ from sklearn.model_selection import train_test_split
 
 
 
-'''
-SALVARE LE FEATURES DELLE CANZONI COME NUMPY ARRAY AL POSTO DI IMMAGINI VERE E PROPRIE
-E PROVARE A TRAINARE SU QUELLO. L'IMPORTANTE è CHE ABBIANO LE STESSE DIMENSIONI DI COSA SI ASPETTA
-'''
-
-
-
-
 AUTOTUNE = tf.data.AUTOTUNE
 for gpu in tf.config.experimental.list_physical_devices('GPU'):
     tf.config.experimental.set_memory_growth(gpu, True)
@@ -41,7 +33,8 @@ test_blues = test_blues.iterdir()
 for idx, image in enumerate(test_blues):
     print(idx, "    :", image)
     image = cv2.imread(str(image))
-    print("image.size: ", image.shape)  '''
+    print("image.size: ", image.shape)  
+'''
 
 
 BUFFER_SIZE = 1000
@@ -69,7 +62,7 @@ def random_jitter(image):
     image = tf.image.resize(image, [286, 286],
                             method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
 
-    # randomly cropping to 640 x 480 x 3
+    # randomly cropping to 256 x 256 x 3
     image = random_crop(image)
 
     # random mirroring
@@ -138,6 +131,11 @@ for image in test_metal_dir:
     else:
         print('Not an image')
 
+
+
+
+
+
 sample_blues = train_blues_images_processed[0]
 sample_metal = train_metal_images_processed[0]
 
@@ -158,6 +156,10 @@ plt.subplot(122)
 plt.title('Metal with random jitter')
 plt.imshow(random_jitter(sample_metal * 0.5 + 0.5))
 plt.show()
+
+
+
+
 
 
 
@@ -208,6 +210,15 @@ plt.title('Is a real blues spectrogram?')
 plt.imshow(discriminator_x(sample_blues)[0, ..., -1], cmap='RdBu_r')
 
 plt.show()
+
+
+
+
+
+
+
+
+
 
 
 # Loss functions
@@ -267,6 +278,15 @@ ckpt_manager = tf.train.CheckpointManager(ckpt, checkpoint_path, max_to_keep=5)
 if ckpt_manager.latest_checkpoint:
     ckpt.restore(ckpt_manager.latest_checkpoint)
     print('Latest checkpoint restored!!')
+
+
+
+
+
+
+
+
+
 
 # TRAINING
 
@@ -382,6 +402,8 @@ for epoch in range(EPOCHS):
 # Run the trained model on the test dataset
 # for inp in test_horses_dir.take(5):
 test = cv2.imread('/nas/home/spol/Thesis/GTZAN/images/blues/test/blues.00048_CQT.png')
+test = preprocess_image_test(test)
+
 test = tf.expand_dims(
     test, axis=0, name=None
 )

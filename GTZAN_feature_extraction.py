@@ -6,6 +6,13 @@ import librosa.display
 import librosa
 import shutil
 
+'''
+al posto della CQT posso provare la STFT che ha magnitude e phase e può essere invertita (iSTFT)
+http://librosa.org/doc/main/generated/librosa.istft.html
+'''
+
+
+
 path_images = "/nas/home/spol/Thesis/GTZAN/images/"
 path_features = "/nas/home/spol/Thesis/GTZAN/features/"
 genres = ['blues', 'classical', 'country', 'disco', 'hiphop', 'jazz', 'metal', 'pop', 'reggae', 'rock']
