@@ -115,11 +115,8 @@ for image in test_zebras_dir:
     else:
         print('not an image')
 
-print('type(train_zebras_images_processed): ', type(train_zebras_images_processed))
 sample_horse = train_horses_images_processed[0]
 sample_zebra = train_zebras_images_processed[0]
-
-print('sample_horse: ', sample_horse)
 
 plt.subplot(121)
 plt.title('Horse')
@@ -332,8 +329,8 @@ for epoch in range(EPOCHS):
 
     n = 0
     for image_x, image_y in zip(train_horses_images_processed, train_zebras_images_processed):
-        image_x = tf.expand_dims(image, axis=0, name=None)
-        image_y = tf.expand_dims(image, axis=0, name=None)
+        image_x = tf.expand_dims(image_x, axis=0, name=None)
+        image_y = tf.expand_dims(image_y, axis=0, name=None)
         train_step(image_x, image_y)
         if n % 10 == 0:
             print('.', end='')

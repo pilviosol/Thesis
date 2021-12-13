@@ -6,13 +6,14 @@ import librosa.display
 import librosa
 
 path_images = "/nas/home/spol/Thesis/GTZAN/images/"
-genres = ['blues', 'classical', 'country', 'disco','hiphop', 'jazz', 'metal', 'pop', 'reggae', 'rock']
-try:
-    os.mkdir(path_images)
-except OSError:
-    print("Creation of the directory %s failed" % path_images)
-else:
-    print("Successfully created the directory %s " % path_images)
+genres = ['blues', 'classical', 'country', 'disco', 'hiphop', 'jazz', 'metal', 'pop', 'reggae', 'rock']
+for genre in genres:
+    try:
+        os.mkdir(path_images + genre)
+    except OSError:
+        print("Creation of the directory %s failed" % path_images + genre)
+    else:
+        print("Successfully created the directory %s " % path_images + genre)
 
 _SAMPLING_RATE = 22000
 print('ollare')
@@ -31,9 +32,8 @@ def extract_features(file_name):
     return cqt
 
 
-
 for names in genres:
-    data_dir = pathlib.Path('GTZAN/genres_original'+ '/' + names)
+    data_dir = pathlib.Path('GTZAN/genres_original' + '/' + names)
     files_in_basepath = data_dir.iterdir()
     print(str(files_in_basepath))
     for item in files_in_basepath:
@@ -46,8 +46,6 @@ for names in genres:
                                            sr=_SAMPLING_RATE, x_axis='time', y_axis='cqt_note', ax=ax)
             ax.set_title(name)
             fig.colorbar(img, ax=ax, format="%+2.0f dB")
-            fig.savefig(path_images + name)
+            fig.savefig(path_images + names + name)
         else:
             print('thats nota a file')
-
-
