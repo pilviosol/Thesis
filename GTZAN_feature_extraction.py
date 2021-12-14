@@ -6,16 +6,11 @@ import librosa.display
 import librosa
 import shutil
 
-'''
-al posto della CQT posso provare la STFT che ha magnitude e phase e può essere invertita (iSTFT)
-http://librosa.org/doc/main/generated/librosa.istft.html
-'''
-
-
-
 path_images = "/nas/home/spol/Thesis/GTZAN/images/"
 path_features = "/nas/home/spol/Thesis/GTZAN/features/"
 genres = ['blues', 'classical', 'country', 'disco', 'hiphop', 'jazz', 'metal', 'pop', 'reggae', 'rock']
+_SAMPLING_RATE = 22000
+print('ollare')
 
 try:
     shutil.rmtree(path_images, ignore_errors=True)
@@ -37,21 +32,19 @@ for genre in genres:
     else:
         print("Successfully created the directory %s" % (path_images + genre))
 
-_SAMPLING_RATE = 22000
-print('ollare')
-data_dir = pathlib.Path('GTZAN/genres_original')
-
 
 def extract_features(file_name):
     try:
         audio, sample_rate = librosa.load(file_name, res_type='kaiser_fast', mono=True)
-        cqt = librosa.feature.chroma_cqt(y=audio, sr=sample_rate)
+        cqt = librosa.cqt(y=audio, sr=sample_rate)
+        stft_mag = np.abs(librosa.stft(y=audio))
+        stft_phase = np.angle(librosa.stft(y=audio))
 
     except Exception as e:
         print("Error encountered while parsing file: ", file_name)
         return None
 
-    return cqt
+    return cqt, stft_mag, stft_phase
 
 
 for genre in genres:
@@ -61,17 +54,40 @@ for genre in genres:
     for item in files_in_basepath:
         if item.is_file():
             print(item.name)
-            features = extract_features(item)
-            name = item.name[0:-4] + '_CQT.png'
-            fig, ax = plt.subplots()
-            img = librosa.display.specshow(librosa.amplitude_to_db(features, ref=np.max),
+            name = item.name[0:-4]
+
+            cqt, stft_mag, stft_phase = extract_features(item)
+
+            fig_cqt, ax = plt.subplots()
+            img = librosa.display.specshow(librosa.amplitude_to_db(cqt, ref=np.max),
                                            sr=_SAMPLING_RATE, ax=ax)
+
+            fig_stftmag, ax = plt.subplots()
+            img = librosa.display.specshow(librosa.amplitude_to_db(stft_mag, ref=np.max),
+                                           sr=_SAMPLING_RATE, ax=ax)
+
+            fig_stftphase, ax = plt.subplots()
+            img = librosa.display.specshow(librosa.amplitude_to_db(stft_phase, ref=np.max),
+                                           sr=_SAMPLING_RATE, ax=ax)
+
             if count < 80:
-                fig.savefig(path_images + genre + "/train/" + name, bbox_inches='tight', pad_inches=-0.1)
-                np.save(path_features + genre + "/train/" + item.name[0:-4], features)
+                fig_cqt.savefig(path_images + genre + "/train/" + name + "_CQT.jpg", bbox_inches='tight', pad_inches=-0.1)
+                fig_stftmag.savefig(path_images + genre + "/train/" + name + "_STFTMAG.jpg", bbox_inches='tight',
+                                    pad_inches=-0.1)
+                fig_stftphase.savefig(path_images + genre + "/train/" + name + "_STFTPHASE.jpg", bbox_inches='tight',
+                                      pad_inches=-0.1)
+                np.save(path_features + genre + "/train/" + name + "_CQT", cqt)
+                np.save(path_features + genre + "/train/" + name + "_STFTMAG", stft_mag)
+                np.save(path_features + genre + "/train/" + name + "_STFTPHASE", stft_phase)
             else:
-                fig.savefig(path_images + genre + "/test/" + name, bbox_inches='tight', pad_inches=-0.1)
-                np.save(path_features + genre + "/test/" + item.name[0:-4], features)
+                fig_cqt.savefig(path_images + genre + "/test/" + name + "_CQT.jpg", bbox_inches='tight', pad_inches=-0.1)
+                fig_stftmag.savefig(path_images + genre + "/test/" + name + "_STFTMAG.jpg", bbox_inches='tight',
+                                    pad_inches=-0.1)
+                fig_stftphase.savefig(path_images + genre + "/test/" + name + "_STFTPHASE.jpg", bbox_inches='tight',
+                                      pad_inches=-0.1)
+                np.save(path_features + genre + "/test/" + name + "_CQT", cqt)
+                np.save(path_features + genre + "/test/" + name + "_STFTMAG", stft_mag)
+                np.save(path_features + genre + "/test/" + name + "_STFTPHASE", stft_phase)
         else:
             print('That is not a file')
         count += 1
