@@ -12,6 +12,17 @@ AUTOTUNE = tf.data.AUTOTUNE
 for gpu in tf.config.experimental.list_physical_devices('GPU'):
     tf.config.experimental.set_memory_growth(gpu, True)
 
+'''
+IMPORTANTE: size dell'input e dell'output 
+PROVA con CQT che è più semplice e piccola
+LEGGERE PAPERS E VEDERE COME SETTANO LORO
+
+'''
+
+
+
+
+
 # INPUT PIPELINE
 
 train_blues = pathlib.Path('/nas/home/spol/Thesis/GTZAN/features/blues/train/')
@@ -25,14 +36,45 @@ test_blues_dir = test_blues.iterdir()
 train_metal_dir = train_blues.iterdir()
 test_metal_dir = test_blues.iterdir()
 
+train_blues_cqt = []
+train_blues_stftmag = []
+train_blues_stftphase = []
+test_blues_stftmag = []
+test_blues_stftphase = []
+test_blues_cqt = []
+train_metal_cqt = []
+train_metal_stftmag = []
+train_metal_stftphase = []
+test_metal_stftmag = []
+test_metal_stftphase = []
+test_metal_cqt = []
 
 # CQT: 84x1293, STFT: 1025x1293
 
 
 for idx, feature in enumerate(train_blues_dir):
-    print(idx, "    :", feature)
-    feature = np.load(feature)
-    print("feature.shape: ", feature.shape)
+    feature_name = feature.name
+    feature_np = np.load(feature)
+    #print("feature.shape: ", feature.shape)
+    if "CQT" in str(feature_name):
+        train_blues_cqt.append(feature_np)
+    elif "STFTMAG" in str(feature_name):
+        train_blues_stftmag.append(feature_np)
+    else:
+        train_blues_stftphase.append(feature_np)
+
+
+for idx, feature in enumerate(train_metal_dir):
+    #print(idx, "    :", feature)
+    feature_name = feature.name
+    feature_np = np.load(feature)
+    #print("feature.shape: ", feature.shape)
+    if "CQT" in str(feature_name):
+        train_metal_cqt.append(feature_np)
+    elif "STFTMAG" in str(feature_name):
+        train_metal_stftmag.append(feature_np)
+    else:
+        train_metal_stftphase.append(feature_np)
 
 
 # FUNZIONI PER CROPPARE E JITTERARE LE IMMAGINI
@@ -139,34 +181,23 @@ for image in test_metal_dir:
         print('Not an image')
 '''
 
-train_blues_cqt = []
-train_blues_stftmag = []
-train_blues_stftphase = []
-test_blues_stftmag = []
-test_blues_stftphase = []
-test_blues_cqt = []
-train_metal_cqt = []
-train_metal_stftmag = []
-train_metal_stftphase = []
-test_metal_stftmag = []
-test_metal_stftphase = []
-test_metal_cqt = []
 
 
 
 #PRENDO UN SAMPLE PER BLUES E UNO PER METAL E PLOTTO
 
-sample_blues = train_blues_dir[0]
-sample_metal = train_metal_dir[0]
+sample_blues = train_blues_stftmag[0]
+sample_metal = train_metal_stftmag[0]
 
 plt.subplot(121)
 plt.title('Blues')
 plt.imshow(sample_blues * 0.5 + 0.5)
-
+plt.show()
 
 plt.subplot(121)
 plt.title('Metal')
 plt.imshow(sample_metal * 0.5 + 0.5)
+plt.show()
 
 
 
@@ -179,7 +210,6 @@ plt.imshow(sample_metal * 0.5 + 0.5)
 
 
 
-'''
 
 # IMPORTO E UTILIZZO ARCHITETTURA PIX2PIX
 
@@ -448,4 +478,4 @@ test = tf.expand_dims(
     test, axis=0, name=None
 )
 generate_images(generator_g, test)
-'''
+

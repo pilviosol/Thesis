@@ -266,6 +266,7 @@ def unet_generator(output_channels, norm_type='batchnorm'):
   concat = tf.keras.layers.Concatenate()
 
   inputs = tf.keras.layers.Input(shape=[None, None, 3])
+  #  inputs = tf.keras.layers.Input(shape=[None, None, 1])
   x = inputs
 
   # Downsampling through the model
