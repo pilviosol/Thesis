@@ -20,25 +20,24 @@ test_blues = pathlib.Path('/nas/home/spol/Thesis/GTZAN/features/blues/test/')
 test_metal = pathlib.Path('/nas/home/spol/Thesis/GTZAN/features/metal/test/')
 
 
-train_blues = train_blues.iterdir()
-for idx, feature in enumerate(train_blues):
-    print(idx, "    :", feature)
+train_blues_dir = train_blues.iterdir()
+test_blues_dir = test_blues.iterdir()
+train_metal_dir = train_blues.iterdir()
+test_metal_dir = test_blues.iterdir()
 
-test_blues = test_blues.iterdir()
-for idx, feature in enumerate(test_blues):
+
+# CQT: 84x1293, STFT: 1025x1293
+
+
+for idx, feature in enumerate(train_blues_dir):
     print(idx, "    :", feature)
     feature = np.load(feature)
-    print("feature.shape: ", feature.shape) #12 x 1293 (CQT)
+    print("feature.shape: ", feature.shape)
 
 
-
-
-
-
-
-
-'''
 # FUNZIONI PER CROPPARE E JITTERARE LE IMMAGINI
+'''
+
 
 BUFFER_SIZE = 1000
 BATCH_SIZE = 1
@@ -86,6 +85,7 @@ def preprocess_image_test(image):
     return image
 
 
+
 train_blues_images = []
 train_blues_images_processed = []
 train_metal_images = []
@@ -94,17 +94,10 @@ test_blues_images = []
 test_blues_images_processed = []
 test_metal_images = []
 test_metal_images_processed = []
-
-
-
-
-
-
-
-
+'''
 
 # LEGGO E PROCESSO OGNI IMMAGINE, APPENDENDOLE NEGLI ARRAY DEFINITI SOPRA
-
+'''
 train_blues_dir = train_blues.iterdir()
 for image in train_blues_dir:
     if image.is_file():
@@ -144,36 +137,37 @@ for image in test_metal_dir:
         test_metal_images_processed.append(image)
     else:
         print('Not an image')
+'''
 
-
-
-
-
+train_blues_cqt = []
+train_blues_stftmag = []
+train_blues_stftphase = []
+test_blues_stftmag = []
+test_blues_stftphase = []
+test_blues_cqt = []
+train_metal_cqt = []
+train_metal_stftmag = []
+train_metal_stftphase = []
+test_metal_stftmag = []
+test_metal_stftphase = []
+test_metal_cqt = []
 
 
 
 #PRENDO UN SAMPLE PER BLUES E UNO PER METAL E PLOTTO
 
-sample_blues = train_blues_images_processed[0]
-sample_metal = train_metal_images_processed[0]
+sample_blues = train_blues_dir[0]
+sample_metal = train_metal_dir[0]
 
 plt.subplot(121)
 plt.title('Blues')
 plt.imshow(sample_blues * 0.5 + 0.5)
 
-plt.subplot(122)
-plt.title('Blues with random jitter')
-plt.imshow(random_jitter(sample_blues * 0.5 + 0.5))
-plt.show()
 
 plt.subplot(121)
 plt.title('Metal')
 plt.imshow(sample_metal * 0.5 + 0.5)
 
-plt.subplot(122)
-plt.title('Metal with random jitter')
-plt.imshow(random_jitter(sample_metal * 0.5 + 0.5))
-plt.show()
 
 
 
@@ -185,6 +179,7 @@ plt.show()
 
 
 
+'''
 
 # IMPORTO E UTILIZZO ARCHITETTURA PIX2PIX
 

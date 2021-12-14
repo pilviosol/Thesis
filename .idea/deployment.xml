@@ -33,7 +33,7 @@
       <paths name="spol@euler:22">
         <serverdata>
           <mappings>
-            <mapping deploy="/nas/home/spol/Thesis" local="$PROJECT_DIR$" />
+            <mapping deploy="/nas/home/spol/Thesis" local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>

@@ -88,6 +88,9 @@ for genre in genres:
                 np.save(path_features + genre + "/test/" + name + "_CQT", cqt)
                 np.save(path_features + genre + "/test/" + name + "_STFTMAG", stft_mag)
                 np.save(path_features + genre + "/test/" + name + "_STFTPHASE", stft_phase)
+            plt.close(fig_cqt)
+            plt.close(fig_stftmag)
+            plt.close(fig_stftphase)
         else:
             print('That is not a file')
         count += 1
