@@ -265,7 +265,7 @@ def unet_generator(output_channels, norm_type='batchnorm'):
 
   concat = tf.keras.layers.Concatenate()
 
-  inputs = tf.keras.layers.Input(shape=[None, None, 3])
+  inputs = tf.keras.layers.Input(shape=[None, None, 1])
   x = inputs
 
   # Downsampling through the model
@@ -297,11 +297,11 @@ def discriminator(norm_type='batchnorm', target=True):
 
   initializer = tf.random_normal_initializer(0., 0.02)
 
-  inp = tf.keras.layers.Input(shape=[None, None, 3], name='input_image')
+  inp = tf.keras.layers.Input(shape=[None, None, 1], name='input_image')
   x = inp
 
   if target:
-    tar = tf.keras.layers.Input(shape=[None, None, 3], name='target_image')
+    tar = tf.keras.layers.Input(shape=[None, None, 1], name='target_image')
     x = tf.keras.layers.concatenate([inp, tar])  # (bs, 256, 256, channels*2)
 
   down1 = downsample(64, 4, norm_type, False)(x)  # (bs, 128, 128, 64)

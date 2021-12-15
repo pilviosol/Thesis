@@ -1,12 +1,14 @@
 import numpy as np
 import tensorflow as tf
-import pix2pix
+import pix2pix_modified
 import pathlib
 import os
 import time
 import matplotlib.pyplot as plt
 from IPython.display import clear_output
 import cv2
+import librosa
+import librosa.display
 
 AUTOTUNE = tf.data.AUTOTUNE
 for gpu in tf.config.experimental.list_physical_devices('GPU'):
@@ -20,9 +22,6 @@ LEGGERE PAPERS E VEDERE COME SETTANO LORO
 '''
 
 
-
-
-
 # INPUT PIPELINE
 
 train_blues = pathlib.Path('/nas/home/spol/Thesis/GTZAN/features/blues/train/')
@@ -33,8 +32,8 @@ test_metal = pathlib.Path('/nas/home/spol/Thesis/GTZAN/features/metal/test/')
 
 train_blues_dir = train_blues.iterdir()
 test_blues_dir = test_blues.iterdir()
-train_metal_dir = train_blues.iterdir()
-test_metal_dir = test_blues.iterdir()
+train_metal_dir = train_metal.iterdir()
+test_metal_dir = test_metal.iterdir()
 
 train_blues_cqt = []
 train_blues_stftmag = []
@@ -55,26 +54,28 @@ test_metal_cqt = []
 for idx, feature in enumerate(train_blues_dir):
     feature_name = feature.name
     feature_np = np.load(feature)
+    feature_reshaped = feature_np[0:1024,0:1024]
     #print("feature.shape: ", feature.shape)
     if "CQT" in str(feature_name):
-        train_blues_cqt.append(feature_np)
+        train_blues_cqt.append(feature_reshaped)
     elif "STFTMAG" in str(feature_name):
-        train_blues_stftmag.append(feature_np)
+        train_blues_stftmag.append(feature_reshaped)
     else:
-        train_blues_stftphase.append(feature_np)
+        train_blues_stftphase.append(feature_reshaped)
 
 
 for idx, feature in enumerate(train_metal_dir):
     #print(idx, "    :", feature)
     feature_name = feature.name
     feature_np = np.load(feature)
+    feature_reshaped = feature_np[0:1024, 0:1024]
     #print("feature.shape: ", feature.shape)
     if "CQT" in str(feature_name):
-        train_metal_cqt.append(feature_np)
+        train_metal_cqt.append(feature_reshaped)
     elif "STFTMAG" in str(feature_name):
-        train_metal_stftmag.append(feature_np)
+        train_metal_stftmag.append(feature_reshaped)
     else:
-        train_metal_stftphase.append(feature_np)
+        train_metal_stftphase.append(feature_reshaped)
 
 
 # FUNZIONI PER CROPPARE E JITTERARE LE IMMAGINI
@@ -189,6 +190,23 @@ for image in test_metal_dir:
 sample_blues = train_blues_stftmag[0]
 sample_metal = train_metal_stftmag[0]
 
+print('sample_blues.shape: ', sample_blues.shape)
+
+
+fig, ax = plt.subplots()
+img = librosa.display.specshow(librosa.amplitude_to_db(sample_blues, ref=np.max), y_axis='log', x_axis='time', ax=ax)
+ax.set_title('Blues Power spectrogram')
+fig.colorbar(img, ax=ax, format="%+2.0f dB")
+plt.show()
+
+fig, ax = plt.subplots()
+img = librosa.display.specshow(librosa.amplitude_to_db(sample_metal, ref=np.max), y_axis='log', x_axis='time', ax=ax)
+ax.set_title('Metal Power spectrogram')
+fig.colorbar(img, ax=ax, format="%+2.0f dB")
+plt.show()
+
+
+'''
 plt.subplot(121)
 plt.title('Blues')
 plt.imshow(sample_blues * 0.5 + 0.5)
@@ -198,38 +216,28 @@ plt.subplot(121)
 plt.title('Metal')
 plt.imshow(sample_metal * 0.5 + 0.5)
 plt.show()
-
-
-
-
-
-
-
-
-
-
+'''
 
 
 
 # IMPORTO E UTILIZZO ARCHITETTURA PIX2PIX
 
-OUTPUT_CHANNELS = 3
+OUTPUT_CHANNELS = 1
 
-generator_g = pix2pix.unet_generator(OUTPUT_CHANNELS, norm_type='instancenorm')
-generator_f = pix2pix.unet_generator(OUTPUT_CHANNELS, norm_type='instancenorm')
+generator_g = pix2pix_modified.unet_generator(OUTPUT_CHANNELS, norm_type='instancenorm')
+generator_f = pix2pix_modified.unet_generator(OUTPUT_CHANNELS, norm_type='instancenorm')
 
-discriminator_x = pix2pix.discriminator(norm_type='instancenorm', target=False)
-discriminator_y = pix2pix.discriminator(norm_type='instancenorm', target=False)
+discriminator_x = pix2pix_modified.discriminator(norm_type='instancenorm', target=False)
+discriminator_y = pix2pix_modified.discriminator(norm_type='instancenorm', target=False)
 
-sample_blues = tf.expand_dims(
-    sample_blues, axis=0, name=None
-)
+sample_blues = tf.expand_dims(sample_blues, axis=0, name=None)
+sample_blues = tf.expand_dims(sample_blues, axis=-1, name=None)
+sample_metal = tf.expand_dims(sample_metal, axis=0, name=None)
+sample_metal = tf.expand_dims(sample_metal, axis=-1, name=None)
 
-sample_metal = tf.expand_dims(
-    sample_metal, axis=0, name=None
-)
 
 to_metal = generator_g(sample_blues)
+print("to_metal.shape", to_metal.shape)
 to_blues = generator_f(sample_metal)
 plt.figure(figsize=(8, 8))
 contrast = 8
@@ -237,14 +245,36 @@ contrast = 8
 imgs = [sample_blues, to_metal, sample_metal, to_blues]
 title = ['Blues', 'To Metal', 'Metal', 'To Blues']
 
-for i in range(len(imgs)):
-    plt.subplot(2, 2, i + 1)
-    plt.title(title[i])
-    if i % 2 == 0:
-        plt.imshow(imgs[i][0] * 0.5 + 0.5)
-    else:
-        plt.imshow(imgs[i][0] * 0.5 * contrast + 0.5)
+sample_blues_squeezed = tf.squeeze(sample_blues)
+to_metal_squeezed = tf.squeeze(to_metal)
+sample_metal_squeezed = tf.squeeze(sample_metal)
+to_blues_squeezed = tf.squeeze(to_blues)
+
+
+# DA RIVEDERE, I PLOT FANNO SCHIFO
+
+fig, ax = plt.subplots(nrows=4, ncols=1, sharex=False)
+img_sample_blues_squeezed = librosa.display.specshow(librosa.amplitude_to_db(sample_blues_squeezed, ref=np.max), y_axis='log', x_axis='time', ax=ax[0])
+ax[0].set_title('sample_blues_squeezed')
+fig.colorbar(img, ax=ax, format="%+2.0f dB")
+
+img_to_metal_squeezed = librosa.display.specshow(librosa.amplitude_to_db(to_metal_squeezed, ref=np.max), y_axis='log', x_axis='time', ax=ax[1])
+ax[1].set_title('to_metal_squeezed')
+fig.colorbar(img, ax=ax, format="%+2.0f dB")
+
+img_sample_metal_squeezed = librosa.display.specshow(librosa.amplitude_to_db(sample_metal_squeezed, ref=np.max), y_axis='log', x_axis='time', ax=ax[2])
+ax[2].set_title('sample_metal_squeezed')
+fig.colorbar(img, ax=ax, format="%+2.0f dB")
+
+img_to_blues_squeezed = librosa.display.specshow(librosa.amplitude_to_db(to_blues_squeezed, ref=np.max), y_axis='log', x_axis='time', ax=ax[3])
+ax[3].set_title('to_blues_squeezed')
+fig.colorbar(img, ax=ax, format="%+2.0f dB")
 plt.show()
+
+
+imgs_squeezed = [img_sample_blues_squeezed, img_to_metal_squeezed, img_sample_metal_squeezed, img_to_blues_squeezed]
+
+
 
 plt.figure(figsize=(8, 8))
 
@@ -325,7 +355,7 @@ ckpt = tf.train.Checkpoint(generator_g=generator_g,
                            discriminator_y_optimizer=discriminator_y_optimizer)
 
 ckpt_manager = tf.train.CheckpointManager(ckpt, checkpoint_path, max_to_keep=5)
-
+'''
 # if a checkpoint exists, restore the latest checkpoint.
 if ckpt_manager.latest_checkpoint:
     ckpt.restore(ckpt_manager.latest_checkpoint)
@@ -478,4 +508,4 @@ test = tf.expand_dims(
     test, axis=0, name=None
 )
 generate_images(generator_g, test)
-
+'''
