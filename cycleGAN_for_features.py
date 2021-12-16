@@ -361,7 +361,7 @@ if ckpt_manager.latest_checkpoint:
     ckpt.restore(ckpt_manager.latest_checkpoint)
     print('Latest checkpoint restored!!')
 
-
+'''
 
 
 
@@ -466,9 +466,11 @@ for epoch in range(EPOCHS):
     start = time.time()
 
     n = 0
-    for image_x, image_y in zip(train_blues_images_processed, train_metal_images_processed):
+    for image_x, image_y in zip(train_blues_stftmag, train_metal_stftmag):
         image_x = tf.expand_dims(image_x, axis=0, name=None)
+        image_x = tf.expand_dims(image_x, axis=-1, name=None)
         image_y = tf.expand_dims(image_y, axis=0, name=None)
+        image_y = tf.expand_dims(image_y, axis=-1, name=None)
         train_step(image_x, image_y)
         if n % 10 == 0:
             print('.', end='')
@@ -498,7 +500,7 @@ for epoch in range(EPOCHS):
 
 
 
-
+'''
 # GENERATE USING TEST DATASET
 
 # Run the trained model on the test dataset
@@ -507,5 +509,4 @@ test = cv2.imread('/nas/home/spol/Thesis/GTZAN/images/blues/test/blues.00048_CQT
 test = tf.expand_dims(
     test, axis=0, name=None
 )
-generate_images(generator_g, test)
-'''
+generate_images(generator_g, test) '''
