@@ -11,8 +11,8 @@ import librosa
 import librosa.display
 
 AUTOTUNE = tf.data.AUTOTUNE
-for gpu in tf.config.experimental.list_physical_devices('GPU'):
-    tf.config.experimental.set_memory_growth(gpu, True)
+'''for gpu in tf.config.experimental.list_physical_devices('GPU'):
+    tf.config.experimental.set_memory_growth(gpu, True) '''
 
 '''
 IMPORTANTE: size dell'input e dell'output 
@@ -189,6 +189,29 @@ for image in test_metal_dir:
 
 sample_blues = train_blues_stftmag[0]
 sample_metal = train_metal_stftmag[0]
+
+audio, sample_rate = librosa.load('GTZAN/genres_original/blues/blues.00000.wav', res_type='kaiser_fast', mono=True)
+cqt = librosa.cqt(y=audio, sr=sample_rate)
+stft_mag = np.abs(librosa.stft(y=audio))
+stft_phase = np.angle(librosa.stft(y=audio))
+
+
+plt.figure()
+plt.subplot(2,1,1)
+plt.imshow(20*np.log10(stft_mag + 1E-5), aspect='auto')
+
+plt.subplot(2,1,2)
+plt.imshow(np.unwrap(stft_phase), aspect='auto')
+plt.show()
+
+fig_stftmag, ax = plt.subplots()
+img = librosa.display.specshow(librosa.amplitude_to_db(stft_mag, ref=np.max),
+                                           sr=sample_rate, ax=ax)
+
+fig_stftphase, ax = plt.subplots()
+img = librosa.display.specshow(librosa.amplitude_to_db(stft_phase, ref=np.max),
+                                           sr=sample_rate, ax=ax)
+
 
 print('sample_blues.shape: ', sample_blues.shape)
 
@@ -385,18 +408,33 @@ EPOCHS = 40
 
 def generate_images(model, test_input):
     prediction = model(test_input)
-
+    test_input_squeezed = tf.squeeze(test_input)
+    prediction_squeezed = tf.squeeze(prediction)
     plt.figure(figsize=(12, 12))
 
     display_list = [test_input[0], prediction[0]]
     title = ['Input Image', 'Predicted Image']
 
     for i in range(2):
+        '''
         plt.subplot(1, 2, i + 1)
         plt.title(title[i])
         # getting the pixel values between [0, 1] to plot it.
-        plt.imshow(display_list[i] * 0.5 + 0.5)
+        #plt.imshow(display_list[i] * 0.5 + 0.5)
+        plt.imshow(display_list[i])
         plt.axis('off')
+        '''
+        fig, ax = plt.subplots(nrows=2, ncols=1, sharex=False)
+        img_sample_blues_squeezed = librosa.display.specshow(librosa.amplitude_to_db(test_input_squeezed, ref=np.max),
+                                                             y_axis='log', x_axis='time', ax=ax[0])
+        ax[0].set_title('Input Image')
+        fig.colorbar(img, ax=ax, format="%+2.0f dB")
+
+        img_to_metal_squeezed = librosa.display.specshow(librosa.amplitude_to_db(prediction_squeezed, ref=np.max),
+                                                         y_axis='log', x_axis='time', ax=ax[1])
+        ax[1].set_title('Predicted Image')
+        fig.colorbar(img, ax=ax, format="%+2.0f dB")
+
     plt.show()
 
 
