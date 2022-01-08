@@ -4,13 +4,14 @@ import pathlib
 import matplotlib.pyplot as plt
 import librosa.display
 import librosa
-import shutil
+
 
 path_images = "/nas/home/spol/Thesis/URPM_vn_fl/images/"
 path_features_vn = "/nas/home/spol/Thesis/URPM_vn_fl/features_vn/"
 path_features_fl = "/nas/home/spol/Thesis/URPM_vn_fl/features_fl/"
 _SAMPLING_RATE = 48000
 print('ollare')
+
 
 try:
     os.mkdir(path_features_vn)
@@ -21,6 +22,18 @@ except OSError:
 
 
 def extract_features(file_name):
+    '''
+
+    :param file_name: file to be analyzed
+    :return:
+    cqt: constnt Q transform
+    stft_mag: magnitude of STFT
+    stft_mag_real: real part of stft magnitude
+    stft_mag_imag: imaginary part of stft magnitude
+    stft_phase: phase of stft
+    mel_spectrogram: spectrogram using mel coefficients
+
+    '''
     try:
         audio, sample_rate = librosa.load(file_name, res_type='kaiser_fast', mono=True)
         cqt = librosa.cqt(y=audio, sr=sample_rate, hop_length=256, fmin=32.7, filter_scale=0.8, bins_per_octave=48)
@@ -39,6 +52,8 @@ def extract_features(file_name):
     return cqt, stft_mag, stft_mag_real, stft_mag_imag, stft_phase, mel_spectrogram
 
 
+# VIOLIN
+
 print("Calculating features for violin.....")
 
 data_dir_vn = pathlib.Path('URPM_vn_fl/vn_train')
@@ -51,6 +66,7 @@ for item in files_in_basepath_vn:
 
         cqt, stft_mag, stft_mag_real, stft_mag_imag, stft_phase, mel_spectrogram = extract_features(item)
 
+        # Saving all features in one folder (.npy format)
         np.save(path_features_vn + name + "_CQT", cqt)
         np.save(path_features_vn + name + "_STFTMAG", stft_mag)
         np.save(path_features_vn + name + "_STFTMAG_REAL", stft_mag_real)
@@ -61,6 +77,11 @@ for item in files_in_basepath_vn:
     else:
         print('That is not a file')
 
+
+
+
+
+# FLUTE
 
 print("Calculating features for flute.....")
 
@@ -74,19 +95,21 @@ for item in files_in_basepath_fl:
 
         cqt, stft_mag, stft_mag_real, stft_mag_imag, stft_phase, mel_spectrogram = extract_features(item)
 
-        np.save(path_features_vn + name + "_CQT", cqt)
-        np.save(path_features_vn + name + "_STFTMAG", stft_mag)
-        np.save(path_features_vn + name + "_STFTMAG_REAL", stft_mag_real)
-        np.save(path_features_vn + name + "_STFTMAG_IMAG", stft_mag_imag)
-        np.save(path_features_vn + name + "_STFTPHASE", stft_phase)
-        np.save(path_features_vn + name + "_MEL", mel_spectrogram)
+        # Saving all features in one folder (.npy format)
+        np.save(path_features_fl + name + "_CQT", cqt)
+        np.save(path_features_fl + name + "_STFTMAG", stft_mag)
+        np.save(path_features_fl + name + "_STFTMAG_REAL", stft_mag_real)
+        np.save(path_features_fl + name + "_STFTMAG_IMAG", stft_mag_imag)
+        np.save(path_features_fl + name + "_STFTPHASE", stft_phase)
+        np.save(path_features_fl + name + "_MEL", mel_spectrogram)
 
     else:
         print('That is not a file')
 
 
-stft_mag = '/nas/home/spol/Thesis/URPM_vn_fl/features_vn/AuSep_1_vn_35_Rondeau_STFTMAG.npy'
-stft_phase = '/nas/home/spol/Thesis/URPM_vn_fl/features_vn/AuSep_1_vn_35_Rondeau_STFTPHASE.npy'
+# SHOW A SAMPLE IMAGE OF MAGNITUDE AND PHASE OF A STFT
+stft_mag = np.load('/nas/home/spol/Thesis/URPM_vn_fl/features_vn/AuSep_1_vn_35_Rondeau_STFTMAG.npy')
+stft_phase = np.load('/nas/home/spol/Thesis/URPM_vn_fl/features_vn/AuSep_1_vn_35_Rondeau_STFTPHASE.npy')
 
 
 plt.figure()
