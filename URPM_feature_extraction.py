@@ -48,8 +48,9 @@ def extract_features(file_name):
     '''
     try:
         audio, sample_rate = librosa.load(file_name, res_type='kaiser_fast', mono=True)
-        cqt = np.abs(librosa.cqt(y=audio, sr=sample_rate, hop_length=1024, fmin=32.7, filter_scale=0.8, bins_per_octave=48))
-        stft_mag = np.abs(librosa.stft(y=audio, hop_length=1024))
+        print('sample_rate: ', sample_rate)
+        cqt = librosa.cqt(y=audio, sr=sample_rate, hop_length=256, fmin=32.7, filter_scale=0.8, bins_per_octave=48)
+        stft_mag = np.abs(librosa.stft(y=audio, n_fft=2048, hop_length=256))
         stft_mag_real = stft_mag.real
         stft_mag_imag = stft_mag.imag
         stft_phase = np.angle(librosa.stft(y=audio, hop_length=256))
