@@ -4,13 +4,25 @@ import pathlib
 import matplotlib.pyplot as plt
 import librosa.display
 import librosa
+import shutil
 
 
-path_images = "/nas/home/spol/Thesis/URPM_vn_fl/images/"
 path_features_vn = "/nas/home/spol/Thesis/URPM_vn_fl/features_vn/"
 path_features_fl = "/nas/home/spol/Thesis/URPM_vn_fl/features_fl/"
 _SAMPLING_RATE = 48000
 print('ollare')
+
+
+
+try:
+    shutil.rmtree(path_features_vn, ignore_errors=True)
+    shutil.rmtree(path_features_fl, ignore_errors=True)
+except OSError:
+    print("Removal of the directory %s failed" % path_features_vn)
+    print("Removal of the directory %s failed" % path_features_fl)
+else:
+    print("Successfully removed the directory %s" % path_features_vn)
+    print("Successfully removed the directory %s" % path_features_fl)
 
 
 try:
@@ -120,4 +132,15 @@ plt.subplot(2,1,2)
 plt.imshow(np.unwrap(stft_phase), aspect='auto')
 plt.show()
 
+
+
+
+
+# DIVIDE THE FEATURES IN 4 SECONDS CHUNKS
+
+features_dir_vn = pathlib.Path('URPM_vn_fl/features_vn')
+features_in_basepath_vn = features_dir_vn.iterdir()
+
+for item in features_in_basepath_vn:
+    print(item.name)
 
