@@ -9,7 +9,7 @@ import shutil
 
 path_features_vn = "/nas/home/spol/Thesis/URPM_vn_fl/features_vn/"
 path_features_fl = "/nas/home/spol/Thesis/URPM_vn_fl/features_fl/"
-_SAMPLING_RATE = 48000
+_SAMPLING_RATE = 22050
 print('ollare')
 
 
@@ -49,20 +49,21 @@ def extract_features(file_name):
     try:
         audio, sample_rate = librosa.load(file_name, res_type='kaiser_fast', mono=True)
         print('sample_rate: ', sample_rate)
-        cqt = librosa.cqt(y=audio, sr=sample_rate, hop_length=256, fmin=32.7, filter_scale=0.8, bins_per_octave=48)
-        stft_mag = np.abs(librosa.stft(y=audio, n_fft=2048, hop_length=256))
+        cqt = librosa.cqt(y=audio, sr=sample_rate, hop_length=512, fmin=32.7, filter_scale=0.8, bins_per_octave=48)
+        stft_full = librosa.stft(y=audio, n_fft=2048, hop_length=512)
+        stft_mag = np.abs(librosa.stft(y=audio, n_fft=2048, hop_length=512))
         stft_mag_real = stft_mag.real
         stft_mag_imag = stft_mag.imag
-        stft_phase = np.angle(librosa.stft(y=audio, hop_length=256))
+        stft_phase = np.angle(librosa.stft(y=audio, hop_length=512))
         mel_spectrogram = librosa.feature.melspectrogram(y=audio, sr=sample_rate,
-                                                         n_fft=2048, hop_length=256,
+                                                         n_fft=2048, hop_length=512,
                                                          n_mels=128)
 
     except Exception as e:
         print("Error encountered while parsing file: ", file_name)
         return None
 
-    return cqt, stft_mag, stft_mag_real, stft_mag_imag, stft_phase, mel_spectrogram
+    return cqt, stft_full, stft_mag, stft_mag_real, stft_mag_imag, stft_phase, mel_spectrogram
 
 
 # VIOLIN
@@ -77,10 +78,11 @@ for item in files_in_basepath_vn:
         print(item.name)
         name = item.name[0:-4]
 
-        cqt, stft_mag, stft_mag_real, stft_mag_imag, stft_phase, mel_spectrogram = extract_features(item)
+        cqt, stft_full, stft_mag, stft_mag_real, stft_mag_imag, stft_phase, mel_spectrogram = extract_features(item)
 
         # Saving all features in one folder (.npy format)
         np.save(path_features_vn + name + "_CQT", cqt)
+        np.save(path_features_vn + name + "_STFTFULL", stft_full)
         np.save(path_features_vn + name + "_STFTMAG", stft_mag)
         np.save(path_features_vn + name + "_STFTMAG_REAL", stft_mag_real)
         np.save(path_features_vn + name + "_STFTMAG_IMAG", stft_mag_imag)
@@ -106,10 +108,11 @@ for item in files_in_basepath_fl:
         print(item.name)
         name = item.name[0:-4]
 
-        cqt, stft_mag, stft_mag_real, stft_mag_imag, stft_phase, mel_spectrogram = extract_features(item)
+        cqt, stft_full, stft_mag, stft_mag_real, stft_mag_imag, stft_phase, mel_spectrogram = extract_features(item)
 
         # Saving all features in one folder (.npy format)
         np.save(path_features_fl + name + "_CQT", cqt)
+        np.save(path_features_fl + name + "_STFTFULL", stft_full)
         np.save(path_features_fl + name + "_STFTMAG", stft_mag)
         np.save(path_features_fl + name + "_STFTMAG_REAL", stft_mag_real)
         np.save(path_features_fl + name + "_STFTMAG_IMAG", stft_mag_imag)
@@ -134,14 +137,4 @@ plt.imshow(np.unwrap(stft_phase), aspect='auto')
 plt.show()
 
 
-
-
-
-# DIVIDE THE FEATURES IN 4 SECONDS CHUNKS
-
-features_dir_vn = pathlib.Path('URPM_vn_fl/features_vn')
-features_in_basepath_vn = features_dir_vn.iterdir()
-
-for item in features_in_basepath_vn:
-    print(item.name)
 
