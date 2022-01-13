@@ -11,24 +11,39 @@ import shutil
 import math
 
 
-path_features_vn_256 = "/nas/home/spol/Thesis/URPM_vn_fl/features_vn_256/"
-path_features_fl_256 = "/nas/home/spol/Thesis/URPM_vn_fl/features_fl_256/"
+# DEFINITION OF PATHS
+CONSTANT_256 = 256  #rounding of Fs/Hop Length
+
+path_features_vn_train_256 = "/nas/home/spol/Thesis/URPM_vn_fl/features_vn_train_256/"
+path_features_fl_train_256 = "/nas/home/spol/Thesis/URPM_vn_fl/features_fl_train_256/"
+path_features_vn_test_256 = "/nas/home/spol/Thesis/URPM_vn_fl/features_vn_test_256/"
+path_features_fl_test_256 = "/nas/home/spol/Thesis/URPM_vn_fl/features_fl_test_256/"
+
 _SAMPLING_RATE = 22050
 
+
 try:
-    shutil.rmtree(path_features_vn_256, ignore_errors=True)
-    shutil.rmtree(path_features_fl_256, ignore_errors=True)
+    shutil.rmtree(path_features_vn_train_256, ignore_errors=True)
+    shutil.rmtree(path_features_fl_train_256, ignore_errors=True)
+    shutil.rmtree(path_features_vn_test_256, ignore_errors=True)
+    shutil.rmtree(path_features_fl_test_256, ignore_errors=True)
 except OSError:
-    print("Removal of the directory %s failed" % path_features_vn_256)
-    print("Removal of the directory %s failed" % path_features_fl_256)
+    print("Removal of the directory %s failed" % path_features_vn_train_256)
+    print("Removal of the directory %s failed" % path_features_fl_train_256)
+    print("Removal of the directory %s failed" % path_features_vn_test_256)
+    print("Removal of the directory %s failed" % path_features_fl_test_256)
 else:
-    print("Successfully removed the directory %s" % path_features_vn_256)
-    print("Successfully removed the directory %s" % path_features_fl_256)
+    print("Successfully removed the directory %s" % path_features_vn_train_256)
+    print("Successfully removed the directory %s" % path_features_fl_train_256)
+    print("Successfully removed the directory %s" % path_features_vn_test_256)
+    print("Successfully removed the directory %s" % path_features_fl_test_256)
 
 
 try:
-    os.mkdir(path_features_vn_256)
-    os.mkdir(path_features_fl_256)
+    os.mkdir(path_features_vn_train_256)
+    os.mkdir(path_features_fl_train_256)
+    os.mkdir(path_features_vn_test_256)
+    os.mkdir(path_features_fl_test_256)
 except OSError:
     print("Creation of the directory  failed")
 
@@ -47,16 +62,15 @@ scipy.io.wavfile.write('/nas/home/spol/Thesis/inverse.wav', sr, y_hat)
 '''
 
 
-
-
-
+# ------------------------------------------------------------------------------------------------------------------
 # DIVIDE THE VIOLIN FEATURES IN 256 LONG CHUNKS
 
-CONSTANT_FOUR_SEC = 172   #rounding of Fs/Hop Length
+# TRAIN SET
 
-print('Dividing vn features in 256 long chunks....')
-features_dir_vn = pathlib.Path('URPM_vn_fl/features_vn')
-features_in_basepath_vn = features_dir_vn.iterdir()
+
+print('Dividing vn train features in 256 long chunks....')
+features_dir_vn = pathlib.Path('URPM_vn_fl/features_vn_train')
+features_in_basepath_vn_train = features_dir_vn.iterdir()
 
 '''
 # TRY ON STFT and ISTFT
@@ -119,16 +133,38 @@ plt.show()
 
 '''
 
-for item in features_in_basepath_vn:
+for item in features_in_basepath_vn_train:
     name = item.name
     print(name)
     feature = np.load(item)
     length = feature.shape[1]
-    chunks = math.floor(length/256)
+    chunks = math.floor(length / CONSTANT_256)
     print(chunks)
     for i in range(chunks):
-        chunk = feature[0:1025, i * 256 : (i+1) * 256 - 1]
-        np.save(path_features_vn_256 + name + "_chunk_" + str(i), chunk)
+        chunk = feature[0:1025, i * CONSTANT_256: (i + 1) * CONSTANT_256 - 1]
+        np.save(path_features_vn_train_256 + name + "_chunk_" + str(i), chunk)
+        print("i: ", i)
+    print('--------------------------------------------')
+
+
+# TEST SET
+
+
+print('Dividing vn test features in 256 long chunks....')
+features_dir_vn = pathlib.Path('URPM_vn_fl/features_vn_test')
+features_in_basepath_vn_test = features_dir_vn.iterdir()
+
+
+for item in features_in_basepath_vn_test:
+    name = item.name
+    print(name)
+    feature = np.load(item)
+    length = feature.shape[1]
+    chunks = math.floor(length / CONSTANT_256)
+    print(chunks)
+    for i in range(chunks):
+        chunk = feature[0:1025, i * CONSTANT_256: (i + 1) * CONSTANT_256 - 1]
+        np.save(path_features_vn_test_256 + name + "_chunk_" + str(i), chunk)
         print("i: ", i)
     print('--------------------------------------------')
 
@@ -138,23 +174,59 @@ for item in features_in_basepath_vn:
 
 
 
-# # DIVIDE THE FLUTE FEATURES IN 256 LONG CHUNKS
-
-print('Dividing vn features in 256 long chunks....')
-features_dir_fl = pathlib.Path('URPM_vn_fl/features_fl')
-features_in_basepath_fl = features_dir_fl.iterdir()
 
 
-for item in features_in_basepath_fl:
+
+
+
+
+
+
+
+# ------------------------------------------------------------------------------------------------------------------
+# DIVIDE THE FLUTE FEATURES IN 256 LONG CHUNKS
+
+
+# TRAIN SET
+
+
+print('Dividing fl train features in 256 long chunks....')
+features_dir_fl = pathlib.Path('URPM_vn_fl/features_fl_train')
+features_in_basepath_fl_train = features_dir_fl.iterdir()
+
+
+for item in features_in_basepath_fl_train:
     name = item.name
     print(name)
     feature = np.load(item)
     length = feature.shape[1]
-    chunks = math.floor(length/256)
+    chunks = math.floor(length / CONSTANT_256)
     print(chunks)
     for i in range(chunks):
-        chunk = feature[0:1025, i * 256 : (i+1) * 256 - 1]
-        np.save(path_features_fl_256 + name + "_chunk_" + str(i), chunk)
+        chunk = feature[0:1025, i * CONSTANT_256: (i + 1) * CONSTANT_256 - 1]
+        np.save(path_features_fl_train_256 + name + "_chunk_" + str(i), chunk)
+        print("i: ", i)
+    print('--------------------------------------------')
+
+
+# TEST SET
+
+
+print('Dividing fl train features in 256 long chunks....')
+features_dir_fl = pathlib.Path('URPM_vn_fl/features_fl_test')
+features_in_basepath_fl_test = features_dir_fl.iterdir()
+
+
+for item in features_in_basepath_fl_test:
+    name = item.name
+    print(name)
+    feature = np.load(item)
+    length = feature.shape[1]
+    chunks = math.floor(length / CONSTANT_256)
+    print(chunks)
+    for i in range(chunks):
+        chunk = feature[0:1025, i * CONSTANT_256: (i + 1) * CONSTANT_256 - 1]
+        np.save(path_features_fl_test_256 + name + "_chunk_" + str(i), chunk)
         print("i: ", i)
     print('--------------------------------------------')
 
