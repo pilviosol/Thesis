@@ -11,8 +11,8 @@ import librosa
 import librosa.display
 
 AUTOTUNE = tf.data.AUTOTUNE
-'''for gpu in tf.config.experimental.list_physical_devices('GPU'):
-    tf.config.experimental.set_memory_growth(gpu, True) '''
+for gpu in tf.config.experimental.list_physical_devices('GPU'):
+    tf.config.experimental.set_memory_growth(gpu, True)
 
 '''
 IMPORTANTE: size dell'input e dell'output 
@@ -23,222 +23,69 @@ LEGGERE PAPERS E VEDERE COME SETTANO LORO
 
 
 # INPUT PIPELINE
-train_vn = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/features_vn_256')
-train_fl = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/features_fl_256')
-test_blues = pathlib.Path('/nas/home/spol/Thesis/GTZAN/features/blues/test/')
-test_metal = pathlib.Path('/nas/home/spol/Thesis/GTZAN/features/metal/test/')
+train_vn = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/features_vn_train_256')
+train_fl = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/features_fl_train_256')
+test_vn = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/features_vn_test_256')
+test_fl = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/features_fl_test_256')
 
 
-train_blues_dir = train_blues.iterdir()
-test_blues_dir = test_blues.iterdir()
-train_metal_dir = train_metal.iterdir()
-test_metal_dir = test_metal.iterdir()
 
-train_blues_cqt = []
-train_blues_stftmag = []
-train_blues_stftphase = []
-test_blues_stftmag = []
-test_blues_stftphase = []
-test_blues_cqt = []
-train_metal_cqt = []
-train_metal_stftmag = []
-train_metal_stftphase = []
-test_metal_stftmag = []
-test_metal_stftphase = []
-test_metal_cqt = []
+train_vn_dir = train_vn.iterdir()
+test_vn_dir = test_vn.iterdir()
+train_fl_dir = train_fl.iterdir()
+test_fl_dir = test_fl.iterdir()
 
-# CQT: 84x1293, STFT: 1025x1293
+train_vn_stft = []
+test_vn_stft = []
+train_fl_stft = []
+test_fl_stft = []
+
+# , STFT: 1025 x length
 
 
-for idx, feature in enumerate(train_blues_dir):
+for idx, feature in enumerate(train_vn_dir):
     feature_name = feature.name
-    feature_np = np.load(feature)
-    feature_reshaped = feature_np[0:1024,0:1024]
-    #print("feature.shape: ", feature.shape)
-    if "CQT" in str(feature_name):
-        train_blues_cqt.append(feature_reshaped)
-    elif "STFTMAG" in str(feature_name):
-        train_blues_stftmag.append(feature_reshaped)
-    else:
-        train_blues_stftphase.append(feature_reshaped)
+    if "STFTMAG." in feature_name:
+        feature_np = np.load(feature)
+        feature_reshaped = feature_np[0:1024,0:256]
+        print("feature.name: ", feature_name)
+        print("feature.shape: ", feature_reshaped.shape)
+        train_vn_stft.append(feature_reshaped)
 
 
-for idx, feature in enumerate(train_metal_dir):
-    #print(idx, "    :", feature)
+for idx, feature in enumerate(train_fl_dir):
     feature_name = feature.name
-    feature_np = np.load(feature)
-    feature_reshaped = feature_np[0:1024, 0:1024]
-    #print("feature.shape: ", feature.shape)
-    if "CQT" in str(feature_name):
-        train_metal_cqt.append(feature_reshaped)
-    elif "STFTMAG" in str(feature_name):
-        train_metal_stftmag.append(feature_reshaped)
-    else:
-        train_metal_stftphase.append(feature_reshaped)
+    if "STFTMAG." in feature_name:
+        feature_np = np.load(feature)
+        feature_reshaped = feature_np[0:1024, 0:256]
+        print("feature.name: ", feature_name)
+        print("feature.shape: ", feature_reshaped.shape)
+        train_fl_stft.append(feature_reshaped)
 
 
-# FUNZIONI PER CROPPARE E JITTERARE LE IMMAGINI
-'''
+#PRENDO UN SAMPLE PER vn E UNO PER fl E PLOTTO
+
+sample_vn = train_vn_stft[0]
+sample_fl = train_fl_stft[3]
 
 
-BUFFER_SIZE = 1000
-BATCH_SIZE = 1
-IMG_WIDTH = 256
-IMG_HEIGHT = 256
+print('sample_vn.shape: ', sample_vn.shape)
 
-
-
-def random_crop(image):
-    cropped_image = tf.image.random_crop(
-        image, size=[IMG_HEIGHT, IMG_WIDTH, 3])
-
-    return cropped_image
-
-
-# normalizing the images to [-1, 1]
-def normalize(image):
-    image = tf.cast(image, tf.float32)
-    image = (image / 127.5) - 1
-    return image
-
-
-def random_jitter(image):
-    # resizing to 286 x 286 x 3
-    image = tf.image.resize(image, [286, 286],
-                            method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
-
-    # randomly cropping to 640 x 480 x 3
-    image = random_crop(image)
-
-    # random mirroring
-    image = tf.image.random_flip_left_right(image)
-
-    return image
-
-
-def preprocess_image_train(image):
-    image = random_jitter(image)
-    image = normalize(image)
-    return image
-
-
-def preprocess_image_test(image):
-    image = normalize(image)
-    return image
-
-
-
-train_blues_images = []
-train_blues_images_processed = []
-train_metal_images = []
-train_metal_images_processed = []
-test_blues_images = []
-test_blues_images_processed = []
-test_metal_images = []
-test_metal_images_processed = []
-'''
-
-# LEGGO E PROCESSO OGNI IMMAGINE, APPENDENDOLE NEGLI ARRAY DEFINITI SOPRA
-'''
-train_blues_dir = train_blues.iterdir()
-for image in train_blues_dir:
-    if image.is_file():
-        image = cv2.imread(str(image))
-        train_blues_images.append(image)
-        image = preprocess_image_train(image)
-        train_blues_images_processed.append(image)
-    else:
-        print('Not an image')
-
-train_metal_dir = train_metal.iterdir()
-for image in train_metal_dir:
-    if image.is_file():
-        image = cv2.imread(str(image))
-        train_metal_images.append(image)
-        image = preprocess_image_train(image)
-        train_metal_images_processed.append(image)
-    else:
-        print('Not an image')
-
-test_blues_dir = test_blues.iterdir()
-for image in test_blues_dir:
-    if image.is_file():
-        image = cv2.imread(str(image))
-        test_blues_images.append(image)
-        image = preprocess_image_test(image)
-        test_blues_images_processed.append(image)
-    else:
-        print('Not an image')
-
-test_metal_dir = test_metal.iterdir()
-for image in test_metal_dir:
-    if image.is_file():
-        image = cv2.imread(str(image))
-        test_metal_images.append(image)
-        image = preprocess_image_test(image)
-        test_metal_images_processed.append(image)
-    else:
-        print('Not an image')
-'''
-
-
-
-
-#PRENDO UN SAMPLE PER BLUES E UNO PER METAL E PLOTTO
-
-sample_blues = train_blues_stftmag[0]
-sample_metal = train_metal_stftmag[0]
-
-audio, sample_rate = librosa.load('GTZAN/genres_original/blues/blues.00000.wav', res_type='kaiser_fast', mono=True)
-cqt = librosa.cqt(y=audio, sr=sample_rate)
-stft_mag = np.abs(librosa.stft(y=audio))
-stft_phase = np.angle(librosa.stft(y=audio))
-
-
-plt.figure()
-plt.subplot(2,1,1)
-plt.imshow(20*np.log10(stft_mag + 1E-5), aspect='auto')
-
-plt.subplot(2,1,2)
-plt.imshow(np.unwrap(stft_phase), aspect='auto')
-plt.show()
-
-fig_stftmag, ax = plt.subplots()
-img = librosa.display.specshow(librosa.amplitude_to_db(stft_mag, ref=np.max),
-                                           sr=sample_rate, ax=ax)
-
-fig_stftphase, ax = plt.subplots()
-img = librosa.display.specshow(librosa.amplitude_to_db(stft_phase, ref=np.max),
-                                           sr=sample_rate, ax=ax)
-
-
-print('sample_blues.shape: ', sample_blues.shape)
+print('sample_vfl.shape: ', sample_fl.shape)
 
 
 fig, ax = plt.subplots()
-img = librosa.display.specshow(librosa.amplitude_to_db(sample_blues, ref=np.max), y_axis='log', x_axis='time', ax=ax)
-ax.set_title('Blues Power spectrogram')
+img = librosa.display.specshow(librosa.amplitude_to_db(sample_vn, ref=np.max), y_axis='log', x_axis='time', ax=ax)
+ax.set_title('vn Power spectrogram')
 fig.colorbar(img, ax=ax, format="%+2.0f dB")
 plt.show()
 
 fig, ax = plt.subplots()
-img = librosa.display.specshow(librosa.amplitude_to_db(sample_metal, ref=np.max), y_axis='log', x_axis='time', ax=ax)
-ax.set_title('Metal Power spectrogram')
+img = librosa.display.specshow(librosa.amplitude_to_db(sample_fl, ref=np.max), y_axis='log', x_axis='time', ax=ax)
+ax.set_title('fl Power spectrogram')
 fig.colorbar(img, ax=ax, format="%+2.0f dB")
 plt.show()
 
-
-'''
-plt.subplot(121)
-plt.title('Blues')
-plt.imshow(sample_blues * 0.5 + 0.5)
-plt.show()
-
-plt.subplot(121)
-plt.title('Metal')
-plt.imshow(sample_metal * 0.5 + 0.5)
-plt.show()
-'''
 
 
 
@@ -252,61 +99,57 @@ generator_f = pix2pix_modified.unet_generator(OUTPUT_CHANNELS, norm_type='instan
 discriminator_x = pix2pix_modified.discriminator(norm_type='instancenorm', target=False)
 discriminator_y = pix2pix_modified.discriminator(norm_type='instancenorm', target=False)
 
-sample_blues = tf.expand_dims(sample_blues, axis=0, name=None)
-sample_blues = tf.expand_dims(sample_blues, axis=-1, name=None)
-sample_metal = tf.expand_dims(sample_metal, axis=0, name=None)
-sample_metal = tf.expand_dims(sample_metal, axis=-1, name=None)
+sample_vn = tf.expand_dims(sample_vn, axis=0, name=None)
+sample_vn = tf.expand_dims(sample_vn, axis=-1, name=None)
+sample_fl = tf.expand_dims(sample_fl, axis=0, name=None)
+sample_fl = tf.expand_dims(sample_fl, axis=-1, name=None)
 
 
-to_metal = generator_g(sample_blues)
-print("to_metal.shape", to_metal.shape)
-to_blues = generator_f(sample_metal)
+to_fl = generator_g(sample_vn)
+print("to_fl.shape", to_fl.shape)
+to_vn = generator_f(sample_fl)
 plt.figure(figsize=(8, 8))
 contrast = 8
 
-imgs = [sample_blues, to_metal, sample_metal, to_blues]
-title = ['Blues', 'To Metal', 'Metal', 'To Blues']
+imgs = [sample_vn, to_fl, sample_fl, to_vn]
+title = ['vn', 'To fl', 'fl', 'To vn']
 
-sample_blues_squeezed = tf.squeeze(sample_blues)
-to_metal_squeezed = tf.squeeze(to_metal)
-sample_metal_squeezed = tf.squeeze(sample_metal)
-to_blues_squeezed = tf.squeeze(to_blues)
+sample_vn_squeezed = tf.squeeze(sample_vn)
+to_fl_squeezed = tf.squeeze(to_fl)
+sample_fl_squeezed = tf.squeeze(sample_fl)
+to_vn_squeezed = tf.squeeze(to_vn)
 
 
 # DA RIVEDERE, I PLOT FANNO SCHIFO
 
 fig, ax = plt.subplots(nrows=4, ncols=1, sharex=False)
-img_sample_blues_squeezed = librosa.display.specshow(librosa.amplitude_to_db(sample_blues_squeezed, ref=np.max), y_axis='log', x_axis='time', ax=ax[0])
-ax[0].set_title('sample_blues_squeezed')
-fig.colorbar(img, ax=ax, format="%+2.0f dB")
+img_sample_vn_squeezed = librosa.display.specshow(librosa.amplitude_to_db(sample_vn_squeezed, ref=np.max), y_axis='log', x_axis='time', ax=ax[0])
+ax[0].set_title('sample_vn_squeezed')
 
-img_to_metal_squeezed = librosa.display.specshow(librosa.amplitude_to_db(to_metal_squeezed, ref=np.max), y_axis='log', x_axis='time', ax=ax[1])
-ax[1].set_title('to_metal_squeezed')
-fig.colorbar(img, ax=ax, format="%+2.0f dB")
+img_to_fl_squeezed = librosa.display.specshow(librosa.amplitude_to_db(to_fl_squeezed, ref=np.max), y_axis='log', x_axis='time', ax=ax[1])
+ax[1].set_title('to_fl_squeezed')
 
-img_sample_metal_squeezed = librosa.display.specshow(librosa.amplitude_to_db(sample_metal_squeezed, ref=np.max), y_axis='log', x_axis='time', ax=ax[2])
-ax[2].set_title('sample_metal_squeezed')
-fig.colorbar(img, ax=ax, format="%+2.0f dB")
+img_sample_fl_squeezed = librosa.display.specshow(librosa.amplitude_to_db(sample_fl_squeezed, ref=np.max), y_axis='log', x_axis='time', ax=ax[2])
+ax[2].set_title('sample_fl_squeezed')
 
-img_to_blues_squeezed = librosa.display.specshow(librosa.amplitude_to_db(to_blues_squeezed, ref=np.max), y_axis='log', x_axis='time', ax=ax[3])
-ax[3].set_title('to_blues_squeezed')
-fig.colorbar(img, ax=ax, format="%+2.0f dB")
+img_to_vn_squeezed = librosa.display.specshow(librosa.amplitude_to_db(to_vn_squeezed, ref=np.max), y_axis='log', x_axis='time', ax=ax[3])
+ax[3].set_title('to_vn_squeezed')
 plt.show()
 
 
-imgs_squeezed = [img_sample_blues_squeezed, img_to_metal_squeezed, img_sample_metal_squeezed, img_to_blues_squeezed]
+imgs_squeezed = [img_sample_vn_squeezed, img_to_fl_squeezed, img_sample_fl_squeezed, img_to_vn_squeezed]
 
 
 
 plt.figure(figsize=(8, 8))
 
 plt.subplot(121)
-plt.title('Is a real metal spectrogram?')
-plt.imshow(discriminator_y(sample_metal)[0, ..., -1], cmap='RdBu_r')
+plt.title('Is a real fl spectrogram?')
+plt.imshow(discriminator_y(sample_fl)[0, ..., -1], cmap='RdBu_r')
 
 plt.subplot(122)
-plt.title('Is a real blues spectrogram?')
-plt.imshow(discriminator_x(sample_blues)[0, ..., -1], cmap='RdBu_r')
+plt.title('Is a real vn spectrogram?')
+plt.imshow(discriminator_x(sample_vn)[0, ..., -1], cmap='RdBu_r')
 
 plt.show()
 
@@ -377,26 +220,13 @@ ckpt = tf.train.Checkpoint(generator_g=generator_g,
                            discriminator_y_optimizer=discriminator_y_optimizer)
 
 ckpt_manager = tf.train.CheckpointManager(ckpt, checkpoint_path, max_to_keep=5)
+
 '''
 # if a checkpoint exists, restore the latest checkpoint.
 if ckpt_manager.latest_checkpoint:
     ckpt.restore(ckpt_manager.latest_checkpoint)
     print('Latest checkpoint restored!!')
-
 '''
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -415,21 +245,15 @@ def generate_images(model, test_input):
     title = ['Input Image', 'Predicted Image']
 
     for i in range(2):
-        '''
-        plt.subplot(1, 2, i + 1)
-        plt.title(title[i])
-        # getting the pixel values between [0, 1] to plot it.
-        #plt.imshow(display_list[i] * 0.5 + 0.5)
-        plt.imshow(display_list[i])
-        plt.axis('off')
-        '''
+        # qui c'era un commento, vedere cycleGAN_forGTZAN_fetaures
+
         fig, ax = plt.subplots(nrows=2, ncols=1, sharex=False)
-        img_sample_blues_squeezed = librosa.display.specshow(librosa.amplitude_to_db(test_input_squeezed, ref=np.max),
+        img_sample_vn_squeezed = librosa.display.specshow(librosa.amplitude_to_db(test_input_squeezed, ref=np.max),
                                                              y_axis='log', x_axis='time', ax=ax[0])
         ax[0].set_title('Input Image')
         fig.colorbar(img, ax=ax, format="%+2.0f dB")
 
-        img_to_metal_squeezed = librosa.display.specshow(librosa.amplitude_to_db(prediction_squeezed, ref=np.max),
+        img_to_fl_squeezed = librosa.display.specshow(librosa.amplitude_to_db(prediction_squeezed, ref=np.max),
                                                          y_axis='log', x_axis='time', ax=ax[1])
         ax[1].set_title('Predicted Image')
         fig.colorbar(img, ax=ax, format="%+2.0f dB")
@@ -503,7 +327,7 @@ for epoch in range(EPOCHS):
     start = time.time()
 
     n = 0
-    for image_x, image_y in zip(train_blues_stftmag, train_metal_stftmag):
+    for image_x, image_y in zip(train_vn_stft, train_fl_stft):
         image_x = tf.expand_dims(image_x, axis=0, name=None)
         image_x = tf.expand_dims(image_x, axis=-1, name=None)
         image_y = tf.expand_dims(image_y, axis=0, name=None)
@@ -516,7 +340,7 @@ for epoch in range(EPOCHS):
     clear_output(wait=True)
     # Using a consistent image (sample_horse) so that the progress of the model
     # is clearly visible.
-    generate_images(generator_g, sample_blues)
+    generate_images(generator_g, sample_vn)
 
     if (epoch + 1) % 5 == 0:
         ckpt_save_path = ckpt_manager.save()
@@ -527,23 +351,7 @@ for epoch in range(EPOCHS):
                                                        time.time() - start))
 
 
-
-
-
-
-
-
-
-
-
-
 '''
-# GENERATE USING TEST DATASET
 
-# Run the trained model on the test dataset
-# for inp in test_horses_dir.take(5):
-test = cv2.imread('/nas/home/spol/Thesis/GTZAN/images/blues/test/blues.00048_CQT.png')
-test = tf.expand_dims(
-    test, axis=0, name=None
-)
-generate_images(generator_g, test) '''
+# qui c'era un commento, vedere cycleGAN_forGTZAN_fetaures
+'''

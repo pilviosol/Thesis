@@ -141,7 +141,8 @@ for item in features_in_basepath_vn_train:
     chunks = math.floor(length / CONSTANT_256)
     print(chunks)
     for i in range(chunks):
-        chunk = feature[0:1025, i * CONSTANT_256: (i + 1) * CONSTANT_256 - 1]
+        chunk = feature[0:1025, i * CONSTANT_256: (i + 1) * CONSTANT_256]
+        print("chunk.shape: ", chunk.shape)
         np.save(path_features_vn_train_256 + name + "_chunk_" + str(i), chunk)
         print("i: ", i)
     print('--------------------------------------------')
@@ -163,7 +164,7 @@ for item in features_in_basepath_vn_test:
     chunks = math.floor(length / CONSTANT_256)
     print(chunks)
     for i in range(chunks):
-        chunk = feature[0:1025, i * CONSTANT_256: (i + 1) * CONSTANT_256 - 1]
+        chunk = feature[0:1025, i * CONSTANT_256: (i + 1) * CONSTANT_256]
         np.save(path_features_vn_test_256 + name + "_chunk_" + str(i), chunk)
         print("i: ", i)
     print('--------------------------------------------')
@@ -203,7 +204,7 @@ for item in features_in_basepath_fl_train:
     chunks = math.floor(length / CONSTANT_256)
     print(chunks)
     for i in range(chunks):
-        chunk = feature[0:1025, i * CONSTANT_256: (i + 1) * CONSTANT_256 - 1]
+        chunk = feature[0:1025, i * CONSTANT_256: (i + 1) * CONSTANT_256]
         np.save(path_features_fl_train_256 + name + "_chunk_" + str(i), chunk)
         print("i: ", i)
     print('--------------------------------------------')
@@ -225,7 +226,7 @@ for item in features_in_basepath_fl_test:
     chunks = math.floor(length / CONSTANT_256)
     print(chunks)
     for i in range(chunks):
-        chunk = feature[0:1025, i * CONSTANT_256: (i + 1) * CONSTANT_256 - 1]
+        chunk = feature[0:1025, i * CONSTANT_256: (i + 1) * CONSTANT_256]
         np.save(path_features_fl_test_256 + name + "_chunk_" + str(i), chunk)
         print("i: ", i)
     print('--------------------------------------------')
