@@ -6,32 +6,45 @@ import librosa.display
 import librosa
 import shutil
 
+# DEFINITION OF PATHS
 
-path_features_vn = "/nas/home/spol/Thesis/URPM_vn_fl/features_vn/"
-path_features_fl = "/nas/home/spol/Thesis/URPM_vn_fl/features_fl/"
+path_features_vn_train = "/nas/home/spol/Thesis/URPM_vn_fl/features_vn_train/"
+path_features_fl_train = "/nas/home/spol/Thesis/URPM_vn_fl/features_fl_train/"
+path_features_vn_test = "/nas/home/spol/Thesis/URPM_vn_fl/features_vn_test/"
+path_features_fl_test = "/nas/home/spol/Thesis/URPM_vn_fl/features_fl_test/"
 _SAMPLING_RATE = 22050
 print('ollare')
 
 
 
 try:
-    shutil.rmtree(path_features_vn, ignore_errors=True)
-    shutil.rmtree(path_features_fl, ignore_errors=True)
+    shutil.rmtree(path_features_vn_train, ignore_errors=True)
+    shutil.rmtree(path_features_fl_train, ignore_errors=True)
+    shutil.rmtree(path_features_vn_test, ignore_errors=True)
+    shutil.rmtree(path_features_fl_test, ignore_errors=True)
 except OSError:
-    print("Removal of the directory %s failed" % path_features_vn)
-    print("Removal of the directory %s failed" % path_features_fl)
+    print("Removal of the directory %s failed" % path_features_vn_train)
+    print("Removal of the directory %s failed" % path_features_fl_train)
+    print("Removal of the directory %s failed" % path_features_vn_test)
+    print("Removal of the directory %s failed" % path_features_fl_test)
 else:
-    print("Successfully removed the directory %s" % path_features_vn)
-    print("Successfully removed the directory %s" % path_features_fl)
+    print("Successfully removed the directory %s" % path_features_vn_train)
+    print("Successfully removed the directory %s" % path_features_fl_train)
+    print("Successfully removed the directory %s" % path_features_vn_test)
+    print("Successfully removed the directory %s" % path_features_fl_test)
 
 
 try:
-    os.mkdir(path_features_vn)
-    os.mkdir(path_features_fl)
+    os.mkdir(path_features_vn_train)
+    os.mkdir(path_features_fl_train)
+    os.mkdir(path_features_vn_test)
+    os.mkdir(path_features_fl_test)
 except OSError:
     print("Creation of the directory  failed")
 
 
+# ------------------------------------------------------------------------------------------------------------------
+# DEFINITION OF FUNCTION EXTRACT_FEATURE
 
 def extract_features(file_name):
     '''
@@ -66,9 +79,14 @@ def extract_features(file_name):
     return cqt, stft_full, stft_mag, stft_mag_real, stft_mag_imag, stft_phase, mel_spectrogram
 
 
+# ------------------------------------------------------------------------------------------------------------------
+# FEATURE EXTRACTION FOR VIOLIN
+
 # VIOLIN
 
-print("Calculating features for violin.....")
+# TRAIN SET
+
+print("Calculating features for violin (train set).....")
 
 data_dir_vn = pathlib.Path('URPM_vn_fl/vn_train')
 files_in_basepath_vn = data_dir_vn.iterdir()
@@ -81,24 +99,53 @@ for item in files_in_basepath_vn:
         cqt, stft_full, stft_mag, stft_mag_real, stft_mag_imag, stft_phase, mel_spectrogram = extract_features(item)
 
         # Saving all features in one folder (.npy format)
-        np.save(path_features_vn + name + "_CQT", cqt)
-        np.save(path_features_vn + name + "_STFTFULL", stft_full)
-        np.save(path_features_vn + name + "_STFTMAG", stft_mag)
-        np.save(path_features_vn + name + "_STFTMAG_REAL", stft_mag_real)
-        np.save(path_features_vn + name + "_STFTMAG_IMAG", stft_mag_imag)
-        np.save(path_features_vn + name + "_STFTPHASE", stft_phase)
-        np.save(path_features_vn + name + "_MEL", mel_spectrogram)
+        np.save(path_features_vn_train + name + "_CQT", cqt)
+        np.save(path_features_vn_train + name + "_STFTFULL", stft_full)
+        np.save(path_features_vn_train + name + "_STFTMAG", stft_mag)
+        np.save(path_features_vn_train + name + "_STFTMAG_REAL", stft_mag_real)
+        np.save(path_features_vn_train + name + "_STFTMAG_IMAG", stft_mag_imag)
+        np.save(path_features_vn_train + name + "_STFTPHASE", stft_phase)
+        np.save(path_features_vn_train + name + "_MEL", mel_spectrogram)
 
     else:
         print('That is not a file')
 
 
+# TEST SET
 
+print("Calculating features for violin (test set).....")
 
+data_dir_vn = pathlib.Path('URPM_vn_fl/vn_test')
+files_in_basepath_vn = data_dir_vn.iterdir()
+
+for item in files_in_basepath_vn:
+    if item.is_file():
+        print(item.name)
+        name = item.name[0:-4]
+
+        cqt, stft_full, stft_mag, stft_mag_real, stft_mag_imag, stft_phase, mel_spectrogram = extract_features(item)
+
+        # Saving all features in one folder (.npy format)
+        np.save(path_features_vn_test + name + "_CQT", cqt)
+        np.save(path_features_vn_test + name + "_STFTFULL", stft_full)
+        np.save(path_features_vn_test + name + "_STFTMAG", stft_mag)
+        np.save(path_features_vn_test + name + "_STFTMAG_REAL", stft_mag_real)
+        np.save(path_features_vn_test + name + "_STFTMAG_IMAG", stft_mag_imag)
+        np.save(path_features_vn_test + name + "_STFTPHASE", stft_phase)
+        np.save(path_features_vn_test + name + "_MEL", mel_spectrogram)
+
+    else:
+        print('That is not a file')
+
+# ------------------------------------------------------------------------------------------------------------------
+# FEATURE EXTRACTION FOR FLUTE
 
 # FLUTE
 
-print("Calculating features for flute.....")
+# TRAIN SET
+
+
+print("Calculating features for flute (train set).....")
 
 data_dir_fl = pathlib.Path('URPM_vn_fl/fl_train')
 files_in_basepath_fl = data_dir_fl.iterdir()
@@ -111,16 +158,46 @@ for item in files_in_basepath_fl:
         cqt, stft_full, stft_mag, stft_mag_real, stft_mag_imag, stft_phase, mel_spectrogram = extract_features(item)
 
         # Saving all features in one folder (.npy format)
-        np.save(path_features_fl + name + "_CQT", cqt)
-        np.save(path_features_fl + name + "_STFTFULL", stft_full)
-        np.save(path_features_fl + name + "_STFTMAG", stft_mag)
-        np.save(path_features_fl + name + "_STFTMAG_REAL", stft_mag_real)
-        np.save(path_features_fl + name + "_STFTMAG_IMAG", stft_mag_imag)
-        np.save(path_features_fl + name + "_STFTPHASE", stft_phase)
-        np.save(path_features_fl + name + "_MEL", mel_spectrogram)
+        np.save(path_features_fl_train + name + "_CQT", cqt)
+        np.save(path_features_fl_train + name + "_STFTFULL", stft_full)
+        np.save(path_features_fl_train + name + "_STFTMAG", stft_mag)
+        np.save(path_features_fl_train + name + "_STFTMAG_REAL", stft_mag_real)
+        np.save(path_features_fl_train + name + "_STFTMAG_IMAG", stft_mag_imag)
+        np.save(path_features_fl_train + name + "_STFTPHASE", stft_phase)
+        np.save(path_features_fl_train + name + "_MEL", mel_spectrogram)
 
     else:
         print('That is not a file')
+
+
+# TEST SET
+
+print("Calculating features for flute (test set).....")
+
+data_dir_fl = pathlib.Path('URPM_vn_fl/fl_test')
+files_in_basepath_fl = data_dir_fl.iterdir()
+
+for item in files_in_basepath_fl:
+    if item.is_file():
+        print(item.name)
+        name = item.name[0:-4]
+
+        cqt, stft_full, stft_mag, stft_mag_real, stft_mag_imag, stft_phase, mel_spectrogram = extract_features(item)
+
+        # Saving all features in one folder (.npy format)
+        np.save(path_features_fl_test + name + "_CQT", cqt)
+        np.save(path_features_fl_test + name + "_STFTFULL", stft_full)
+        np.save(path_features_fl_test + name + "_STFTMAG", stft_mag)
+        np.save(path_features_fl_test + name + "_STFTMAG_REAL", stft_mag_real)
+        np.save(path_features_fl_test + name + "_STFTMAG_IMAG", stft_mag_imag)
+        np.save(path_features_fl_test + name + "_STFTPHASE", stft_phase)
+        np.save(path_features_fl_test + name + "_MEL", mel_spectrogram)
+
+    else:
+        print('That is not a file')
+
+
+# ------------------------------------------------------------------------------------------------------------------
 
 
 # SHOW A SAMPLE IMAGE OF MAGNITUDE AND PHASE OF A STFT
