@@ -6,11 +6,19 @@ import os
 import time
 import matplotlib.pyplot as plt
 from IPython.display import clear_output
-import cv2
+#import cv2
 import librosa
 import librosa.display
 
-AUTOTUNE = tf.data.AUTOTUNE
+
+
+
+
+
+
+
+#AUTOTUNE = tf.data.AUTOTUNE
+
 for gpu in tf.config.experimental.list_physical_devices('GPU'):
     tf.config.experimental.set_memory_growth(gpu, True)
 

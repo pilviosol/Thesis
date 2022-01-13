@@ -23,6 +23,13 @@
           </mappings>
         </serverdata>
       </paths>
+      <paths name="spol@curie:22 agent">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/nas/home/spol/Thesis" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
       <paths name="spol@dirac:22">
         <serverdata>
           <mappings>
@@ -30,10 +37,24 @@
           </mappings>
         </serverdata>
       </paths>
+      <paths name="spol@dirac:22 agent">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/tmp/pycharm_project_671" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
       <paths name="spol@euler:22">
         <serverdata>
           <mappings>
             <mapping deploy="/nas/home/spol/Thesis" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="spol@euler:22 agent">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/nas/home/spol/Thesis" local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </paths>
@@ -52,6 +73,13 @@
         </serverdata>
       </paths>
       <paths name="spol@hack:22 password (2)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/nas/home/spol/Thesis" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="spol@hack:22 password (3)">
         <serverdata>
           <mappings>
             <mapping deploy="/nas/home/spol/Thesis" local="$PROJECT_DIR$" />
