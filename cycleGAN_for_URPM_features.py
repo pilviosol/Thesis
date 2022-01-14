@@ -3,40 +3,33 @@ import tensorflow as tf
 import pix2pix_modified
 import pathlib
 import os
+import shutil
 import time
 import matplotlib.pyplot as plt
 from IPython.display import clear_output
-#import cv2
 import librosa
 import librosa.display
+from utils import *
 
+# DEFINITION OF PATHS / DIRECTORIES FOR IMAGES TO BE SAVED
+path_epoch_images = "/nas/home/spol/Thesis/epoch_images/"
 
+try:
+    shutil.rmtree(path_epoch_images, ignore_errors=True)
+except OSError:
+    print("Removal of the directory %s failed" % path_epoch_images)
+else:
+    print("Successfully removed the directory %s" % path_epoch_images)
 
+try:
+    os.mkdir(path_epoch_images)
+except OSError:
+    print("Creation of the directory  failed")
 
-
-
-
-
-#AUTOTUNE = tf.data.AUTOTUNE
-
-for gpu in tf.config.experimental.list_physical_devices('GPU'):
-    tf.config.experimental.set_memory_growth(gpu, True)
-
-'''
-IMPORTANTE: size dell'input e dell'output 
-PROVA con CQT che è più semplice e piccola
-LEGGERE PAPERS E VEDERE COME SETTANO LORO
-
-'''
-
-
-# INPUT PIPELINE
 train_vn = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/features_vn_train_256')
 train_fl = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/features_fl_train_256')
 test_vn = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/features_vn_test_256')
 test_fl = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/features_fl_test_256')
-
-
 
 train_vn_dir = train_vn.iterdir()
 test_vn_dir = test_vn.iterdir()
@@ -48,19 +41,32 @@ test_vn_stft = []
 train_fl_stft = []
 test_fl_stft = []
 
-# , STFT: 1025 x length
+# ------------------------------------------------------------------------------------------------------------------
+# SETTING GPU ORDER
+set_gpu(-1)
+'''
+IMPORTANTE: size dell'input e dell'output 
+PROVA con CQT che è più semplice e piccola
+LEGGERE PAPERS E VEDERE COME SETTANO LORO
 
+'''
 
+# STFT: 1025 x 256, FOR NOW WORKING ON STFT MAGNITUDE ONLY
+
+# ------------------------------------------------------------------------------------------------------------------
+# LOADING FEATURES AND APPENDING THEM INTO ARRAY
+
+# Cycling over violin segments
 for idx, feature in enumerate(train_vn_dir):
     feature_name = feature.name
     if "STFTMAG." in feature_name:
         feature_np = np.load(feature)
-        feature_reshaped = feature_np[0:1024,0:256]
+        feature_reshaped = feature_np[0:1024, 0:256]
         print("feature.name: ", feature_name)
         print("feature.shape: ", feature_reshaped.shape)
         train_vn_stft.append(feature_reshaped)
 
-
+# Cycling over flute segments
 for idx, feature in enumerate(train_fl_dir):
     feature_name = feature.name
     if "STFTMAG." in feature_name:
@@ -70,17 +76,14 @@ for idx, feature in enumerate(train_fl_dir):
         print("feature.shape: ", feature_reshaped.shape)
         train_fl_stft.append(feature_reshaped)
 
-
-#PRENDO UN SAMPLE PER vn E UNO PER fl E PLOTTO
+# ------------------------------------------------------------------------------------------------------------------
+# PLOTTING SPECTROGRAM OF A SAMPLE OF VIOLIN AND ONE OF FLUTE
 
 sample_vn = train_vn_stft[0]
 sample_fl = train_fl_stft[3]
 
-
 print('sample_vn.shape: ', sample_vn.shape)
-
 print('sample_vfl.shape: ', sample_fl.shape)
-
 
 fig, ax = plt.subplots()
 img = librosa.display.specshow(librosa.amplitude_to_db(sample_vn, ref=np.max), y_axis='log', x_axis='time', ax=ax)
@@ -94,10 +97,8 @@ ax.set_title('fl Power spectrogram')
 fig.colorbar(img, ax=ax, format="%+2.0f dB")
 plt.show()
 
-
-
-
-# IMPORTO E UTILIZZO ARCHITETTURA PIX2PIX
+# ------------------------------------------------------------------------------------------------------------------
+# IMPORTING AND USING PIX2PIX_MODIFIED ARCHITECTURE
 
 OUTPUT_CHANNELS = 1
 
@@ -107,11 +108,12 @@ generator_f = pix2pix_modified.unet_generator(OUTPUT_CHANNELS, norm_type='instan
 discriminator_x = pix2pix_modified.discriminator(norm_type='instancenorm', target=False)
 discriminator_y = pix2pix_modified.discriminator(norm_type='instancenorm', target=False)
 
+# EXPANDING DIMENSIONS TO FEED SAMPLES TO THE NETWORK
+
 sample_vn = tf.expand_dims(sample_vn, axis=0, name=None)
 sample_vn = tf.expand_dims(sample_vn, axis=-1, name=None)
 sample_fl = tf.expand_dims(sample_fl, axis=0, name=None)
 sample_fl = tf.expand_dims(sample_fl, axis=-1, name=None)
-
 
 to_fl = generator_g(sample_vn)
 print("to_fl.shape", to_fl.shape)
@@ -119,35 +121,32 @@ to_vn = generator_f(sample_fl)
 plt.figure(figsize=(8, 8))
 contrast = 8
 
-imgs = [sample_vn, to_fl, sample_fl, to_vn]
-title = ['vn', 'To fl', 'fl', 'To vn']
+# ------------------------------------------------------------------------------------------------------------------
+# PLOTTING EXAMPLES
+
 
 sample_vn_squeezed = tf.squeeze(sample_vn)
 to_fl_squeezed = tf.squeeze(to_fl)
 sample_fl_squeezed = tf.squeeze(sample_fl)
 to_vn_squeezed = tf.squeeze(to_vn)
 
+fig, ax = plt.subplots(nrows=2, ncols=2)
+img_sample_vn_squeezed = librosa.display.specshow(librosa.amplitude_to_db(sample_vn_squeezed, ref=np.max), y_axis='log',
+                                                  x_axis='time', ax=ax[0, 0])
+ax[0, 0].set_title('sample_vn_squeezed')
 
-# DA RIVEDERE, I PLOT FANNO SCHIFO
+img_to_fl_squeezed = librosa.display.specshow(librosa.amplitude_to_db(to_fl_squeezed, ref=np.max), y_axis='log',
+                                              x_axis='time', ax=ax[1, 0])
+ax[1, 0].set_title('to_fl_squeezed')
 
-fig, ax = plt.subplots(nrows=4, ncols=1, sharex=False)
-img_sample_vn_squeezed = librosa.display.specshow(librosa.amplitude_to_db(sample_vn_squeezed, ref=np.max), y_axis='log', x_axis='time', ax=ax[0])
-ax[0].set_title('sample_vn_squeezed')
+img_sample_fl_squeezed = librosa.display.specshow(librosa.amplitude_to_db(sample_fl_squeezed, ref=np.max), y_axis='log',
+                                                  x_axis='time', ax=ax[0, 1])
+ax[0, 1].set_title('sample_fl_squeezed')
 
-img_to_fl_squeezed = librosa.display.specshow(librosa.amplitude_to_db(to_fl_squeezed, ref=np.max), y_axis='log', x_axis='time', ax=ax[1])
-ax[1].set_title('to_fl_squeezed')
-
-img_sample_fl_squeezed = librosa.display.specshow(librosa.amplitude_to_db(sample_fl_squeezed, ref=np.max), y_axis='log', x_axis='time', ax=ax[2])
-ax[2].set_title('sample_fl_squeezed')
-
-img_to_vn_squeezed = librosa.display.specshow(librosa.amplitude_to_db(to_vn_squeezed, ref=np.max), y_axis='log', x_axis='time', ax=ax[3])
-ax[3].set_title('to_vn_squeezed')
+img_to_vn_squeezed = librosa.display.specshow(librosa.amplitude_to_db(to_vn_squeezed, ref=np.max), y_axis='log',
+                                              x_axis='time', ax=ax[1, 1])
+ax[1, 1].set_title('to_vn_squeezed')
 plt.show()
-
-
-imgs_squeezed = [img_sample_vn_squeezed, img_to_fl_squeezed, img_sample_fl_squeezed, img_to_vn_squeezed]
-
-
 
 plt.figure(figsize=(8, 8))
 
@@ -161,15 +160,8 @@ plt.imshow(discriminator_x(sample_vn)[0, ..., -1], cmap='RdBu_r')
 
 plt.show()
 
-
-
-
-
-
-
-
-
-# LOSS FUNCTIONS
+# ------------------------------------------------------------------------------------------------------------------
+# LOSS FUNCTIONS AND OPTIMIZER DEFINITION
 
 LAMBDA = 10
 
@@ -207,13 +199,7 @@ generator_f_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_x_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_y_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 
-
-
-
-
-
-
-
+# ------------------------------------------------------------------------------------------------------------------
 # CHECKPOINTS
 
 checkpoint_path = "./checkpoints/train"
@@ -236,36 +222,36 @@ if ckpt_manager.latest_checkpoint:
     print('Latest checkpoint restored!!')
 '''
 
-
-
-# TRAINING
+# ------------------------------------------------------------------------------------------------------------------
+# TRAINING PROCEDURE DEFINITION
 
 EPOCHS = 40
 
 
-def generate_images(model, test_input):
+def generate_images(model, test_input, epoch):
     prediction = model(test_input)
     test_input_squeezed = tf.squeeze(test_input)
     prediction_squeezed = tf.squeeze(prediction)
     plt.figure(figsize=(12, 12))
 
-    display_list = [test_input[0], prediction[0]]
-    title = ['Input Image', 'Predicted Image']
-
     for i in range(2):
         # qui c'era un commento, vedere cycleGAN_forGTZAN_fetaures
 
-        fig, ax = plt.subplots(nrows=2, ncols=1, sharex=False)
+        fig, ax = plt.subplots(nrows=2, ncols=1)
         img_sample_vn_squeezed = librosa.display.specshow(librosa.amplitude_to_db(test_input_squeezed, ref=np.max),
-                                                             y_axis='log', x_axis='time', ax=ax[0])
+                                                          y_axis='log', x_axis='time', ax=ax[0])
         ax[0].set_title('Input Image')
         fig.colorbar(img, ax=ax, format="%+2.0f dB")
 
         img_to_fl_squeezed = librosa.display.specshow(librosa.amplitude_to_db(prediction_squeezed, ref=np.max),
-                                                         y_axis='log', x_axis='time', ax=ax[1])
+                                                      y_axis='log', x_axis='time', ax=ax[1])
         ax[1].set_title('Predicted Image')
         fig.colorbar(img, ax=ax, format="%+2.0f dB")
-
+        fig.savefig(path_epoch_images + "EPOCH" + str(epoch) + ".jpg", dpi='figure', format=None, metadata=None,
+                    bbox_inches=None, pad_inches=0.1,
+                    facecolor='auto', edgecolor='auto',
+                    backend=None
+                    )
     plt.show()
 
 
@@ -331,6 +317,10 @@ def train_step(real_x, real_y):
                                                   discriminator_y.trainable_variables))
 
 
+# ------------------------------------------------------------------------------------------------------------------
+# ACTUAL TRAINING OF THE NETWORK
+
+
 for epoch in range(EPOCHS):
     start = time.time()
 
@@ -348,7 +338,7 @@ for epoch in range(EPOCHS):
     clear_output(wait=True)
     # Using a consistent image (sample_horse) so that the progress of the model
     # is clearly visible.
-    generate_images(generator_g, sample_vn)
+    generate_images(generator_g, sample_vn, epoch)
 
     if (epoch + 1) % 5 == 0:
         ckpt_save_path = ckpt_manager.save()
@@ -357,7 +347,6 @@ for epoch in range(EPOCHS):
 
     print('Time taken for epoch {} is {} sec\n'.format(epoch + 1,
                                                        time.time() - start))
-
 
 '''
 
