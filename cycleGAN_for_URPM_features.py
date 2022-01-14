@@ -10,9 +10,12 @@ from IPython.display import clear_output
 import librosa
 import librosa.display
 from utils import *
+import scipy
 
 # DEFINITION OF PATHS / DIRECTORIES FOR IMAGES TO BE SAVED
 path_epoch_images = "/nas/home/spol/Thesis/epoch_images/"
+data_dir = pathlib.Path(path_epoch_images)
+path_epoch_images_dir = data_dir.iterdir()
 
 try:
     shutil.rmtree(path_epoch_images, ignore_errors=True)
@@ -25,6 +28,7 @@ try:
     os.mkdir(path_epoch_images)
 except OSError:
     print("Creation of the directory  failed")
+
 
 train_vn = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/features_vn_train_256')
 train_fl = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/features_fl_train_256')
@@ -43,7 +47,7 @@ test_fl_stft = []
 
 # ------------------------------------------------------------------------------------------------------------------
 # SETTING GPU ORDER
-set_gpu(-1)
+set_gpu(0)
 '''
 IMPORTANTE: size dell'input e dell'output 
 PROVA con CQT che è più semplice e piccola
@@ -56,7 +60,7 @@ LEGGERE PAPERS E VEDERE COME SETTANO LORO
 # ------------------------------------------------------------------------------------------------------------------
 # LOADING FEATURES AND APPENDING THEM INTO ARRAY
 
-# Cycling over violin segments
+# Cycling over violin train segments
 for idx, feature in enumerate(train_vn_dir):
     feature_name = feature.name
     if "STFTMAG." in feature_name:
@@ -66,7 +70,7 @@ for idx, feature in enumerate(train_vn_dir):
         print("feature.shape: ", feature_reshaped.shape)
         train_vn_stft.append(feature_reshaped)
 
-# Cycling over flute segments
+# Cycling over flute train segments
 for idx, feature in enumerate(train_fl_dir):
     feature_name = feature.name
     if "STFTMAG." in feature_name:
@@ -75,6 +79,27 @@ for idx, feature in enumerate(train_fl_dir):
         print("feature.name: ", feature_name)
         print("feature.shape: ", feature_reshaped.shape)
         train_fl_stft.append(feature_reshaped)
+
+# Cycling over violin test segments
+for idx, feature in enumerate(test_vn_dir):
+    feature_name = feature.name
+    if "STFTMAG." in feature_name:
+        feature_np = np.load(feature)
+        feature_reshaped = feature_np[0:1024, 0:256]
+        print("feature.name: ", feature_name)
+        print("feature.shape: ", feature_reshaped.shape)
+        test_vn_stft.append(feature_reshaped)
+
+# Cycling over flute test segments
+for idx, feature in enumerate(test_fl_dir):
+    feature_name = feature.name
+    if "STFTMAG." in feature_name:
+        feature_np = np.load(feature)
+        feature_reshaped = feature_np[0:1024, 0:256]
+        print("feature.name: ", feature_name)
+        print("feature.shape: ", feature_reshaped.shape)
+        test_fl_stft.append(feature_reshaped)
+
 
 # ------------------------------------------------------------------------------------------------------------------
 # PLOTTING SPECTROGRAM OF A SAMPLE OF VIOLIN AND ONE OF FLUTE
@@ -230,6 +255,7 @@ EPOCHS = 40
 
 def generate_images(model, test_input, epoch):
     prediction = model(test_input)
+    np.save(path_epoch_images + str(epoch) + "_new", prediction)
     test_input_squeezed = tf.squeeze(test_input)
     prediction_squeezed = tf.squeeze(prediction)
     plt.figure(figsize=(12, 12))
@@ -348,7 +374,21 @@ for epoch in range(EPOCHS):
     print('Time taken for epoch {} is {} sec\n'.format(epoch + 1,
                                                        time.time() - start))
 
-'''
 
-# qui c'era un commento, vedere cycleGAN_forGTZAN_fetaures
-'''
+# ------------------------------------------------------------------------------------------------------------------
+# RUN THE TRAINED MODEL ON TEST DATASET
+for i in range(5):
+    test_vn_stft[i] = tf.expand_dims(test_vn_stft[i], axis=0, name=None)
+    test_vn_stft[i] = tf.expand_dims(test_vn_stft[i], axis=-1, name=None)
+    generate_images(generator_g, test_vn_stft[i], i)
+
+for idx, new_stft in enumerate(path_epoch_images_dir):
+    new_stft_name = new_stft.name
+    if ".npy" in new_stft_name:
+        feature_np = np.load(new_stft)
+        inv = librosa.griffinlim(feature_np)
+        scipy.io.wavfile.write('/nas/home/spol/Thesis/inverse' + str(idx) + '.wav', 22050, inv)
+
+
+
+

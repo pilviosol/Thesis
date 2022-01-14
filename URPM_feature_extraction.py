@@ -6,6 +6,13 @@ import librosa.display
 import librosa
 import shutil
 
+'''
+PROVARE IL GRIFFIN LIMM ALGORITHM PER I CAZZI MIEI BELLA
+'''
+
+
+
+
 # DEFINITION OF PATHS
 
 path_features_vn_train = "/nas/home/spol/Thesis/URPM_vn_fl/features_vn_train/"
