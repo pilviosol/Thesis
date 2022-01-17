@@ -11,6 +11,20 @@ import librosa
 import librosa.display
 from utils import *
 import scipy
+from tensorboardX import SummaryWriter
+import wandb
+from wandb.keras import WandbCallback
+
+wandb.init(project="my-test-project", entity="pilviosol")
+
+wandb.config = {
+  "learning_rate": 0.001,
+  "epochs": 40,
+  "batch_size": 128
+}
+config = wandb.config
+
+
 
 # DEFINITION OF PATHS / DIRECTORIES FOR IMAGES TO BE SAVED
 path_epoch_images = "/nas/home/spol/Thesis/epoch_images/"
@@ -250,7 +264,7 @@ if ckpt_manager.latest_checkpoint:
 # ------------------------------------------------------------------------------------------------------------------
 # TRAINING PROCEDURE DEFINITION
 
-EPOCHS = 40
+EPOCHS = config['epochs']
 
 
 def generate_images(model, test_input, epoch):
@@ -282,7 +296,7 @@ def generate_images(model, test_input, epoch):
 
 
 @tf.function
-def train_step(real_x, real_y):
+def train_step(real_x, real_y, epoch):
     # persistent is set to True because the tape is used more than
     # once to calculate the gradients.
     with tf.GradientTape(persistent=True) as tape:
@@ -308,7 +322,6 @@ def train_step(real_x, real_y):
         # calculate the loss
         gen_g_loss = generator_loss(disc_fake_y)
         gen_f_loss = generator_loss(disc_fake_x)
-
         total_cycle_loss = calc_cycle_loss(real_x, cycled_x) + calc_cycle_loss(real_y, cycled_y)
 
         # Total generator loss = adversarial loss + cycle loss
@@ -317,6 +330,14 @@ def train_step(real_x, real_y):
 
         disc_x_loss = discriminator_loss(disc_real_x, disc_fake_x)
         disc_y_loss = discriminator_loss(disc_real_y, disc_fake_y)
+
+        with train_writer.as_default():
+            tf.summary.scalar("Loss", total_cycle_loss, step=epoch)
+        wandb.log({"loss": tf.keras.backend.get_value(total_cycle_loss), "epoch": epoch})
+
+
+
+        #tb.add_scalar("train/loss", total_gen_g_loss, epoch)
 
     # Calculate the gradients for generator and discriminator
     generator_g_gradients = tape.gradient(total_gen_g_loss,
@@ -345,6 +366,9 @@ def train_step(real_x, real_y):
 
 # ------------------------------------------------------------------------------------------------------------------
 # ACTUAL TRAINING OF THE NETWORK
+#tb = SummaryWriter(logdir="./logs")
+train_writer = tf.summary.create_file_writer("logs/train/")
+test_writer = tf.summary.create_file_writer("logs/test/")
 
 
 for epoch in range(EPOCHS):
@@ -356,7 +380,7 @@ for epoch in range(EPOCHS):
         image_x = tf.expand_dims(image_x, axis=-1, name=None)
         image_y = tf.expand_dims(image_y, axis=0, name=None)
         image_y = tf.expand_dims(image_y, axis=-1, name=None)
-        train_step(image_x, image_y)
+        train_step(image_x, image_y, epoch)
         if n % 10 == 0:
             print('.', end='')
         n += 1
@@ -388,7 +412,4 @@ for idx, new_stft in enumerate(path_epoch_images_dir):
         feature_np = np.load(new_stft)
         inv = librosa.griffinlim(feature_np)
         scipy.io.wavfile.write('/nas/home/spol/Thesis/inverse' + str(idx) + '.wav', 22050, inv)
-
-
-
 

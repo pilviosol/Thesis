@@ -22,3 +22,4 @@ dependencies:
   - pip:
       - tensorflow==2.3.0
       - gputil
+      - wandb
