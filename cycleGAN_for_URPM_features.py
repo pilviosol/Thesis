@@ -292,9 +292,14 @@ def generate_images(model, test_input, epoch):
                     facecolor='auto', edgecolor='auto',
                     backend=None
                     )
+
+        #images = wandb.Image(dioporco, caption="Generated images at epoch" + str(epoch))
+
+        #wandb.log({"examples": images})
+
     plt.show()
 
-
+train_loss = tf.keras.metrics.Mean(name="train_loss")
 @tf.function
 def train_step(real_x, real_y, epoch):
     # persistent is set to True because the tape is used more than
@@ -331,9 +336,7 @@ def train_step(real_x, real_y, epoch):
         disc_x_loss = discriminator_loss(disc_real_x, disc_fake_x)
         disc_y_loss = discriminator_loss(disc_real_y, disc_fake_y)
 
-        with train_writer.as_default():
-            tf.summary.scalar("Loss", total_cycle_loss, step=epoch)
-        wandb.log({"loss": tf.keras.backend.get_value(total_cycle_loss), "epoch": epoch})
+
 
 
 
@@ -362,6 +365,8 @@ def train_step(real_x, real_y, epoch):
 
     discriminator_y_optimizer.apply_gradients(zip(discriminator_y_gradients,
                                                   discriminator_y.trainable_variables))
+    #return tf.keras.backend.get_value(total_cycle_loss).numpy()
+    train_loss(total_cycle_loss)
 
 
 # ------------------------------------------------------------------------------------------------------------------
@@ -397,6 +402,14 @@ for epoch in range(EPOCHS):
 
     print('Time taken for epoch {} is {} sec\n'.format(epoch + 1,
                                                        time.time() - start))
+    loss = train_loss.result()
+
+    wandb.log({"train_loss": loss.numpy(), "global_step": epoch})
+    '''
+    with train_writer.as_default():
+        tf.summary.scalar("Loss", total_cycle_loss, step=epoch) '''
+
+
 
 
 # ------------------------------------------------------------------------------------------------------------------
