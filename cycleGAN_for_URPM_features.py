@@ -337,9 +337,6 @@ def train_step(real_x, real_y, epoch):
         disc_y_loss = discriminator_loss(disc_real_y, disc_fake_y)
 
 
-
-
-
         #tb.add_scalar("train/loss", total_gen_g_loss, epoch)
 
     # Calculate the gradients for generator and discriminator
@@ -423,6 +420,7 @@ for idx, new_stft in enumerate(path_epoch_images_dir):
     new_stft_name = new_stft.name
     if ".npy" in new_stft_name:
         feature_np = np.load(new_stft)
-        inv = librosa.griffinlim(feature_np)
+        feature_np_squeezed = tf.squeeze(feature_np)
+        inv = librosa.griffinlim(feature_np_squeezed.numpy())
         scipy.io.wavfile.write('/nas/home/spol/Thesis/inverse' + str(idx) + '.wav', 22050, inv)
 
