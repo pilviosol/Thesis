@@ -10,7 +10,7 @@ from IPython.display import clear_output
 import librosa
 import librosa.display
 from utils import *
-import scipy
+import scipy.io.wavfile
 from tensorboardX import SummaryWriter
 import wandb
 from wandb.keras import WandbCallback
@@ -422,5 +422,5 @@ for idx, new_stft in enumerate(path_epoch_images_dir):
         feature_np = np.load(new_stft)
         feature_np_squeezed = tf.squeeze(feature_np)
         inv = librosa.griffinlim(feature_np_squeezed.numpy())
-        scipy.io.wavfile.write('/nas/home/spol/Thesis/inverse' + str(idx) + '.wav', 22050, inv)
+        scipy.io.wavfile.write('/nas/home/spol/Thesis/Inverse/inverse' + str(idx) + '.wav', 22050, inv)
 

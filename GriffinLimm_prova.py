@@ -11,6 +11,7 @@ import librosa
 import librosa.display
 from utils import *
 import scipy
+import scipy.io.wavfile
 from tensorboardX import SummaryWriter
 import wandb
 from wandb.keras import WandbCallback
@@ -38,12 +39,13 @@ ax[2].set_title('Magnitude-only istft reconstruction')
 plt.show()
 '''
 
-
+#/nas/home/spol/Thesis/URPM_vn_fl/vn_train/AuSep_1_vn_01_Jupiter.wav
 feature_np = np.load('/nas/home/spol/Thesis/epoch_images/9_new.npy')
 feature_np_squeezed = tf.squeeze(feature_np)
 print('feature_np_squeezed.shape: ', feature_np_squeezed.shape)
 
 y_inv = librosa.griffinlim(feature_np_squeezed.numpy())
+scipy.io.wavfile.write('/nas/home/spol/Thesis/Inverse/inverse.wav', 22050, y_inv)
 
 plt.figure()
 librosa.display.waveshow(y_inv, sr=22050, color='b')
