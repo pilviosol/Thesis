@@ -19,7 +19,7 @@ wandb.init(project="my-test-project", entity="pilviosol")
 
 wandb.config = {
   "learning_rate": 0.001,
-  "epochs": 40,
+  "epochs": 50,
   "batch_size": 128
 }
 config = wandb.config
@@ -44,8 +44,8 @@ except OSError:
     print("Creation of the directory  failed")
 
 
-train_vn = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/features_vn_train_256')
-train_fl = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/features_fl_train_256')
+train_vn = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/single_feature_vn')
+train_fl = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/single_feature_fl')
 test_vn = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/features_vn_test_256')
 test_fl = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/features_fl_test_256')
 
@@ -119,7 +119,7 @@ for idx, feature in enumerate(test_fl_dir):
 # PLOTTING SPECTROGRAM OF A SAMPLE OF VIOLIN AND ONE OF FLUTE
 
 sample_vn = train_vn_stft[0]
-sample_fl = train_fl_stft[3]
+sample_fl = train_fl_stft[0]
 
 print('sample_vn.shape: ', sample_vn.shape)
 print('sample_vfl.shape: ', sample_fl.shape)
