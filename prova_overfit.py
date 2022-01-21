@@ -15,6 +15,20 @@ from tensorboardX import SummaryWriter
 import wandb
 from wandb.keras import WandbCallback
 
+
+'''
+TO DO:
+
+IMPORTANTE: size dell'input e dell'output 
+PROVA con CQT che è più semplice e piccola
+
+'''
+
+
+# ------------------------------------------------------------------------------------------------------------------
+# WANDB CONFIGURATION
+print('WANDB CONFIGURATION......')
+
 wandb.init(project="my-test-project", entity="pilviosol")
 
 wandb.config = {
@@ -23,27 +37,35 @@ wandb.config = {
   "batch_size": 128
 }
 config = wandb.config
+print('WANDB CONFIGURATION CONCLUDED!')
 
 
-
-# DEFINITION OF PATHS / DIRECTORIES FOR IMAGES TO BE SAVED
+# ------------------------------------------------------------------------------------------------------------------
+# DEFINITION OF PATHS / DIRECTORIES FOR IMAGES AND AUDIO RECONSTRUCTIONS TO BE SAVED
+print('DEFINITION OF PATHS / DIRECTORIES FOR IMAGES AND AUDIO RECONSTRUCTIONS TO BE SAVED....')
 path_epoch_images = "/nas/home/spol/Thesis/epoch_images/"
+path_reconstructions = "/nas/home/spol/Thesis/Inverse/"
 data_dir = pathlib.Path(path_epoch_images)
 path_epoch_images_dir = data_dir.iterdir()
 
 try:
     shutil.rmtree(path_epoch_images, ignore_errors=True)
+    shutil.rmtree(path_reconstructions, ignore_errors=True)
 except OSError:
     print("Removal of the directory %s failed" % path_epoch_images)
+    print("Removal of the directory %s failed" % path_reconstructions)
 else:
     print("Successfully removed the directory %s" % path_epoch_images)
+    print("Successfully removed the directory %s" % path_reconstructions)
 
 try:
     os.mkdir(path_epoch_images)
+    os.mkdir(path_reconstructions)
 except OSError:
-    print("Creation of the directory  failed")
+    print("Creation of the directories failed")
 
 
+# PATH WHERE FEATURES ARE STORED
 train_vn = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/single_feature_vn')
 train_fl = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/single_feature_fl')
 test_vn = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/features_vn_test_256')
@@ -54,75 +76,86 @@ test_vn_dir = test_vn.iterdir()
 train_fl_dir = train_fl.iterdir()
 test_fl_dir = test_fl.iterdir()
 
+# INITIALIZATION OF ARRAY OF FEATURES
 train_vn_stft = []
 test_vn_stft = []
 train_fl_stft = []
 test_fl_stft = []
 
+print('DEFINITION OF PATHS / DIRECTORIES FOR IMAGES AND AUDIO RECONSTRUCTIONS TO BE SAVED CONCLUDED!')
+
 # ------------------------------------------------------------------------------------------------------------------
 # SETTING GPU ORDER
-set_gpu(1)
-'''
-IMPORTANTE: size dell'input e dell'output 
-PROVA con CQT che è più semplice e piccola
-LEGGERE PAPERS E VEDERE COME SETTANO LORO
+set_gpu(0)
 
-'''
-
-# STFT: 1025 x 256, FOR NOW WORKING ON STFT MAGNITUDE ONLY
 
 # ------------------------------------------------------------------------------------------------------------------
 # LOADING FEATURES AND APPENDING THEM INTO ARRAY
-#   QUA SAREBBE DA OTTIMIZZARE FACENDO UNA FUNZIONE E CHIAMANDOLA PER OGNUNA DELLE DIRECTORY
+print('LOADING FEATURES AND APPENDING THEM INTO ARRAY...')
+
+
 # Cycling over violin train segments
+print('Cycling over violin train segments....')
 for idx, feature in enumerate(train_vn_dir):
     feature_name = feature.name
     if "STFTMAG." in feature_name:
         feature_np = np.load(feature)
         feature_reshaped = feature_np[0:1024, 0:256]
-        print("feature.name: ", feature_name)
-        print("feature.shape: ", feature_reshaped.shape)
+        print("feature.name: ", feature_name, ", Shape: ", feature_reshaped.shape)
         train_vn_stft.append(feature_reshaped)
 
 # Cycling over flute train segments
+print('Cycling over flute train segments....')
 for idx, feature in enumerate(train_fl_dir):
     feature_name = feature.name
     if "STFTMAG." in feature_name:
         feature_np = np.load(feature)
         feature_reshaped = feature_np[0:1024, 0:256]
-        print("feature.name: ", feature_name)
-        print("feature.shape: ", feature_reshaped.shape)
+        print("feature.name: ", feature_name, ", Shape: ", feature_reshaped.shape)
         train_fl_stft.append(feature_reshaped)
 
 # Cycling over violin test segments
+print('Cycling over violin test segments....')
 for idx, feature in enumerate(test_vn_dir):
     feature_name = feature.name
     if "STFTMAG." in feature_name:
         feature_np = np.load(feature)
         feature_reshaped = feature_np[0:1024, 0:256]
-        print("feature.name: ", feature_name)
-        print("feature.shape: ", feature_reshaped.shape)
+        print("feature.name: ", feature_name, ", Shape: ", feature_reshaped.shape)
         test_vn_stft.append(feature_reshaped)
 
 # Cycling over flute test segments
+print('Cycling over flute test segments....')
 for idx, feature in enumerate(test_fl_dir):
     feature_name = feature.name
     if "STFTMAG." in feature_name:
         feature_np = np.load(feature)
         feature_reshaped = feature_np[0:1024, 0:256]
-        print("feature.name: ", feature_name)
-        print("feature.shape: ", feature_reshaped.shape)
+        print("feature.name: ", feature_name, ", Shape: ", feature_reshaped.shape)
         test_fl_stft.append(feature_reshaped)
 
+print('LOADING FEATURES AND APPENDING THEM INTO ARRAY CONCLUDED!')
 
 # ------------------------------------------------------------------------------------------------------------------
 # PLOTTING SPECTROGRAM OF A SAMPLE OF VIOLIN AND ONE OF FLUTE
+print('PLOTTING SPECTROGRAM OF A SAMPLE OF VIOLIN AND ONE OF FLUTE...')
+
 
 sample_vn = train_vn_stft[0]
 sample_fl = train_fl_stft[0]
 
 print('sample_vn.shape: ', sample_vn.shape)
 print('sample_vfl.shape: ', sample_fl.shape)
+
+plt.subplot(211)
+plt.imshow(librosa.amplitude_to_db(sample_vn, ref=np.max), y_axis='log', x_axis='time')
+plt.subplot(212)
+plt.imshow(librosa.amplitude_to_db(sample_fl, ref=np.max), y_axis='log', x_axis='time')
+
+
+
+
+
 
 fig, ax = plt.subplots()
 img = librosa.display.specshow(librosa.amplitude_to_db(sample_vn, ref=np.max), y_axis='log', x_axis='time', ax=ax)
@@ -136,8 +169,12 @@ ax.set_title('fl Power spectrogram')
 fig.colorbar(img, ax=ax, format="%+2.0f dB")
 plt.show()
 
+print('PLOTTING SPECTROGRAM OF A SAMPLE OF VIOLIN AND ONE OF FLUTE CONCLUDED!')
+
+
 # ------------------------------------------------------------------------------------------------------------------
 # IMPORTING AND USING PIX2PIX_MODIFIED ARCHITECTURE
+print('IMPORTING AND USING PIX2PIX_MODIFIED ARCHITECTURE....')
 
 OUTPUT_CHANNELS = 1
 
@@ -147,8 +184,12 @@ generator_f = pix2pix_modified.unet_generator(OUTPUT_CHANNELS, norm_type='instan
 discriminator_x = pix2pix_modified.discriminator(norm_type='instancenorm', target=False)
 discriminator_y = pix2pix_modified.discriminator(norm_type='instancenorm', target=False)
 
+print('IMPORTING AND USING PIX2PIX_MODIFIED ARCHITECTURE CONCLUDED!')
+
+
 # ------------------------------------------------------------------------------------------------------------------
-# EXPANDING DIMENSIONS TO FEED SAMPLES TO THE NETWORK
+# EXPANDING DIMENSIONS TO FEED SAMPLES TO THE NETWORK AND PLOTTING EXAMPLES
+print('EXPANDING DIMENSIONS TO FEED SAMPLES TO THE NETWORK AND PLOTTING EXAMPLES....')
 
 sample_vn = tf.expand_dims(sample_vn, axis=0, name=None)
 sample_vn = tf.expand_dims(sample_vn, axis=-1, name=None)
@@ -198,8 +239,13 @@ plt.imshow(discriminator_x(sample_vn)[0, ..., -1], cmap='RdBu_r')
 
 plt.show()
 
+print('EXPANDING DIMENSIONS TO FEED SAMPLES TO THE NETWORK AND PLOTTING EXAMPLES CONCLUDED!')
+
+
 # ------------------------------------------------------------------------------------------------------------------
 # LOSS FUNCTIONS AND OPTIMIZER DEFINITION
+
+print('LOSS FUNCTIONS AND OPTIMIZER DEFINITION....')
 
 LAMBDA = 10
 
@@ -237,9 +283,12 @@ generator_f_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_x_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_y_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 
+print('LOSS FUNCTIONS AND OPTIMIZER DEFINITION CONCLUDED!')
+
+
 # ------------------------------------------------------------------------------------------------------------------
 # CHECKPOINTS
-
+'''
 checkpoint_path = "./checkpoints/train"
 
 ckpt = tf.train.Checkpoint(generator_g=generator_g,
@@ -253,7 +302,7 @@ ckpt = tf.train.Checkpoint(generator_g=generator_g,
 
 ckpt_manager = tf.train.CheckpointManager(ckpt, checkpoint_path, max_to_keep=5)
 
-'''
+
 # if a checkpoint exists, restore the latest checkpoint.
 if ckpt_manager.latest_checkpoint:
     ckpt.restore(ckpt_manager.latest_checkpoint)
@@ -262,6 +311,7 @@ if ckpt_manager.latest_checkpoint:
 
 # ------------------------------------------------------------------------------------------------------------------
 # TRAINING PROCEDURE DEFINITION
+print('TRAINING PROCEDURE DEFINITION....')
 
 EPOCHS = config['epochs']
 
@@ -382,10 +432,15 @@ def train_step(real_x, real_y, epoch):
     disc_x_loss_(disc_x_loss)
     disc_y_loss_(disc_y_loss)
 
+print('TRAINING PROCEDURE DEFINITION CONCLUDED!')
+
 
 # ------------------------------------------------------------------------------------------------------------------
 # ACTUAL TRAINING OF THE NETWORK
-#tb = SummaryWriter(logdir="./logs")
+
+print('ACTUAL TRAINING OF THE NETWORK....')
+
+# tb = SummaryWriter(logdir="./logs")
 train_writer = tf.summary.create_file_writer("logs/train/")
 test_writer = tf.summary.create_file_writer("logs/test/")
 
@@ -408,14 +463,14 @@ for epoch in range(EPOCHS):
     # Using a consistent image (sample_horse) so that the progress of the model
     # is clearly visible.
     generate_images(generator_g, sample_vn, epoch)
-
+    '''
     if (epoch + 1) % 5 == 0:
         ckpt_save_path = ckpt_manager.save()
         print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
                                                             ckpt_save_path))
 
     print('Time taken for epoch {} is {} sec\n'.format(epoch + 1,
-                                                       time.time() - start))
+                                                       time.time() - start)) '''
     gen_g_loss = gen_g_loss_.result()
     gen_f_loss = gen_f_loss_.result()
     total_cycle_loss = total_cycle_loss_.result()
@@ -436,14 +491,26 @@ for epoch in range(EPOCHS):
         tf.summary.scalar("Loss", total_cycle_loss, step=epoch) '''
 
 
+print('ACTUAL TRAINING OF THE NETWORK CONCLUDED!')
 
 
 # ------------------------------------------------------------------------------------------------------------------
-# RUN THE TRAINED MODEL ON TEST DATASET
+# RUNNING THE TRAINED MODEL ON TEST DATASET
+
+print('RUNNING THE TRAINED MODEL ON TEST DATASET')
+
 for i in range(5):
     test_vn_stft[i] = tf.expand_dims(test_vn_stft[i], axis=0, name=None)
     test_vn_stft[i] = tf.expand_dims(test_vn_stft[i], axis=-1, name=None)
     generate_images(generator_g, test_vn_stft[i], i)
+
+print('RUNNING THE TRAINED MODEL ON TEST DATASET CONCLUDED!')
+
+
+# ------------------------------------------------------------------------------------------------------------------
+# INVERTING TRAINING STFT TO WAV AUDIO AND STORING THEM INTO FOLDER
+
+print('INVERTING TRAINING STFT TO WAV AUDIO AND STORING THEM INTO FOLDER....')
 
 for idx, new_stft in enumerate(path_epoch_images_dir):
     new_stft_name = new_stft.name
@@ -451,5 +518,8 @@ for idx, new_stft in enumerate(path_epoch_images_dir):
         feature_np = np.load(new_stft)
         feature_np_squeezed = tf.squeeze(feature_np)
         inv = librosa.griffinlim(feature_np_squeezed.numpy())
-        scipy.io.wavfile.write('/nas/home/spol/Thesis/Inverse/inverse' + str(int(idx/2)) + '.wav', 22050, inv)
+        scipy.io.wavfile.write(path_reconstructions + 'inverse' + str(int(idx/2)) + '.wav', 22050, inv)
+
+print('INVERTING TRAINING STFT TO WAV AUDIO AND STORING THEM INTO FOLDER CONCLUDED!')
+
 

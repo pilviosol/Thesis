@@ -124,6 +124,8 @@ sample_fl = train_fl_stft[3]
 print('sample_vn.shape: ', sample_vn.shape)
 print('sample_vfl.shape: ', sample_fl.shape)
 
+
+
 fig, ax = plt.subplots()
 img = librosa.display.specshow(librosa.amplitude_to_db(sample_vn, ref=np.max), y_axis='log', x_axis='time', ax=ax)
 ax.set_title('vn Power spectrogram')
