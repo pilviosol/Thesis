@@ -21,6 +21,7 @@ TO DO:
 
 IMPORTANTE: size dell'input e dell'output 
 PROVA con CQT che è più semplice e piccola
+CAPIRE CHE DATI DO'. FORSE DEVONO ESSERE RIDISTRIBUTI IN LOGARITMICO!!
 
 '''
 
@@ -147,11 +148,18 @@ sample_fl = train_fl_stft[0]
 print('sample_vn.shape: ', sample_vn.shape)
 print('sample_vfl.shape: ', sample_fl.shape)
 
-plt.subplot(211)
-plt.imshow(librosa.amplitude_to_db(sample_vn, ref=np.max), y_axis='log', x_axis='time')
-plt.subplot(212)
-plt.imshow(librosa.amplitude_to_db(sample_fl, ref=np.max), y_axis='log', x_axis='time')
+fig = plt.figure()
+im = plt.imshow(librosa.amplitude_to_db(sample_vn, ref=np.max), aspect='auto', origin='lower')
+plt.colorbar(im)
+plt.title('sample_vn')
+plt.show()
 
+
+fig = plt.figure()
+im = plt.imshow(librosa.amplitude_to_db(sample_fl, ref=np.max), aspect='auto', origin='lower')
+plt.colorbar(im)
+plt.title('sample_fl')
+plt.show()
 
 
 
@@ -208,6 +216,26 @@ sample_vn_squeezed = tf.squeeze(sample_vn)
 to_fl_squeezed = tf.squeeze(to_fl)
 sample_fl_squeezed = tf.squeeze(sample_fl)
 to_vn_squeezed = tf.squeeze(to_vn)
+
+
+
+plt.subplot(221)
+plt.imshow(librosa.amplitude_to_db(sample_vn_squeezed), aspect='auto', origin='lower')
+plt.title('sample_vn_squeezed')
+plt.subplot(222)
+plt.imshow(librosa.amplitude_to_db(to_fl_squeezed), aspect='auto', origin='lower')
+plt.title('to_fl_squeezed')
+plt.subplot(223)
+plt.imshow(librosa.amplitude_to_db(sample_fl_squeezed), aspect='auto', origin='lower')
+plt.title('sample_fl_squeezed')
+plt.subplot(224)
+plt.imshow(librosa.amplitude_to_db(to_vn_squeezed), aspect='auto', origin='lower')
+plt.title('to_vn_squeezed')
+plt.show()
+
+
+
+
 
 fig, ax = plt.subplots(nrows=2, ncols=2)
 img_sample_vn_squeezed = librosa.display.specshow(librosa.amplitude_to_db(sample_vn_squeezed, ref=np.max), y_axis='log',
