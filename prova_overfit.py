@@ -19,7 +19,7 @@ wandb.init(project="my-test-project", entity="pilviosol")
 
 wandb.config = {
   "learning_rate": 0.001,
-  "epochs": 50,
+  "epochs": 500,
   "batch_size": 128
 }
 config = wandb.config
@@ -61,7 +61,7 @@ test_fl_stft = []
 
 # ------------------------------------------------------------------------------------------------------------------
 # SETTING GPU ORDER
-set_gpu(0)
+set_gpu(1)
 '''
 IMPORTANTE: size dell'input e dell'output 
 PROVA con CQT che è più semplice e piccola
@@ -284,22 +284,34 @@ def generate_images(model, test_input, epoch):
 
         librosa.display.specshow(librosa.amplitude_to_db(prediction_squeezed, ref=np.max),
                                                       y_axis='log', x_axis='time', ax=ax[1])
+        fig.suptitle('EPOCH' + str(epoch), fontsize=16)
         ax[1].set_title('Predicted Image')
         fig.colorbar(img, ax=ax, format="%+2.0f dB")
-        fig.savefig(path_epoch_images + "EPOCH" + str(epoch) + ".jpg", dpi='figure', format=None, metadata=None,
-                    bbox_inches=None, pad_inches=0.1,
-                    facecolor='auto', edgecolor='auto',
-                    backend=None
-                    )
+        if (epoch + 1) % 10 == 0:
+            fig.savefig(path_epoch_images + "EPOCH" + str(epoch) + ".jpg", dpi='figure', format=None,
+                        bbox_inches=None, pad_inches=0.1,
+                        facecolor='auto', edgecolor='auto',
+                        backend=None
+                        )
+        plt.close()
 
-        #images = wandb.Image(dioporco, caption="Generated images at epoch" + str(epoch))
+        #images = wandb.Image(xx, caption="Generated images at epoch" + str(epoch))
 
         #wandb.log({"examples": images})
 
-    plt.show()
+    plt.close()
 
-train_loss = tf.keras.metrics.Mean(name="train_loss")
-@tf.function
+gen_g_loss_ = tf.keras.metrics.Mean(name="gen_g_loss")
+gen_f_loss_ = tf.keras.metrics.Mean(name="gen_f_loss")
+train_loss_ = tf.keras.metrics.Mean(name="train_loss")
+total_cycle_loss_ = tf.keras.metrics.Mean(name="total_cycle_loss")
+total_gen_g_loss_ = tf.keras.metrics.Mean(name="total_gen_g_loss")
+total_gen_f_loss_ = tf.keras.metrics.Mean(name="total_gen_f_loss")
+disc_x_loss_ = tf.keras.metrics.Mean(name="disc_x_loss")
+disc_y_loss_ = tf.keras.metrics.Mean(name="disc_y_loss")
+
+
+#@tf.function
 def train_step(real_x, real_y, epoch):
     # persistent is set to True because the tape is used more than
     # once to calculate the gradients.
@@ -362,7 +374,13 @@ def train_step(real_x, real_y, epoch):
     discriminator_y_optimizer.apply_gradients(zip(discriminator_y_gradients,
                                                   discriminator_y.trainable_variables))
     #return tf.keras.backend.get_value(total_cycle_loss).numpy()
-    train_loss(total_cycle_loss)
+    gen_g_loss_(gen_g_loss)
+    gen_f_loss_(gen_f_loss)
+    total_cycle_loss_(total_cycle_loss)
+    total_gen_g_loss_(total_gen_g_loss)
+    total_gen_f_loss_(total_gen_f_loss)
+    disc_x_loss_(disc_x_loss)
+    disc_y_loss_(disc_y_loss)
 
 
 # ------------------------------------------------------------------------------------------------------------------
@@ -398,9 +416,21 @@ for epoch in range(EPOCHS):
 
     print('Time taken for epoch {} is {} sec\n'.format(epoch + 1,
                                                        time.time() - start))
-    loss = train_loss.result()
+    gen_g_loss = gen_g_loss_.result()
+    gen_f_loss = gen_f_loss_.result()
+    total_cycle_loss = total_cycle_loss_.result()
+    total_gen_g_loss = total_gen_g_loss_.result()
+    total_gen_f_loss = total_gen_f_loss_.result()
+    disc_x_loss = disc_x_loss_.result()
+    disc_y_loss = disc_y_loss_.result()
 
-    wandb.log({"train_loss": loss.numpy(), "global_step": epoch})
+    wandb.log({"gen_g_loss": gen_g_loss.numpy(), "global_step": epoch})
+    wandb.log({"gen_f_loss": gen_f_loss.numpy(), "global_step": epoch})
+    wandb.log({"total_cycle_loss": total_cycle_loss.numpy(), "global_step": epoch})
+    wandb.log({"total_gen_g_loss": total_gen_g_loss.numpy(), "global_step": epoch})
+    wandb.log({"total_gen_f_loss": total_gen_f_loss.numpy(), "global_step": epoch})
+    wandb.log({"disc_x_loss": disc_x_loss.numpy(), "global_step": epoch})
+    wandb.log({"disc_y_loss": disc_y_loss.numpy(), "global_step": epoch})
     '''
     with train_writer.as_default():
         tf.summary.scalar("Loss", total_cycle_loss, step=epoch) '''
@@ -421,5 +451,5 @@ for idx, new_stft in enumerate(path_epoch_images_dir):
         feature_np = np.load(new_stft)
         feature_np_squeezed = tf.squeeze(feature_np)
         inv = librosa.griffinlim(feature_np_squeezed.numpy())
-        scipy.io.wavfile.write('/nas/home/spol/Thesis/Inverse/inverse' + str(idx) + '.wav', 22050, inv)
+        scipy.io.wavfile.write('/nas/home/spol/Thesis/Inverse/inverse' + str(int(idx/2)) + '.wav', 22050, inv)
 

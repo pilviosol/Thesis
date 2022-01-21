@@ -19,7 +19,7 @@ wandb.init(project="my-test-project", entity="pilviosol")
 
 wandb.config = {
   "learning_rate": 0.001,
-  "epochs": 40,
+  "epochs": 100,
   "batch_size": 128
 }
 config = wandb.config
@@ -271,6 +271,7 @@ def generate_images(model, test_input, epoch):
     np.save(path_epoch_images + str(epoch) + "_new", prediction)
     test_input_squeezed = tf.squeeze(test_input)
     prediction_squeezed = tf.squeeze(prediction)
+
     plt.figure(figsize=(12, 12))
 
     for i in range(2):
@@ -296,7 +297,7 @@ def generate_images(model, test_input, epoch):
 
         #wandb.log({"examples": images})
 
-    plt.show()
+    plt.close()
 
 train_loss = tf.keras.metrics.Mean(name="train_loss")
 @tf.function
