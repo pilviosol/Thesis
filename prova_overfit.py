@@ -34,7 +34,7 @@ wandb.init(project="my-test-project", entity="pilviosol")
 
 wandb.config = {
   "learning_rate": 0.001,
-  "epochs": 500,
+  "epochs": 200,
   "batch_size": 128
 }
 config = wandb.config
@@ -491,14 +491,14 @@ for epoch in range(EPOCHS):
     # Using a consistent image (sample_horse) so that the progress of the model
     # is clearly visible.
     generate_images(generator_g, sample_vn, epoch)
-    '''
+
     if (epoch + 1) % 5 == 0:
-        ckpt_save_path = ckpt_manager.save()
+        '''ckpt_save_path = ckpt_manager.save()
         print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
-                                                            ckpt_save_path))
+                                                            ckpt_save_path))'''
 
     print('Time taken for epoch {} is {} sec\n'.format(epoch + 1,
-                                                       time.time() - start)) '''
+                                                       time.time() - start))
     gen_g_loss = gen_g_loss_.result()
     gen_f_loss = gen_f_loss_.result()
     total_cycle_loss = total_cycle_loss_.result()
@@ -540,6 +540,7 @@ print('RUNNING THE TRAINED MODEL ON TEST DATASET CONCLUDED!')
 
 print('INVERTING TRAINING STFT TO WAV AUDIO AND STORING THEM INTO FOLDER....')
 
+#QUESTO FOR E' SBAGLIATO (LA PARTE STR)IDX/2)...
 for idx, new_stft in enumerate(path_epoch_images_dir):
     new_stft_name = new_stft.name
     if ".npy" in new_stft_name:
