@@ -23,3 +23,5 @@ dependencies:
       - tensorflow==2.3.0
       - gputil
       - wandb
+      - tensorflow-probability
+      - imageio
