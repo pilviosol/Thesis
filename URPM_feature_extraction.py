@@ -70,7 +70,7 @@ def extract_features(file_name):
         audio, sample_rate = librosa.load(file_name, res_type='kaiser_fast', mono=True)
         print('sample_rate: ', sample_rate)
         cqt = librosa.cqt(y=audio, sr=sample_rate, hop_length=512, fmin=32.7, filter_scale=0.8,
-                          bins_per_octave=48)
+                          bins_per_octave=48, n_bins=384)
         stft_full = librosa.stft(y=audio, n_fft=2048, hop_length=512)
         stft_mag = np.abs(librosa.stft(y=audio, n_fft=2048, hop_length=512))
         stft_mag_real = stft_mag.real
@@ -96,7 +96,7 @@ def extract_features(file_name):
 
 print("Calculating features for violin (train set).....")
 
-data_dir_vn = pathlib.Path('URPM_vn_fl/vn_train')
+data_dir_vn = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/vn_train')
 files_in_basepath_vn = data_dir_vn.iterdir()
 
 for item in files_in_basepath_vn:
@@ -123,7 +123,7 @@ for item in files_in_basepath_vn:
 
 print("Calculating features for violin (test set).....")
 
-data_dir_vn = pathlib.Path('URPM_vn_fl/vn_test')
+data_dir_vn = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/vn_test')
 files_in_basepath_vn = data_dir_vn.iterdir()
 
 for item in files_in_basepath_vn:
@@ -155,7 +155,7 @@ for item in files_in_basepath_vn:
 
 print("Calculating features for flute (train set).....")
 
-data_dir_fl = pathlib.Path('URPM_vn_fl/fl_train')
+data_dir_fl = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/fl_train')
 files_in_basepath_fl = data_dir_fl.iterdir()
 
 for item in files_in_basepath_fl:
@@ -182,7 +182,7 @@ for item in files_in_basepath_fl:
 
 print("Calculating features for flute (test set).....")
 
-data_dir_fl = pathlib.Path('URPM_vn_fl/fl_test')
+data_dir_fl = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/fl_test')
 files_in_basepath_fl = data_dir_fl.iterdir()
 
 for item in files_in_basepath_fl:
@@ -209,8 +209,8 @@ for item in files_in_basepath_fl:
 
 
 # SHOW A SAMPLE IMAGE OF MAGNITUDE AND PHASE OF A STFT
-stft_mag = np.load('/nas/home/spol/Thesis/URPM_vn_fl/features_vn/AuSep_1_vn_35_Rondeau_STFTMAG.npy')
-stft_phase = np.load('/nas/home/spol/Thesis/URPM_vn_fl/features_vn/AuSep_1_vn_35_Rondeau_STFTPHASE.npy')
+stft_mag = np.load('/nas/home/spol/Thesis/URPM_vn_fl/features_vn_train/AuSep_1_vn_35_Rondeau_STFTMAG.npy')
+stft_phase = np.load('/nas/home/spol/Thesis/URPM_vn_fl/features_vn_train/AuSep_1_vn_35_Rondeau_STFTPHASE.npy')
 
 
 plt.figure()

@@ -1,6 +1,6 @@
 import wandb
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+#from __future__ import absolute_import, division, print_function, unicode_literals
 import pathlib
 from utils import *
 
@@ -54,21 +54,24 @@ wandb.config = {
 config = wandb.config
 
 train_vn = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/features_vn_train_256')
-train_fl = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/features_fl_train_256')
-test_vn = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/features_vn_test_256')
-test_fl = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/features_fl_test_256')
-
 train_vn_dir = train_vn.iterdir()
-test_vn_dir = test_vn.iterdir()
-train_fl_dir = train_fl.iterdir()
-test_fl_dir = test_fl.iterdir()
-
 train_vn_stft = []
-test_vn_stft = []
-train_fl_stft = []
-test_fl_stft = []
 
 
+
+
+for idx, feature in enumerate(train_vn_dir):
+    feature_name = feature.name
+    if "CQT." in feature_name:
+        feature_np = np.load(feature)
+        feature_reshaped = feature_np[0:1024, 0:256]
+        print("feature.name: ", feature_name)
+        print("feature.shape: ", feature_reshaped.shape)
+        train_vn_stft.append(feature_reshaped)
+
+print('porco')
+
+'''
 # Define Sampling Layer
 class Sampling(layers.Layer):
     """Uses (z_mean, z_log_var) to sample z, the vector encoding a digit."""
@@ -85,7 +88,9 @@ class Sampling(layers.Layer):
 
 if not config['continue_training']:
     # Define encoder model.
-    original_dim = config['n_bins']
+    n_bins = int(config['num_octaves'] * config['bins_per_octave'])
+
+    original_dim = n_bins
     original_inputs = tf.keras.Input(shape=(original_dim,), name='encoder_input')
     x = layers.Dense(config['n_units'], activation='relu')(original_inputs)
     z_mean = layers.Dense(config['latent_dim'], name='z_mean')(x)
@@ -118,11 +123,10 @@ if not config['continue_training']:
             decay_rate=0.96,
             staircase=True)
 
-    optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate, beta_1=config['adam_beta_1'],
+    optimizer = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'], beta_1=config['adam_beta_1'],
                                          beta_2=config['adam_beta_2'])
 
     vae.compile(optimizer,
                 loss=tf.keras.losses.MeanSquaredError())
-
-history = vae.fit(training_array, training_array, epochs=config['epochs'], batch_size=config['batch_size'])
-
+'''
+#history = vae.fit(train_vn_stft, train_vn_stft, epochs=config['epochs'], batch_size=config['batch_size'])

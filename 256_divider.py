@@ -69,7 +69,7 @@ scipy.io.wavfile.write('/nas/home/spol/Thesis/inverse.wav', sr, y_hat)
 
 
 print('Dividing vn train features in 256 long chunks....')
-features_dir_vn = pathlib.Path('URPM_vn_fl/features_vn_train')
+features_dir_vn = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/features_vn_train')
 features_in_basepath_vn_train = features_dir_vn.iterdir()
 
 '''
@@ -152,7 +152,7 @@ for item in features_in_basepath_vn_train:
 
 
 print('Dividing vn test features in 256 long chunks....')
-features_dir_vn = pathlib.Path('URPM_vn_fl/features_vn_test')
+features_dir_vn = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/features_vn_test')
 features_in_basepath_vn_test = features_dir_vn.iterdir()
 
 
@@ -192,7 +192,7 @@ for item in features_in_basepath_vn_test:
 
 
 print('Dividing fl train features in 256 long chunks....')
-features_dir_fl = pathlib.Path('URPM_vn_fl/features_fl_train')
+features_dir_fl = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/features_fl_train')
 features_in_basepath_fl_train = features_dir_fl.iterdir()
 
 
@@ -214,7 +214,7 @@ for item in features_in_basepath_fl_train:
 
 
 print('Dividing fl train features in 256 long chunks....')
-features_dir_fl = pathlib.Path('URPM_vn_fl/features_fl_test')
+features_dir_fl = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/features_fl_test')
 features_in_basepath_fl_test = features_dir_fl.iterdir()
 
 
