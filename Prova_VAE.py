@@ -38,7 +38,7 @@ wandb.config = {
     "output_activation": "relu",
     "epochs": 2000,
     "learning_rate": 0.0001,
-    "batch_size": 64,
+    "batch_size": 384,
     "buffer_size": 60000,
     "buffer_size_dataset": True,
     "continue_training": False,
@@ -67,11 +67,11 @@ for idx, feature in enumerate(train_vn_dir):
         feature_reshaped = feature_np[0:1024, 0:256]
         print("feature.name: ", feature_name)
         print("feature.shape: ", feature_reshaped.shape)
-        train_vn_stft.append(feature_reshaped)
+        train_vn_stft.append(np.transpose(feature_reshaped))
 
-print('porco')
+print(train_vn_stft[0].shape)
 
-'''
+
 # Define Sampling Layer
 class Sampling(layers.Layer):
     """Uses (z_mean, z_log_var) to sample z, the vector encoding a digit."""
@@ -128,5 +128,5 @@ if not config['continue_training']:
 
     vae.compile(optimizer,
                 loss=tf.keras.losses.MeanSquaredError())
-'''
-#history = vae.fit(train_vn_stft, train_vn_stft, epochs=config['epochs'], batch_size=config['batch_size'])
+
+history = vae.fit(train_vn_stft, train_vn_stft, epochs=config['epochs'], batch_size=config['batch_size'])
