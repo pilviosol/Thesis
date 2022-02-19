@@ -190,7 +190,7 @@ for image in test_metal_dir:
 sample_blues = train_blues_stftmag[0]
 sample_metal = train_metal_stftmag[0]
 
-audio, sample_rate = librosa.load('GTZAN/genres_original/blues/blues.00000.wav', res_type='kaiser_fast', mono=True)
+audio, sample_rate = librosa.load('../GTZAN/genres_original/blues/blues.00000.wav', res_type='kaiser_fast', mono=True)
 cqt = librosa.cqt(y=audio, sr=sample_rate)
 stft_mag = np.abs(librosa.stft(y=audio))
 stft_phase = np.angle(librosa.stft(y=audio))

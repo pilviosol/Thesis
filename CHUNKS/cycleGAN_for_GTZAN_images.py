@@ -1,10 +1,6 @@
-# pip install git+https://github.com/tensorflow/examples.git
 import tensorflow as tf
-# import tensorflow_datasets as tfds
-# from tensorflow_examples.models.pix2pix import pix2pix
 import pix2pix
 import pathlib
-import os
 import time
 import matplotlib.pyplot as plt
 from IPython.display import clear_output
@@ -13,13 +9,29 @@ import cv2
 AUTOTUNE = tf.data.AUTOTUNE
 for gpu in tf.config.experimental.list_physical_devices('GPU'):
     tf.config.experimental.set_memory_growth(gpu, True)
+
+
+
 # INPUT PIPELINE
 
 
-train_horses = pathlib.Path('horse2zebra/trainA/')
-train_zebras = pathlib.Path("horse2zebra/trainB/")
-test_horses = pathlib.Path("horse2zebra/testA/")
-test_zebras = pathlib.Path("horse2zebra/testB/")
+train_blues = pathlib.Path('/nas/home/spol/Thesis/GTZAN/images/blues/train/')
+train_metal = pathlib.Path('/nas/home/spol/Thesis/GTZAN/images/metal/train/')
+test_blues = pathlib.Path('/nas/home/spol/Thesis/GTZAN/images/blues/test/')
+test_metal = pathlib.Path('/nas/home/spol/Thesis/GTZAN/images/metal/test/')
+
+'''
+train_blues = train_blues.iterdir()
+for idx, image in enumerate(train_blues):
+    print(idx, "    :", image)
+
+test_blues = test_blues.iterdir()
+for idx, image in enumerate(test_blues):
+    print(idx, "    :", image)
+    image = cv2.imread(str(image))
+    print("image.size: ", image.shape)  
+'''
+
 
 BUFFER_SIZE = 1000
 BATCH_SIZE = 1
@@ -66,74 +78,87 @@ def preprocess_image_test(image):
     return image
 
 
-train_horses_images = []
-train_horses_images_processed = []
-train_zebras_images = []
-train_zebras_images_processed = []
-test_horses_images = []
-test_horses_images_processed = []
-test_zebras_images = []
-test_zebras_images_processed = []
+train_blues_images = []
+train_blues_images_processed = []
+train_metal_images = []
+train_metal_images_processed = []
+test_blues_images = []
+test_blues_images_processed = []
+test_metal_images = []
+test_metal_images_processed = []
 
-train_horses_dir = train_horses.iterdir()
-for image in train_horses_dir:
+train_blues_dir = train_blues.iterdir()
+for image in train_blues_dir:
     if image.is_file():
         image = cv2.imread(str(image))
-        train_horses_images.append(image)
+        train_blues_images.append(image)
         image = preprocess_image_train(image)
-        train_horses_images_processed.append(image)
+        train_blues_images_processed.append(image)
     else:
-        print('not an image')
+        print('Not an image')
 
-train_zebras_dir = train_zebras.iterdir()
-for image in train_zebras_dir:
+train_metal_dir = train_metal.iterdir()
+for image in train_metal_dir:
     if image.is_file():
         image = cv2.imread(str(image))
-        train_zebras_images.append(image)
+        train_metal_images.append(image)
         image = preprocess_image_train(image)
-        train_zebras_images_processed.append(image)
+        train_metal_images_processed.append(image)
     else:
-        print('not an image')
+        print('Not an image')
 
-test_horses_dir = test_horses.iterdir()
-for image in test_horses_dir:
+test_blues_dir = test_blues.iterdir()
+for image in test_blues_dir:
     if image.is_file():
         image = cv2.imread(str(image))
-        test_horses_images.append(image)
+        test_blues_images.append(image)
         image = preprocess_image_test(image)
-        test_horses_images_processed.append(image)
+        test_blues_images_processed.append(image)
     else:
-        print('not an image')
+        print('Not an image')
 
-test_zebras_dir = test_zebras.iterdir()
-for image in test_zebras_dir:
+test_metal_dir = test_metal.iterdir()
+for image in test_metal_dir:
     if image.is_file():
         image = cv2.imread(str(image))
-        test_zebras_images.append(image)
+        test_metal_images.append(image)
         image = preprocess_image_test(image)
-        test_zebras_images_processed.append(image)
+        test_metal_images_processed.append(image)
     else:
-        print('not an image')
+        print('Not an image')
 
-sample_horse = train_horses_images_processed[0]
-sample_zebra = train_zebras_images_processed[0]
+
+
+
+
+
+sample_blues = train_blues_images_processed[0]
+sample_metal = train_metal_images_processed[0]
 
 plt.subplot(121)
-plt.title('Horse')
-plt.imshow(sample_horse * 0.5 + 0.5)
+plt.title('Blues')
+plt.imshow(sample_blues * 0.5 + 0.5)
 
 plt.subplot(122)
-plt.title('Horse with random jitter')
-plt.imshow(random_jitter(sample_horse * 0.5 + 0.5))
+plt.title('Blues with random jitter')
+plt.imshow(random_jitter(sample_blues * 0.5 + 0.5))
 plt.show()
 
 plt.subplot(121)
-plt.title('Zebra')
-plt.imshow(sample_zebra * 0.5 + 0.5)
+plt.title('Metal')
+plt.imshow(sample_metal * 0.5 + 0.5)
 
 plt.subplot(122)
-plt.title('Zebra with random jitter')
-plt.imshow(random_jitter(sample_zebra * 0.5 + 0.5))
+plt.title('Metal with random jitter')
+plt.imshow(random_jitter(sample_metal * 0.5 + 0.5))
+plt.show()
+
+
+
+
+
+
+
 
 # Import and reuse the Pix2Pix models
 
@@ -145,21 +170,21 @@ generator_f = pix2pix.unet_generator(OUTPUT_CHANNELS, norm_type='instancenorm')
 discriminator_x = pix2pix.discriminator(norm_type='instancenorm', target=False)
 discriminator_y = pix2pix.discriminator(norm_type='instancenorm', target=False)
 
-sample_horse = tf.expand_dims(
-    sample_horse, axis=0, name=None
+sample_blues = tf.expand_dims(
+    sample_blues, axis=0, name=None
 )
 
-sample_zebra = tf.expand_dims(
-    sample_zebra, axis=0, name=None
+sample_metal = tf.expand_dims(
+    sample_metal, axis=0, name=None
 )
 
-to_zebra = generator_g(sample_horse)
-to_horse = generator_f(sample_zebra)
+to_metal = generator_g(sample_blues)
+to_blues = generator_f(sample_metal)
 plt.figure(figsize=(8, 8))
 contrast = 8
 
-imgs = [sample_horse, to_zebra, sample_zebra, to_horse]
-title = ['Horse', 'To Zebra', 'Zebra', 'To Horse']
+imgs = [sample_blues, to_metal, sample_metal, to_blues]
+title = ['Blues', 'To Metal', 'Metal', 'To Blues']
 
 for i in range(len(imgs)):
     plt.subplot(2, 2, i + 1)
@@ -173,14 +198,24 @@ plt.show()
 plt.figure(figsize=(8, 8))
 
 plt.subplot(121)
-plt.title('Is a real zebra?')
-plt.imshow(discriminator_y(sample_zebra)[0, ..., -1], cmap='RdBu_r')
+plt.title('Is a real metal spectrogram?')
+plt.imshow(discriminator_y(sample_metal)[0, ..., -1], cmap='RdBu_r')
 
 plt.subplot(122)
-plt.title('Is a real horse?')
-plt.imshow(discriminator_x(sample_horse)[0, ..., -1], cmap='RdBu_r')
+plt.title('Is a real blues spectrogram?')
+plt.imshow(discriminator_x(sample_blues)[0, ..., -1], cmap='RdBu_r')
 
 plt.show()
+
+
+
+
+
+
+
+
+
+
 
 # Loss functions
 
@@ -239,6 +274,15 @@ ckpt_manager = tf.train.CheckpointManager(ckpt, checkpoint_path, max_to_keep=5)
 if ckpt_manager.latest_checkpoint:
     ckpt.restore(ckpt_manager.latest_checkpoint)
     print('Latest checkpoint restored!!')
+
+
+
+
+
+
+
+
+
 
 # TRAINING
 
@@ -328,7 +372,7 @@ for epoch in range(EPOCHS):
     start = time.time()
 
     n = 0
-    for image_x, image_y in zip(train_horses_images_processed, train_zebras_images_processed):
+    for image_x, image_y in zip(train_blues_images_processed, train_metal_images_processed):
         image_x = tf.expand_dims(image_x, axis=0, name=None)
         image_y = tf.expand_dims(image_y, axis=0, name=None)
         train_step(image_x, image_y)
@@ -339,7 +383,7 @@ for epoch in range(EPOCHS):
     clear_output(wait=True)
     # Using a consistent image (sample_horse) so that the progress of the model
     # is clearly visible.
-    generate_images(generator_g, sample_horse)
+    generate_images(generator_g, sample_blues)
 
     if (epoch + 1) % 5 == 0:
         ckpt_save_path = ckpt_manager.save()
@@ -353,8 +397,12 @@ for epoch in range(EPOCHS):
 
 # Run the trained model on the test dataset
 # for inp in test_horses_dir.take(5):
-test = cv2.imread('horse2zebra/testA/n02381460_20.jpg')
+test = cv2.imread('/nas/home/spol/Thesis/GTZAN/images/blues/test/blues.00048_CQT.png')
+test = preprocess_image_test(test)
+
 test = tf.expand_dims(
     test, axis=0, name=None
 )
 generate_images(generator_g, test)
+
+
