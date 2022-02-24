@@ -1,6 +1,6 @@
 import wandb
 
-#from __future__ import absolute_import, division, print_function, unicode_literals
+# from __future__ import absolute_import, division, print_function, unicode_literals
 import pathlib
 from utils import *
 
@@ -36,7 +36,7 @@ wandb.config = {
     "kl_beta": 0.0005,
     "batch_norm": True,
     "output_activation": "relu",
-    "epochs": 2000,
+    "epochs": 500,
     "learning_rate": 0.0001,
     "batch_size": 384,
     "buffer_size": 60000,
@@ -56,9 +56,6 @@ config = wandb.config
 train_vn = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/features_vn_train_256')
 train_vn_dir = train_vn.iterdir()
 train_vn_stft = []
-
-
-
 
 for idx, feature in enumerate(train_vn_dir):
     feature_name = feature.name
@@ -130,3 +127,66 @@ if not config['continue_training']:
                 loss=tf.keras.losses.MeanSquaredError())
 
 history = vae.fit(train_vn_stft, train_vn_stft, epochs=config['epochs'], batch_size=config['batch_size'])
+
+'''
+# Generate examples
+print("Generating examples...")
+my_examples_folder = workdir.joinpath('audio_examples')
+for f in os.listdir(my_audio):
+    print("Examples for {}".format(os.path.splitext(f)[0]))
+    file_path = my_audio.joinpath(f)
+    my_file_duration = librosa.get_duration(filename=file_path)
+    my_offset = random.randint(0, int(my_file_duration) - example_length)
+    s, fs = librosa.load(file_path, duration=example_length, offset=my_offset, sr=None)
+    # Get the CQT magnitude
+    print("Calculating CQT")
+    C_complex = librosa.cqt(y=s, sr=fs, hop_length=hop_length, bins_per_octave=bins_per_octave, n_bins=n_bins)
+    C = np.abs(C_complex)
+    # Invert using Griffin-Lim
+    # y_inv = librosa.griffinlim_cqt(C, sr=fs, n_iter=n_iter, hop_length=hop_length, bins_per_octave=bins_per_octave)
+    # And invert without estimating phase
+    # y_icqt = librosa.icqt(C, sr=fs, hop_length=hop_length, bins_per_octave=bins_per_octave)
+    # y_icqt_full = librosa.icqt(C_complex, hop_length=hop_length, sr=fs, bins_per_octave=bins_per_octave)
+    C_32 = C.astype('float32')
+    y_inv_32 = librosa.griffinlim_cqt(C, sr=fs, n_iter=n_iter, hop_length=hop_length, bins_per_octave=bins_per_octave,
+                                      dtype=np.float32)
+    ## Generate the same CQT using the model
+    my_array = np.transpose(C_32)
+    test_dataset = tf.data.Dataset.from_tensor_slices(my_array).batch(batch_size).prefetch(AUTOTUNE)
+    output = tf.constant(0., dtype='float32', shape=(1, n_bins))
+
+    print("Working on regenerating cqt magnitudes with the DL model")
+    for step, x_batch_train in enumerate(test_dataset):
+        reconstructed = vae(x_batch_train)
+        output = tf.concat([output, reconstructed], 0)
+
+    output_np = np.transpose(output.numpy())
+    output_inv_32 = librosa.griffinlim_cqt(output_np[1:],
+                                           sr=fs, n_iter=n_iter, hop_length=hop_length, bins_per_octave=bins_per_octave,
+                                           dtype=np.float32)
+
+    if normalize_examples:
+        output_inv_32 = librosa.util.normalize(output_inv_32)
+    print("Saving audio files...")
+    my_audio_out_fold = my_examples_folder.joinpath(os.path.splitext(f)[0])
+    os.makedirs(my_audio_out_fold, exist_ok=True)
+    librosa.output.write_wav(my_audio_out_fold.joinpath('original.wav'),
+                             s, sample_rate)
+    librosa.output.write_wav(my_audio_out_fold.joinpath('original-icqt+gL.wav'),
+                             y_inv_32, sample_rate)
+    librosa.output.write_wav(my_audio_out_fold.joinpath('VAE-output+gL.wav'),
+                             output_inv_32, sample_rate)
+
+# Generate a plot for loss
+print("Generating loss plot...")
+history_dict = history.history
+fig = plt.figure()
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.ylim(0., 0.01)
+plt.plot(history_dict['loss'])
+fig.savefig(workdir.joinpath('my_history_plot.pdf'), dpi=300)
+
+print('bye...')
+'''
+
