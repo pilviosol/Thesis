@@ -18,7 +18,7 @@ WORKDIR /root
 # Installs Magenta DDSP from Github.
 RUN wget https://github.com//magenta/ddsp/archive/main.zip && \
     unzip main.zip && \
-    cd ddsp-main && \
+    cd ddsp_main && \
     python setup.py install
 
 # Copies running script.

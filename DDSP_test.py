@@ -1,6 +1,6 @@
 import sys
-sys.path.insert(1, '/nas/home/spol/Thesis/ddsp-main/ddsp')
-
+sys.path.insert(1, '/ddsp_main/ddsp')
+import ddsp_main.ddsp.core # così posso importare le funzioni che voglio cazzo
 import warnings
 import copy
 import os
