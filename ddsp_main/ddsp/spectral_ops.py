@@ -16,13 +16,12 @@
 """Library of FFT operations for loss functions and conditioning."""
 
 import crepe
-from ddsp import core
-from ddsp.core import safe_log
-from ddsp.core import tf_float32
-import gin
+import ddsp_main.ddsp.core as core
+
+# import gin
 import librosa
 import numpy as np
-import tensorflow.compat.v2 as tf
+# import tensorflow.compat.v2 as tf
 import tensorflow_probability as tfp
 
 CREPE_SAMPLE_RATE = 16000

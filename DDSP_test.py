@@ -1,6 +1,6 @@
-import sys
-sys.path.insert(1, '/ddsp_main/ddsp')
-import ddsp_main.ddsp.core # così posso importare le funzioni che voglio cazzo
+from ddsp_main.ddsp.spectral_ops import reset_crepe
+from ddsp_main.ddsp.training.metrics import compute_audio_features
+import ddsp_main.ddsp.core
 import warnings
 import copy
 import os
@@ -14,7 +14,6 @@ import pickle
 
 # import tensorflow_datasets as tfds
 warnings.filterwarnings("ignore")
-
 
 
 # Helper Functions
@@ -36,7 +35,8 @@ reset_crepe()
 '''
 # Compute features.
 start_time = time.time()
-audio_features = ddsp.training.metrics.compute_audio_features(audio)
+
+audio_features = compute_audio_features(audio)
 audio_features['loudness_db'] = audio_features['loudness_db'].astype(np.float32)
 audio_features_mod = None
 print('Audio features took %.1f seconds' % (time.time() - start_time))
@@ -58,5 +58,5 @@ ax[2].plot(audio_features['f0_confidence'][:TRIM])
 ax[2].set_ylabel('f0 confidence')
 _ = ax[2].set_xlabel('Time step [frame]')
 
-
+plt.show()
 '''
