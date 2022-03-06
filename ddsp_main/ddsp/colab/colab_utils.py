@@ -53,9 +53,9 @@ def play(array_of_floats,
   This function should only be called from a Colab notebook.
 
   Args:
-    array_of_floats: A 1D or 2D array-like container of float sound samples.
+    array_of_floats: A 1D or 2D array-like container of float sound VV_samples.
       Values outside of the range [-1, 1] will be clipped.
-    sample_rate: Sample rate in samples per second.
+    sample_rate: Sample rate in VV_samples per second.
     ephemeral: If set to True, the widget will be ephemeral, and disappear on
       reload (and it won't be counted against realtime document size).
     autoplay: If True, automatically start playing the sound when the widget is

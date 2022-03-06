@@ -25,7 +25,7 @@ arch.init_gpus()
 
 def main():
     # Define output paths
-    weights_path = os.path.join(trained_models_root, '{:s}'.format(model_name_keras), 'model')
+    weights_path = os.path.join(trained_models_root, '{:s}'.format(model_name_keras), 'VV_model')
     history_path = os.path.join(trained_models_root, '{:s}'.format(model_name_keras), 'history_keras.npy')
 
     # Load dataset for training and validation
@@ -35,7 +35,7 @@ def main():
     img_tr = img_tr / 255.0
     img_val = img_val / 255.0
 
-    # Initialize model
+    # Initialize VV_model
     model = getattr(arch, model_name_keras)(input_shape)
     model.summary()
 
@@ -46,10 +46,10 @@ def main():
     reduce_checkpoint = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=3)
     callback_list = [mod_checkpoint, stop_checkpoint, reduce_checkpoint]
 
-    # Compile model
+    # Compile VV_model
     model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
-    # Train model
+    # Train VV_model
     history = model.fit(img_tr, y_tr, batch_size=batch_size, epochs=epochs, validation_data=(img_val, y_val),
                         callbacks=callback_list)
 

@@ -84,7 +84,7 @@ class Sampling(layers.Layer):
 # Train
 
 if not config['continue_training']:
-    # Define encoder model.
+    # Define encoder VV_model.
     n_bins = int(config['num_octaves'] * config['bins_per_octave'])
 
     original_dim = n_bins
@@ -96,7 +96,7 @@ if not config['continue_training']:
     encoder = tf.keras.Model(inputs=original_inputs, outputs=z, name='encoder')
     encoder.summary()
 
-    # Define decoder model.
+    # Define decoder VV_model.
     latent_inputs = tf.keras.Input(shape=(config['latent_dim'],), name='z_sampling')
     x = layers.Dense(config['n_units'], activation='relu')(latent_inputs)
     outputs = layers.Dense(original_dim, activation=config['output_activation'])(x)
@@ -104,7 +104,7 @@ if not config['continue_training']:
     decoder.summary()
 
     outputs = decoder(z)
-    # Define VAE model.
+    # Define VAE VV_model.
     vae = tf.keras.Model(inputs=original_inputs, outputs=outputs, name='vae')
     vae.summary()
 
@@ -150,12 +150,12 @@ for f in os.listdir(my_audio):
     C_32 = C.astype('float32')
     y_inv_32 = librosa.griffinlim_cqt(C, sr=fs, n_iter=n_iter, hop_length=hop_length, bins_per_octave=bins_per_octave,
                                       dtype=np.float32)
-    ## Generate the same CQT using the model
+    ## Generate the same CQT using the VV_model
     my_array = np.transpose(C_32)
     test_dataset = tf.data.Dataset.from_tensor_slices(my_array).batch(batch_size).prefetch(AUTOTUNE)
     output = tf.constant(0., dtype='float32', shape=(1, n_bins))
 
-    print("Working on regenerating cqt magnitudes with the DL model")
+    print("Working on regenerating cqt magnitudes with the DL VV_model")
     for step, x_batch_train in enumerate(test_dataset):
         reconstructed = vae(x_batch_train)
         output = tf.concat([output, reconstructed], 0)

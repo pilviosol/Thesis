@@ -123,7 +123,7 @@ def train_step(model, x, optimizer):
   """Executes one training step and returns the loss.
 
   This function computes the loss and gradients, and uses the latter to
-  update the model's parameters.
+  update the VV_model's parameters.
   """
   with tf.GradientTape() as tape:
     loss = compute_loss(model, x)

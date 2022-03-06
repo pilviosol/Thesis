@@ -209,8 +209,8 @@ notes_ds = tf.data.Dataset.from_tensor_slices(train_notes)
 print("notes_ds.element_spec::\n", notes_ds.element_spec)
 
 
-# Train the model on batches of sequences of notes. Each example will consist of a sequence of notes as the input
-# features, and next note as the label. In this way, the model will be trained to predict the next note in a sequence.
+# Train the VV_model on batches of sequences of notes. Each example will consist of a sequence of notes as the input
+# features, and next note as the label. In this way, the VV_model will be trained to predict the next note in a sequence.
 # Use the handy window function with size seq_length to create the features and labels in this format.
 def create_sequences(
         dataset: tf.data.Dataset,
@@ -249,7 +249,7 @@ vocab_size = 128
 seq_ds = create_sequences(notes_ds, seq_length, vocab_size)
 print("seq_ds.element_spec:\n", seq_ds.element_spec)
 
-# The shape of the dataset is (100,1), meaning that the model will take 100 notes as input,
+# The shape of the dataset is (100,1), meaning that the VV_model will take 100 notes as input,
 # and learn to predict the following note as output.
 for seq, target in seq_ds.take(1):
     print('sequence shape:', seq.shape)
@@ -270,10 +270,10 @@ print("train_ds.element_spec:\n", train_ds.element_spec)
 
 # %%
 # -------------------------------------------------------------
-# Create and Train the model
+# Create and Train the VV_model
 # -------------------------------------------------------------
-# The model will have three outputs, one for each note variable. For pitch and duration,
-# use a custom loss function based on mean squared error that encourages the model to output non-negative values.
+# The VV_model will have three outputs, one for each note variable. For pitch and duration,
+# use a custom loss function based on mean squared error that encourages the VV_model to output non-negative values.
 def mse_with_positive_pressure(y_true: tf.Tensor, y_pred: tf.Tensor):
     mse = (y_true - y_pred) ** 2
     positive_pressure = 10 * tf.maximum(-y_pred, 0.0)
@@ -307,7 +307,7 @@ model.compile(loss=loss, optimizer=optimizer)
 
 model.summary()
 
-# Testing the model.evaluate function, you can see that the pitch loss is significantly greater than the step and
+# Testing the VV_model.evaluate function, you can see that the pitch loss is significantly greater than the step and
 # duration losses. Note that loss is the total loss computed by summing all the other losses and is currently
 # dominated by the pitch loss.
 losses = model.evaluate(train_ds, return_dict=True)
@@ -327,7 +327,7 @@ model.compile(
 # The loss then becomes the weighted sum of the individual losses
 model.evaluate(train_ds, return_dict=True)
 
-# Train the model
+# Train the VV_model
 callbacks = [
     tf.keras.callbacks.ModelCheckpoint(
         filepath='./training_checkpoints/ckpt_{epoch}',
@@ -355,13 +355,13 @@ plt.show()
 # -------------------------------------------------------------
 # Generate notes
 # -------------------------------------------------------------
-# To use the model to generate notes, you will first need to provide a starting sequence of notes.
+# To use the VV_model to generate notes, you will first need to provide a starting sequence of notes.
 # The function below generates one note from a sequence of notes.
 def predict_next_note(
         notes: np.ndarray,
         keras_model: tf.keras.Model,
         temperature: float = 1.0) -> int:
-    """Generates a note IDs using a trained sequence model."""
+    """Generates a note IDs using a trained sequence VV_model."""
 
     assert temperature > 0
 

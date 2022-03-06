@@ -33,13 +33,13 @@ ZMidiAutoencoder = _configurable(ZMidiAutoencoder)
 
 @gin.configurable
 def get_model(model=gin.REQUIRED):
-  """Gin configurable function get a 'global' model for use in ddsp_run.py.
+  """Gin configurable function get a 'global' VV_model for use in ddsp_run.py.
 
-  Convenience for using the same model in train(), evaluate(), and sample().
+  Convenience for using the same VV_model in train(), evaluate(), and sample().
   Args:
-    model: An instantiated model, such as 'models.Autoencoder()'.
+    model: An instantiated VV_model, such as 'models.Autoencoder()'.
 
   Returns:
-    The 'global' model specified in the gin config.
+    The 'global' VV_model specified in the gin config.
   """
   return model

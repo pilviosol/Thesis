@@ -18,28 +18,28 @@ models = {
     'full': None
 }
 
-# the model is trained on 16kHz audio
+# the VV_model is trained on 16kHz audio
 model_srate = 16000
 
 
 def build_and_load_model(model_capacity):
     """
-    Build the CNN model and load the weights
+    Build the CNN VV_model and load the weights
 
     Parameters
     ----------
     model_capacity : 'tiny', 'small', 'medium', 'large', or 'full'
-        String specifying the model capacity, which determines the model's
+        String specifying the VV_model capacity, which determines the VV_model's
         capacity multiplier to 4 (tiny), 8 (small), 16 (medium), 24 (large),
-        or 32 (full). 'full' uses the model size specified in the paper,
+        or 32 (full). 'full' uses the VV_model size specified in the paper,
         and the others use a reduced number of filters in each convolutional
-        layer, resulting in a smaller model that is faster to evaluate at the
+        layer, resulting in a smaller VV_model that is faster to evaluate at the
         cost of slightly reduced pitch estimation accuracy.
 
     Returns
     -------
-    model : tensorflow.keras.models.Model
-        The pre-trained keras model loaded in memory
+    VV_model : tensorflow.keras.models.Model
+        The pre-trained keras VV_model loaded in memory
     """
     from tensorflow.keras.layers import Input, Reshape, Conv2D, BatchNormalization
     from tensorflow.keras.layers import MaxPool2D, Dropout, Permute, Flatten, Dense
@@ -73,7 +73,7 @@ def build_and_load_model(model_capacity):
         model = Model(inputs=x, outputs=y)
 
         package_dir = os.path.dirname(os.path.realpath(__file__))
-        filename = "model-{}.h5".format(model_capacity)
+        filename = "VV_model-{}.h5".format(model_capacity)
         model.load_weights(os.path.join(package_dir, filename))
         model.compile('adam', 'binary_crossentropy')
 
@@ -140,7 +140,7 @@ def to_viterbi_cents(salience):
     emission = (np.eye(360) * self_emission + np.ones(shape=(360, 360)) *
                 ((1 - self_emission) / 360))
 
-    # fix the model parameters because we are not optimizing the model
+    # fix the VV_model parameters because we are not optimizing the VV_model
     model = hmm.MultinomialHMM(360, starting, transition)
     model.startprob_, model.transmat_, model.emissionprob_ = \
         starting, transition, emission
@@ -160,12 +160,12 @@ def get_activation(audio, sr, model_capacity='full', center=True, step_size=10,
     Parameters
     ----------
     audio : np.ndarray [shape=(N,) or (N, C)]
-        The audio samples. Multichannel audio will be downmixed.
+        The audio VV_samples. Multichannel audio will be downmixed.
     sr : int
-        Sample rate of the audio samples. The audio will be resampled if
-        the sample rate is not 16 kHz, which is expected by the model.
+        Sample rate of the audio VV_samples. The audio will be resampled if
+        the sample rate is not 16 kHz, which is expected by the VV_model.
     model_capacity : 'tiny', 'small', 'medium', 'large', or 'full'
-        String specifying the model capacity; see the docstring of
+        String specifying the VV_model capacity; see the docstring of
         :func:`~crepe.core.build_and_load_model`
     center : boolean
         - If `True` (default), the signal `audio` is padded so that frame
@@ -204,7 +204,7 @@ def get_activation(audio, sr, model_capacity='full', center=True, step_size=10,
                         strides=(audio.itemsize, hop_length * audio.itemsize))
     frames = frames.transpose().copy()
 
-    # normalize each frame -- this is expected by the model
+    # normalize each frame -- this is expected by the VV_model
     frames -= np.mean(frames, axis=1)[:, np.newaxis]
     frames /= np.std(frames, axis=1)[:, np.newaxis]
 
@@ -220,12 +220,12 @@ def predict(audio, sr, model_capacity='full',
     Parameters
     ----------
     audio : np.ndarray [shape=(N,) or (N, C)]
-        The audio samples. Multichannel audio will be downmixed.
+        The audio VV_samples. Multichannel audio will be downmixed.
     sr : int
-        Sample rate of the audio samples. The audio will be resampled if
-        the sample rate is not 16 kHz, which is expected by the model.
+        Sample rate of the audio VV_samples. The audio will be resampled if
+        the sample rate is not 16 kHz, which is expected by the VV_model.
     model_capacity : 'tiny', 'small', 'medium', 'large', or 'full'
-        String specifying the model capacity; see the docstring of
+        String specifying the VV_model capacity; see the docstring of
         :func:`~crepe.core.build_and_load_model`
     viterbi : bool
         Apply viterbi smoothing to the estimated pitch curve. False by default.
@@ -274,7 +274,7 @@ def process_file(file, output=None, model_capacity='full', viterbi=False,
                  center=True, save_activation=False, save_plot=False,
                  plot_voicing=False, step_size=10, verbose=True):
     """
-    Use the input model to perform pitch estimation on the input file.
+    Use the input VV_model to perform pitch estimation on the input file.
 
     Parameters
     ----------
@@ -284,7 +284,7 @@ def process_file(file, output=None, model_capacity='full', viterbi=False,
         Path to directory for saving output files. If None, output files will
         be saved to the directory containing the input file.
     model_capacity : 'tiny', 'small', 'medium', 'large', or 'full'
-        String specifying the model capacity; see the docstring of
+        String specifying the VV_model capacity; see the docstring of
         :func:`~crepe.core.build_and_load_model`
     viterbi : bool
         Apply viterbi smoothing to the estimated pitch curve. False by default.

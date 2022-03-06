@@ -336,7 +336,7 @@ for epoch in range(EPOCHS):
         n += 1
 
     clear_output(wait=True)
-    # Using a consistent image (sample_horse) so that the progress of the model
+    # Using a consistent image (sample_horse) so that the progress of the VV_model
     # is clearly visible.
     generate_images(generator_g, sample_horse)
 
@@ -350,7 +350,7 @@ for epoch in range(EPOCHS):
 
 # GENERATE USING TEST DATASET
 
-# Run the trained model on the test dataset
+# Run the trained VV_model on the test dataset
 # for inp in test_horses_dir.take(5):
 test = cv2.imread('horse2zebra/testA/n02381460_20.jpg')
 test = tf.expand_dims(

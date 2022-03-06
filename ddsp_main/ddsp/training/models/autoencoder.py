@@ -15,12 +15,11 @@
 # Lint as: python3
 """Model that encodes audio features and decodes with a ddsp processor group."""
 
-import ddsp
-from ddsp.training.models.model import Model
-
+from ddsp_main.ddsp.training.models.model import Model
+from ddsp_main.ddsp.core import make_iterable
 
 class Autoencoder(Model):
-  """Wrap the model function for dependency injection with gin."""
+  """Wrap the VV_model function for dependency injection with gin."""
 
   def __init__(self,
                preprocessor=None,
@@ -34,7 +33,7 @@ class Autoencoder(Model):
     self.encoder = encoder
     self.decoder = decoder
     self.processor_group = processor_group
-    self.loss_objs = ddsp.core.make_iterable(losses)
+    self.loss_objs = make_iterable(losses)
 
   def encode(self, features, training=True):
     """Get conditioning by preprocessing then encoding."""

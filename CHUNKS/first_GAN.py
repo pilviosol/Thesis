@@ -30,28 +30,28 @@ train_dataset = tf.data.Dataset.from_tensor_slices(train_images).shuffle(BUFFER_
 
 
 def make_generator_model():
-    model = tf.keras.Sequential()
-    model.add(layers.Dense(7*7*256, use_bias=False, input_shape=(100,)))
-    model.add(layers.BatchNormalization())
-    model.add(layers.LeakyReLU())
+    VV_model = tf.keras.Sequential()
+    VV_model.add(layers.Dense(7*7*256, use_bias=False, input_shape=(100,)))
+    VV_model.add(layers.BatchNormalization())
+    VV_model.add(layers.LeakyReLU())
 
-    model.add(layers.Reshape((7, 7, 256)))
-    assert model.output_shape == (None, 7, 7, 256)  # Note: None is the batch size
+    VV_model.add(layers.Reshape((7, 7, 256)))
+    assert VV_model.output_shape == (None, 7, 7, 256)  # Note: None is the batch size
 
-    model.add(layers.Conv2DTranspose(128, (5, 5), strides=(1, 1), padding='same', use_bias=False))
-    assert model.output_shape == (None, 7, 7, 128)
-    model.add(layers.BatchNormalization())
-    model.add(layers.LeakyReLU())
+    VV_model.add(layers.Conv2DTranspose(128, (5, 5), strides=(1, 1), padding='same', use_bias=False))
+    assert VV_model.output_shape == (None, 7, 7, 128)
+    VV_model.add(layers.BatchNormalization())
+    VV_model.add(layers.LeakyReLU())
 
-    model.add(layers.Conv2DTranspose(64, (5, 5), strides=(2, 2), padding='same', use_bias=False))
-    assert model.output_shape == (None, 14, 14, 64)
-    model.add(layers.BatchNormalization())
-    model.add(layers.LeakyReLU())
+    VV_model.add(layers.Conv2DTranspose(64, (5, 5), strides=(2, 2), padding='same', use_bias=False))
+    assert VV_model.output_shape == (None, 14, 14, 64)
+    VV_model.add(layers.BatchNormalization())
+    VV_model.add(layers.LeakyReLU())
 
-    model.add(layers.Conv2DTranspose(1, (5, 5), strides=(2, 2), padding='same', use_bias=False, activation='tanh'))
-    assert model.output_shape == (None, 28, 28, 1)
+    VV_model.add(layers.Conv2DTranspose(1, (5, 5), strides=(2, 2), padding='same', use_bias=False, activation='tanh'))
+    assert VV_model.output_shape == (None, 28, 28, 1)
 
-    return model
+    return VV_model
 
 
 generator = make_generator_model()
@@ -64,20 +64,20 @@ plt.show()
 
 
 def make_discriminator_model():
-    model = tf.keras.Sequential()
-    model.add(layers.Conv2D(64, (5, 5), strides=(2, 2), padding='same',
+    VV_model = tf.keras.Sequential()
+    VV_model.add(layers.Conv2D(64, (5, 5), strides=(2, 2), padding='same',
                                      input_shape=[28, 28, 1]))
-    model.add(layers.LeakyReLU())
-    model.add(layers.Dropout(0.3))
+    VV_model.add(layers.LeakyReLU())
+    VV_model.add(layers.Dropout(0.3))
 
-    model.add(layers.Conv2D(128, (5, 5), strides=(2, 2), padding='same'))
-    model.add(layers.LeakyReLU())
-    model.add(layers.Dropout(0.3))
+    VV_model.add(layers.Conv2D(128, (5, 5), strides=(2, 2), padding='same'))
+    VV_model.add(layers.LeakyReLU())
+    VV_model.add(layers.Dropout(0.3))
 
-    model.add(layers.Flatten())
-    model.add(layers.Dense(1))
+    VV_model.add(layers.Flatten())
+    VV_model.add(layers.Dense(1))
 
-    return model
+    return VV_model
 
 discriminator = make_discriminator_model()
 decision = discriminator(generated_image)
@@ -135,10 +135,10 @@ def train_step(images):
     generator_optimizer.apply_gradients(zip(gradients_of_generator, generator.trainable_variables))
     discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator, discriminator.trainable_variables))
 
-def generate_and_save_images(model, epoch, test_input):
+def generate_and_save_images(VV_model, epoch, test_input):
   # Notice `training` is set to False.
   # This is so all layers run in inference mode (batchnorm).
-  predictions = model(test_input, training=False)
+  predictions = VV_model(test_input, training=False)
 
   fig = plt.figure(figsize=(4, 4))
 
@@ -163,7 +163,7 @@ def train(dataset, epochs):
                              epoch + 1,
                              seed)
 
-    # Save the model every 15 epochs
+    # Save the VV_model every 15 epochs
     if (epoch + 1) % 15 == 0:
       checkpoint.save(file_prefix = checkpoint_prefix)
 

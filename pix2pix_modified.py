@@ -228,12 +228,12 @@ def upsample(filters, size, norm_type='batchnorm', apply_dropout=False):
 
 
 def unet_generator(output_channels, norm_type='batchnorm'):
-  """Modified u-net generator model (https://arxiv.org/abs/1611.07004).
+  """Modified u-net generator VV_model (https://arxiv.org/abs/1611.07004).
   Args:
     output_channels: Output channels
     norm_type: Type of normalization. Either 'batchnorm' or 'instancenorm'.
   Returns:
-    Generator model
+    Generator VV_model
   """
 
   down_stack = [
@@ -268,7 +268,7 @@ def unet_generator(output_channels, norm_type='batchnorm'):
   inputs = tf.keras.layers.Input(shape=[None, None, 1])
   x = inputs
 
-  # Downsampling through the model
+  # Downsampling through the VV_model
   skips = []
   for down in down_stack:
     x = down(x)
@@ -287,12 +287,12 @@ def unet_generator(output_channels, norm_type='batchnorm'):
 
 
 def discriminator(norm_type='batchnorm', target=True):
-  """PatchGan discriminator model (https://arxiv.org/abs/1611.07004).
+  """PatchGan discriminator VV_model (https://arxiv.org/abs/1611.07004).
   Args:
     norm_type: Type of normalization. Either 'batchnorm' or 'instancenorm'.
     target: Bool, indicating whether target image is an input or not.
   Returns:
-    Discriminator model
+    Discriminator VV_model
   """
 
   initializer = tf.random_normal_initializer(0., 0.02)
@@ -384,7 +384,7 @@ class Pix2pix(object):
     return total_gen_loss
 
   def train_step(self, input_image, target_image):
-    """One train step over the generator and discriminator model.
+    """One train step over the generator and discriminator VV_model.
     Args:
       input_image: Input Image.
       target_image: Target image.
@@ -436,7 +436,7 @@ class Pix2pix(object):
       wall_time_sec = time.time() - start_time
       time_list.append(wall_time_sec)
 
-      # saving (checkpoint) the model every 20 epochs
+      # saving (checkpoint) the VV_model every 20 epochs
       if (epoch + 1) % 20 == 0:
         self.checkpoint.save(file_prefix=checkpoint_pr)
 

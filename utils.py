@@ -1,14 +1,4 @@
-"""
-Utilities
-
-Blank Project
-
-Image and Sound Processing Lab - Politecnico di Milano
-
-Paolo Bestagini
-"""
 import os
-
 import GPUtil
 
 # Tell "from utils import *" what to import
@@ -41,3 +31,9 @@ def set_gpu(id=-1):
             name = GPUtil.getGPUs()[device].name
         print('GPU selected: %d - %s' % (device, name))
         os.environ["CUDA_VISIBLE_DEVICES"] = str(device)
+
+
+def reset_crepe():
+  """Reset the global state of CREPE to force VV_model re-building."""
+  for k in crepe.core.models:
+    crepe.core.models[k] = None

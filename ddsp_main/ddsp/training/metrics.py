@@ -18,14 +18,15 @@
 import dataclasses
 
 from absl import logging
-import ddsp
+# import ddsp
 import librosa
 import mir_eval
-import note_seq
-from note_seq import sequences_lib
+# import note_seq
+# from note_seq import sequences_lib
 import numpy as np
-import tensorflow.compat.v2 as tf
-
+import tensorflow as tf
+from ddsp_main.ddsp.spectral_ops import CREPE_SAMPLE_RATE, compute_loudness, compute_f0
+from ddsp_main.ddsp.core import resample, midi_to_hz
 # Global values for evaluation.
 MIN_F0_CONFIDENCE = 0.85
 OUTLIER_MIDI_THRESH = 12
@@ -60,12 +61,12 @@ def compute_audio_features(audio, frame_rate=250):
   audio = squeeze(audio)
 
   # Requires 16kHz for CREPE.
-  sample_rate = ddsp.spectral_ops.CREPE_SAMPLE_RATE
-  audio_feats['loudness_db'] = ddsp.spectral_ops.compute_loudness(
+  sample_rate = CREPE_SAMPLE_RATE
+  audio_feats['loudness_db'] = compute_loudness(
       audio, sample_rate, frame_rate)
 
   audio_feats['f0_hz'], audio_feats['f0_confidence'] = (
-      ddsp.spectral_ops.compute_f0(audio, frame_rate))
+      compute_f0(audio, frame_rate))
 
   return audio_feats
 
@@ -87,10 +88,10 @@ def f0_dist_conf_thresh(f0_hz,
   - Compute `delta_f0` between generated audio and ground truth audio.
   - Only select values in `delta_f0` based on this `keep_mask`
   - Compute mean on this selection
-  - At the start of training, audio samples will sound bad and thus have no
+  - At the start of training, audio VV_samples will sound bad and thus have no
   pitch content. If the `f0_confidence` is all below the threshold, we keep a
-  count of it. A better performing model will have a smaller count of
-  "untrackable pitch" samples.
+  count of it. A better performing VV_model will have a smaller count of
+  "untrackable pitch" VV_samples.
 
   Args:
     f0_hz: Ground truth audio f0 in hertz [MB,:].
@@ -130,7 +131,7 @@ def f0_dist_conf_thresh(f0_hz,
 
 # ---------------------- Metrics -----------------------------------------------
 class BaseMetrics(object):
-  """Base object for computing metrics on generated audio samples."""
+  """Base object for computing metrics on generated audio VV_samples."""
 
   def __init__(self, sample_rate, frame_rate, name):
     """Constructor.
@@ -192,12 +193,12 @@ class LoudnessMetrics(BaseMetrics):
     if 'loudness_db' in batch:
       loudness_original = batch['loudness_db']
     else:
-      loudness_original = ddsp.spectral_ops.compute_loudness(
+      loudness_original = compute_loudness(
           batch['audio'], sample_rate=self._sample_rate,
           frame_rate=self._frame_rate)
 
     # Compute loudness across entire batch
-    loudness_gen = ddsp.spectral_ops.compute_loudness(
+    loudness_gen = compute_loudness(
         audio_gen, sample_rate=self._sample_rate,
         frame_rate=self._frame_rate)
 
@@ -240,7 +241,7 @@ class F0CrepeMetrics(BaseMetrics):
     # Compute metrics per sample. No batch operations possible.
     for i in range(batch_size):
       # Extract f0 from generated audio example.
-      f0_hz_gen, _ = ddsp.spectral_ops.compute_f0(
+      f0_hz_gen, _ = compute_f0(
           audio_gen[i],
           frame_rate=self._frame_rate,
           viterbi=True)
@@ -249,7 +250,7 @@ class F0CrepeMetrics(BaseMetrics):
         f0_conf_gt = batch['f0_confidence'][i]
       else:
         # Missing f0 in ground truth, extract it.
-        f0_hz_gt, f0_conf_gt = ddsp.spectral_ops.compute_f0(
+        f0_hz_gt, f0_conf_gt = compute_f0(
             batch['audio'][i],
             frame_rate=self._frame_rate,
             viterbi=True)
@@ -306,9 +307,9 @@ class F0Metrics(BaseMetrics):
     if f0_hz_predict.shape[1] != batch['f0_hz'].shape[1]:
       # f0_hz_predict = ddsp.core.resample(f0_hz_predict,
       #                                    batch['f0_hz'].shape[1]).numpy()
-      batch['f0_hz'] = ddsp.core.resample(batch['f0_hz'],
+      batch['f0_hz'] = resample(batch['f0_hz'],
                                           f0_hz_predict.shape[1]).numpy()
-      batch['f0_confidence'] = ddsp.core.resample(
+      batch['f0_confidence'] = resample(
           batch['f0_confidence'], f0_hz_predict.shape[1]).numpy()
 
     # Compute metrics per sample. No batch operations possible.
@@ -410,9 +411,9 @@ def compute_note_metrics(gt_sequence, pred_sequence):
 
   offset_matching = (
       mir_eval.transcription.match_notes(gt_intervals,
-                                         ddsp.core.midi_to_hz(gt_pitches),
+                                         midi_to_hz(gt_pitches),
                                          pred_intervals,
-                                         ddsp.core.midi_to_hz(pred_pitches)))
+                                         midi_to_hz(pred_pitches)))
 
   full_note_metrics = EvalCounts(
       tp=len(offset_matching),

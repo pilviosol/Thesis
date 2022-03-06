@@ -26,9 +26,9 @@ def init_gpus():
 
 def model_keras(input_shape):
     """
-    Simple CNN model
+    Simple CNN VV_model
     :param input_shape: input data shape
-    :return: CNN model
+    :return: CNN VV_model
     """
     model = models.Sequential()
     model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=input_shape))

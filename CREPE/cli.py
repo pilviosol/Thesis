@@ -12,7 +12,7 @@ def run(filename, output=None, model_capacity='full', viterbi=False,
         save_activation=False, save_plot=False, plot_voicing=False,
         no_centering=False, step_size=10, verbose=True):
     """
-    Collect the WAV files to process and run the model
+    Collect the WAV files to process and run the VV_model
 
     Parameters
     ----------
@@ -23,7 +23,7 @@ def run(filename, output=None, model_capacity='full', viterbi=False,
         Path to directory for saving output files. If None, output files will
         be saved to the directory containing the input file.
     model_capacity : 'tiny', 'small', 'medium', 'large', or 'full'
-        String specifying the model capacity; see the docstring of
+        String specifying the VV_model capacity; see the docstring of
         :func:`~crepe.core.build_and_load_model`
     viterbi : bool
         Apply viterbi smoothing to the estimated pitch curve. False by default.
@@ -95,7 +95,7 @@ def positive_int(value):
 
 def main():
     """
-    This is a script for running the pre-trained pitch estimation model, CREPE,
+    This is a script for running the pre-trained pitch estimation VV_model, CREPE,
     by taking WAV files(s) as input. For each input WAV, a CSV file containing:
 
         time, frequency, confidence
@@ -105,14 +105,14 @@ def main():
 
     is created as the output, where the first column is a timestamp in seconds,
     the second column is the estimated frequency in Hz, and the third column is
-    a value between 0 and 1 indicating the model's voicing confidence (i.e.
+    a value between 0 and 1 indicating the VV_model's voicing confidence (i.e.
     confidence in the presence of a pitch for every frame).
 
     The script can also optionally save the output activation matrix of the
-    model to an npy file, where the matrix dimensions are (n_frames, 360) using
+    VV_model to an npy file, where the matrix dimensions are (n_frames, 360) using
     a hop size of 10 ms (there are 360 pitch bins covering 20 cents each).
     The script can also output a plot of the activation matrix, including an
-    optional visual representation of the model's voicing detection.
+    optional visual representation of the VV_model's voicing detection.
     """
 
     parser = ArgumentParser(sys.argv[0], description=main.__doc__,
@@ -126,9 +126,9 @@ def main():
                              'already exist; if not given, the output will be '
                              'saved to the same directory as the input WAV '
                              'file(s)')
-    parser.add_argument('--model-capacity', '-c', default='full',
+    parser.add_argument('--VV_model-capacity', '-c', default='full',
                         choices=['tiny', 'small', 'medium', 'large', 'full'],
-                        help='String specifying the model capacity; smaller '
+                        help='String specifying the VV_model capacity; smaller '
                              'models are faster to compute, but may yield '
                              'less accurate pitch estimation')
     parser.add_argument('--viterbi', '-V', action='store_true',

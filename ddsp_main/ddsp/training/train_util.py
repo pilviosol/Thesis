@@ -21,9 +21,9 @@ import os
 import time
 
 from absl import logging
-from ddsp.training import cloud
+# from ddsp_main.ddsp.training import cloud
 import gin
-import tensorflow.compat.v2 as tf
+import tensorflow as tf
 
 
 
@@ -122,8 +122,8 @@ def get_latest_checkpoint(checkpoint_path):
   """Helper function to get path to latest checkpoint.
 
   Args:
-    checkpoint_path: Path to the directory containing model checkpoints, or
-      to a specific checkpoint (e.g. `/path/to/model.ckpt-iteration`).
+    checkpoint_path: Path to the directory containing VV_model checkpoints, or
+      to a specific checkpoint (e.g. `/path/to/VV_model.ckpt-iteration`).
 
   Returns:
     Path to latest checkpoint.
@@ -211,7 +211,7 @@ def write_gin_config(summary_writer, save_dir, step):
 
 def gin_register_keras_layers():
   """Registers all keras layers and Sequential to be referenceable in gin."""
-  # Register sequential model.
+  # Register sequential VV_model.
   gin.external_configurable(tf.keras.Sequential, 'tf.keras.Sequential')
 
   # Register all the layers.
@@ -257,7 +257,7 @@ def train(data_provider,
   dataset = trainer.distribute_dataset(dataset)
   dataset_iter = iter(dataset)
 
-  # Build model, easiest to just run forward pass.
+  # Build VV_model, easiest to just run forward pass.
   trainer.build(next(dataset_iter))
 
   # Load latest checkpoint if one exists in load directory.
@@ -283,7 +283,7 @@ def train(data_provider,
     tick = time.time()
 
     for iteration in range(num_steps):
-      step = trainer.step  # Step is not iteration if restarting a model.
+      step = trainer.step  # Step is not iteration if restarting a VV_model.
 
       # Take a step.
       losses = trainer.train_step(dataset_iter)
@@ -316,10 +316,10 @@ def train(data_provider,
         for k, metric in avg_losses.items():
           tf.summary.scalar('losses/{}'.format(k), metric.result(), step=step)
           metric.reset_states()
-
+      '''
       # Report metrics for hyperparameter tuning if enabled.
       if report_loss_to_hypertune:
-        cloud.report_metric_to_hypertune(losses['total_loss'], step.numpy())
+        cloud.report_metric_to_hypertune(losses['total_loss'], step.numpy()) '''
 
       # Stop the training when the loss reaches given value
       if (early_stop_loss_value is not None and

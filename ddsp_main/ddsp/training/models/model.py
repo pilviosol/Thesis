@@ -18,9 +18,8 @@
 import time
 
 from absl import logging
-import ddsp
-from ddsp.core import copy_if_tf_function
-from ddsp.training import train_util
+from ddsp_main.ddsp.core import copy_if_tf_function, make_iterable
+from ddsp_main.ddsp.training import train_util
 import tensorflow as tf
 
 
@@ -41,7 +40,7 @@ class Model(tf.keras.Model):
       **kwargs: Keyword arguments passed on to call().
 
     Returns:
-      outputs: A dictionary of model outputs generated in call().
+      outputs: A dictionary of VV_model outputs generated in call().
         {output_name: output_tensor or dict}.
       losses: If return_losses=True, also returns a dictionary of losses,
         {loss_name: loss_value}.
@@ -49,7 +48,7 @@ class Model(tf.keras.Model):
     # Copy mutable dicts if in graph mode to prevent side-effects (pure func).
     args = [copy_if_tf_function(a) if isinstance(a, dict) else a for a in args]
 
-    # Run model.
+    # Run VV_model.
     self._losses_dict = {}
     outputs = super().__call__(*args, **kwargs)
 
@@ -65,14 +64,14 @@ class Model(tf.keras.Model):
     return tf.reduce_sum(list(losses_dict.values()))
 
   def _update_losses_dict(self, loss_objs, *args, **kwargs):
-    """Helper function to run loss objects on args and add to model losses."""
-    for loss_obj in ddsp.core.make_iterable(loss_objs):
+    """Helper function to run loss objects on args and add to VV_model losses."""
+    for loss_obj in make_iterable(loss_objs):
       if hasattr(loss_obj, 'get_losses_dict'):
         losses_dict = loss_obj.get_losses_dict(*args, **kwargs)
         self._losses_dict.update(losses_dict)
 
   def restore(self, checkpoint_path, verbose=True, restore_keys=None):
-    """Restore model and optimizer from a checkpoint.
+    """Restore VV_model and optimizer from a checkpoint.
 
     Args:
       checkpoint_path: Path to checkpoint file or directory.
@@ -86,7 +85,7 @@ class Model(tf.keras.Model):
     latest_checkpoint = train_util.get_latest_checkpoint(checkpoint_path)
 
     if restore_keys is None:
-      # If no keys are passed, restore the whole model.
+      # If no keys are passed, restore the whole VV_model.
       checkpoint = tf.train.Checkpoint(model=self)
       logging.info('Model restoring all components.')
       if verbose:
@@ -97,7 +96,7 @@ class Model(tf.keras.Model):
     else:
       # Restore only sub-modules by building a new subgraph.
       # Following https://www.tensorflow.org/guide/checkpoint#loading_mechanics.
-      logging.info('Trainer restoring model subcomponents:')
+      logging.info('Trainer restoring VV_model subcomponents:')
       for k in restore_keys:
         to_restore = {k: getattr(self, k)}
         log_str = 'Restoring {}'.format(to_restore)
@@ -108,7 +107,7 @@ class Model(tf.keras.Model):
         status.assert_existing_objects_matched()
 
     logging.info('Loaded checkpoint %s', latest_checkpoint)
-    logging.info('Loading model took %.1f seconds', time.time() - start_time)
+    logging.info('Loading VV_model took %.1f seconds', time.time() - start_time)
 
   def get_audio_from_outputs(self, outputs):
     """Extract audio output tensor from outputs dict of call()."""

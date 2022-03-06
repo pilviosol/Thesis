@@ -488,7 +488,7 @@ for epoch in range(EPOCHS):
         n += 1
 
     clear_output(wait=True)
-    # Using a consistent image (sample_horse) so that the progress of the model
+    # Using a consistent image (sample_horse) so that the progress of the VV_model
     # is clearly visible.
     generate_images(generator_g, sample_vn, epoch)
 

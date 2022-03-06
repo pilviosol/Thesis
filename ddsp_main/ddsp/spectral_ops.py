@@ -17,12 +17,12 @@
 
 import crepe
 import ddsp_main.ddsp.core as core
-
+from ddsp_main.ddsp.core import tf_float32, safe_log
 # import gin
 import librosa
 import numpy as np
-# import tensorflow.compat.v2 as tf
-import tensorflow_probability as tfp
+import tensorflow as tf
+# import tensorflow_probability as tfp
 
 CREPE_SAMPLE_RATE = 16000
 CREPE_FRAME_SIZE = 1024
@@ -66,13 +66,13 @@ def stft_np(audio, frame_size=2048, overlap=0.75, pad_end=True):
   return s
 
 
-@gin.register
+# @gin.register
 def compute_mag(audio, size=2048, overlap=0.75, pad_end=True):
   mag = tf.abs(stft(audio, frame_size=size, overlap=overlap, pad_end=pad_end))
   return tf_float32(mag)
 
 
-@gin.register
+# @gin.register
 def compute_mel(audio,
                 lo_hz=0.0,
                 hi_hz=8000.0,
@@ -91,12 +91,12 @@ def compute_mel(audio,
   return mel
 
 
-@gin.register
+# @gin.register
 def compute_logmag(audio, size=2048, overlap=0.75, pad_end=True):
   return safe_log(compute_mag(audio, size, overlap, pad_end))
 
 
-@gin.register
+# @gin.register
 def compute_logmel(audio,
                    lo_hz=80.0,
                    hi_hz=7600.0,
@@ -111,7 +111,7 @@ def compute_logmel(audio,
   return safe_log(mel)
 
 
-@gin.register
+# @gin.register
 def compute_mfcc(audio,
                  lo_hz=20.0,
                  hi_hz=8000.0,
@@ -251,7 +251,7 @@ def compute_power(audio,
   return power_db
 
 
-@gin.register
+# @gin.register
 def compute_loudness(audio,
                      sample_rate=16000,
                      frame_rate=250,
@@ -326,7 +326,7 @@ def compute_loudness(audio,
   return loudness
 
 
-@gin.register
+# @gin.register
 def compute_f0(audio, frame_rate, viterbi=True, padding='center'):
   """Fundamental frequency (f0) estimate using CREPE.
 
@@ -409,14 +409,14 @@ def pad_or_trim_to_expected_length(vector,
   is_1d = (len(vector.shape) == 1)
   vector = vector[lib.newaxis, :] if is_1d else vector
 
-  # Pad missing samples
+  # Pad missing VV_samples
   if vector_len < expected_len:
     n_padding = expected_len - vector_len
     vector = lib.pad(
         vector, ((0, 0), (0, n_padding)),
         mode='constant',
         constant_values=pad_value)
-  # Trim samples
+  # Trim VV_samples
   elif vector_len > expected_len:
     vector = vector[..., :expected_len]
 
@@ -426,13 +426,13 @@ def pad_or_trim_to_expected_length(vector,
 
 
 def reset_crepe():
-  """Reset the global state of CREPE to force model re-building."""
+  """Reset the global state of CREPE to force VV_model re-building."""
   for k in crepe.core.models:
     crepe.core.models[k] = None
 
-
+'''
 class PretrainedCREPE(tf.keras.Model):
-  """A wrapper around a pretrained CREPE model, for pitch prediction.
+  """A wrapper around a pretrained CREPE VV_model, for pitch prediction.
 
   Enables predicting pitch and confidence entirely in TF for running in batch
   on accelerators. For [full,large,small,tiny] crepe models, reads h5 models
@@ -447,7 +447,7 @@ class PretrainedCREPE(tf.keras.Model):
     self.hop_size = hop_size
     self.frame_size = 1024
     self.sample_rate = 16000
-    # Load the crepe model.
+    # Load the crepe VV_model.
     if model_size_or_path in ['full', 'large', 'small', 'tiny']:
       self.core_model = crepe.core.build_and_load_model(model_size_or_path)
     else:
@@ -495,7 +495,7 @@ class PretrainedCREPE(tf.keras.Model):
       return frames
 
   def normalize_frames(self, frames):
-    """Normalize each frame -- this is expected by the model."""
+    """Normalize each frame -- this is expected by the VV_model."""
     mu, var = tf.nn.moments(frames, axes=[-1])
     std = tf.where(tf.abs(var) > 0, tf.sqrt(var), 1e-8)
     frames -= mu[:, None]
@@ -564,5 +564,5 @@ class PretrainedCREPE(tf.keras.Model):
     hmm = self.create_hmm(num_steps)
     centers = hmm.posterior_mode(acts)
     return centers
-
+'''
 
