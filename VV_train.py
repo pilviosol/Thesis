@@ -5,7 +5,7 @@ import pathlib
 from VV_autoencoder import VAE
 from utils import *
 
-set_gpu(0)
+set_gpu(-1)
 
 LEARNING_RATE = 0.0005
 BATCH_SIZE = 64
@@ -16,15 +16,15 @@ SPECTROGRAMS_PATH_dir = SPECTROGRAMS_PATH.iterdir()
 
 
 def load_fsdd(spectrograms_path):
-    print('ciao')
     x_train = []
     for root, _, file_names in os.walk(spectrograms_path):
         for file_name in file_names:
             if "STFTMAG.npy" in file_name:
                 file_path = os.path.join(root, file_name)
                 spectrogram = np.load(file_path) # (n_bins, n_frames, 1)
-                spectrogram = spectrogram[0:1024, 0:64]
+                spectrogram = spectrogram[0:256, 0:128]
                 print("file_name: ", file_name)
+                print("shape: ", spectrogram.shape)
                 x_train.append(spectrogram)
     x_train = np.array(x_train)
     x_train = x_train[..., np.newaxis] # -> (3000, 256, 64, 1)
@@ -33,7 +33,7 @@ def load_fsdd(spectrograms_path):
 
 def train(x_train, learning_rate, batch_size, epochs):
     autoencoder = VAE(
-        input_shape=(1024, 64, 1),
+        input_shape=(256, 128, 1),
         conv_filters=(512, 256, 128, 64, 32),
         conv_kernels=(3, 3, 3, 3, 3),
         conv_strides=(2, 2, 2, 2, (2, 1)),
