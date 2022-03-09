@@ -12,10 +12,10 @@ violin_4sec_path = "/nas/home/spol/Thesis/violin_4sec/"
 # -------------------------------------------------------------------------------------------------------------------
 # RESAMPLING
 # -------------------------------------------------------------------------------------------------------------------
-'''
+
 y, sr = librosa.load(violin_4sec_path + 'violin_4sec.wav', sr=None)
 resample(violin_4sec_path, violin_4sec_path, SR_16kHz)
-'''
+
 
 # -------------------------------------------------------------------------------------------------------------------
 # STFT
@@ -74,9 +74,30 @@ print('debiug')
 # -------------------------------------------------------------------------------------------------------------------
 # CQT
 # -------------------------------------------------------------------------------------------------------------------
-y, sr = librosa.load(violin_4sec_path + 'Resampled_violin_4sec.wav', sr=None)
+y, sr = librosa.load(violin_4sec_path + 'violin_4sec.wav')
 
-C = np.abs(librosa.cqt(y, sr=sr,  n_bins=252*2, bins_per_octave=36*2))
+
+C = np.abs(librosa.cqt(y, sr=sr,  n_bins=384, bins_per_octave=48, hop_length=128))
+y_hat = librosa.griffinlim_cqt(C, sr=sr, bins_per_octave=48, hop_length=128)
+scipy.io.wavfile.write(violin_4sec_path + 'y_hat.wav', sr, y_hat)
+
+
+'''
+C_nb_384_bpo_48_hl_128 = np.abs(librosa.cqt(y, sr=sr,  n_bins=384, bins_per_octave=48, hop_length=128))
+C_nb_384_bpo_48_hl_256 = np.abs(librosa.cqt(y, sr=sr,  n_bins=384, bins_per_octave=48, hop_length=256))
+C_nb_252_bpo_36_hl_128 = np.abs(librosa.cqt(y, sr=sr,  n_bins=252, bins_per_octave=36, hop_length=128))
+C_nb_252_bpo_36_hl_256 = np.abs(librosa.cqt(y, sr=sr,  n_bins=252, bins_per_octave=36, hop_length=256))
+
+
+y_nb_384_bpo_48_hl_128 = librosa.griffinlim_cqt(C_nb_384_bpo_48_hl_128, sr=sr, bins_per_octave=48, hop_length=128)
+scipy.io.wavfile.write(violin_4sec_path + 'Resampled_violin_4sec_nb_384_bpo_48_hl_128.wav', sr, y_nb_384_bpo_48_hl_128)
+y_nb_384_bpo_48_hl_256 = librosa.griffinlim_cqt(C_nb_384_bpo_48_hl_256, sr=sr, bins_per_octave=48, hop_length=256)
+scipy.io.wavfile.write(violin_4sec_path + 'Resampled_violin_4sec_nb_384_bpo_48_hl_256.wav', sr, y_nb_384_bpo_48_hl_256)
+y_nb_252_bpo_36_hl_128 = librosa.griffinlim_cqt(C_nb_252_bpo_36_hl_128, sr=sr, bins_per_octave=36, hop_length=128)
+scipy.io.wavfile.write(violin_4sec_path + 'Resampled_violin_4sec_nb_252_bpo_36_hl_128.wav', sr, y_nb_252_bpo_36_hl_128)
+y_nb_252_bpo_36_hl_256 = librosa.griffinlim_cqt(C_nb_252_bpo_36_hl_256, sr=sr, bins_per_octave=36, hop_length=256)
+scipy.io.wavfile.write(violin_4sec_path + 'Resampled_violin_4sec_nb_252_bpo_36_hl_256.wav', sr, y_nb_252_bpo_36_hl_256)
+
 
 fig, ax = plt.subplots()
 img = librosa.display.specshow(librosa.amplitude_to_db(C, ref=np.max),
@@ -84,7 +105,5 @@ img = librosa.display.specshow(librosa.amplitude_to_db(C, ref=np.max),
 ax.set_title('Constant-Q power spectrum')
 fig.colorbar(img, ax=ax, format="%+2.0f dB")
 plt.show()
-
-y_reconstructed_cqt = librosa.griffinlim_cqt(C, sr=sr, bins_per_octave=36*2)
-scipy.io.wavfile.write(violin_4sec_path + 'Resampled_violin_4sec_cqt_default_reconstructed.wav', sr, y_reconstructed_cqt)
-
+'''
+print('debiug')
