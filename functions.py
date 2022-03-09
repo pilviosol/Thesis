@@ -4,6 +4,8 @@ import pathlib
 import shutil
 import math
 import librosa
+import librosa.display
+import scipy.io.wavfile
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -100,3 +102,15 @@ def feature_calculation(path_songs, store_features_path):
 
         else:
             print('That is not a file')
+
+
+def resample(origin_path, destination_path, new_sr):
+
+    files_dir = pathlib.Path(origin_path)
+    files_in_basepath = files_dir.iterdir()
+    for item in files_in_basepath:
+        name = item.name
+        print(name)
+        y, sr = librosa.load(item, sr=None)
+        y_new_sr = librosa.resample(y, orig_sr=sr, target_sr=new_sr)
+        scipy.io.wavfile.write(destination_path + '/' + 'Resampled_' + name, new_sr, y_new_sr)
