@@ -43,3 +43,12 @@ for a in flute_pitches_velocities:
         count += 1
 
 print('debug')
+
+
+# TODO
+"""
+eliminare quelli che non hanno tutte le velocities. 
+Eliminare i pitch che sono in vocal e non in flute
+Rinominare i file per pitch e fare un count di quanti pitch ho dell'uno e dell'altro
+Far matchare il numero di pitches di uno e dell'altro in modo da trainare ordinatamente
+"""
