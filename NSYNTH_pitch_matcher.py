@@ -15,7 +15,7 @@ def append_pitches_velocities(path):
     pitches_velocities = []
     files_dir = pathlib.Path(path)
     files_in_basepath = files_dir.iterdir()
-    for item in files_in_basepath:
+    for item in sorted(files_in_basepath):
         name = item.name
         pitch_velocity = str(name)[-11: -4]
         print('pitch_velocity', pitch_velocity)
@@ -36,5 +36,10 @@ for flute_pitch_velocity in flute_pitches_velocities:
 for vocal_pitch_velocity in vocal_pitches_velocities:
     if vocal_pitch_velocity not in flute_pitches_velocities:
         not_present_B.append(vocal_pitch_velocity)
+
+count = 0
+for a in flute_pitches_velocities:
+    if a[4:7] == '025':
+        count += 1
 
 print('debug')
