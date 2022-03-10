@@ -11,8 +11,11 @@ LEARNING_RATE = 0.0005
 BATCH_SIZE = 32
 EPOCHS = 150
 
-SPECTROGRAMS_PATH = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/features_fl_train_resampled_256/')
-SPECTROGRAMS_PATH_dir = SPECTROGRAMS_PATH.iterdir()
+x_train_SPECTROGRAMS_PATH = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/features_fl_train_resampled_256/')
+x_train_SPECTROGRAMS_PATH_dir = x_train_SPECTROGRAMS_PATH.iterdir()
+
+y_train_SPECTROGRAMS_PATH = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/features_fl_train_resampled_256/')
+y_train_SPECTROGRAMS_PATH_dir = y_train_SPECTROGRAMS_PATH.iterdir()
 
 
 def load_fsdd(spectrograms_path):
@@ -30,7 +33,7 @@ def load_fsdd(spectrograms_path):
     return x_train
 
 
-def train(x_train, learning_rate, batch_size, epochs):
+def train(x_train, y_train, learning_rate, batch_size, epochs):
     autoencoder = VAE(
         input_shape=(512, 256, 1),
         conv_filters=(512, 256, 128, 64, 32),
@@ -40,12 +43,13 @@ def train(x_train, learning_rate, batch_size, epochs):
     )
     autoencoder.summary()
     autoencoder.compile(learning_rate)
-    autoencoder.train(x_train, batch_size, epochs)
+    autoencoder.train(x_train, y_train, batch_size, epochs)
     return autoencoder
 
 
 if __name__ == "__main__":
     print('ollare')
-    x_train = load_fsdd(SPECTROGRAMS_PATH)
-    autoencoder = train(x_train, LEARNING_RATE, BATCH_SIZE, EPOCHS)
+    x_train = load_fsdd(x_train_SPECTROGRAMS_PATH)
+    y_train = load_fsdd(y_train_SPECTROGRAMS_PATH)
+    autoencoder = train(x_train, y_train, LEARNING_RATE, BATCH_SIZE, EPOCHS)
     autoencoder.save("VV_model")

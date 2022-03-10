@@ -14,6 +14,27 @@ import scipy.io.wavfile
 CONSTANT_256 = 256
 
 
+def extract_subset(origin_path, destination_path, string):
+
+    files_dir = pathlib.Path(origin_path)
+    files_in_basepath = files_dir.iterdir()
+    try:
+        shutil.rmtree((destination_path + string))
+    except OSError:
+        print("Removal of the directory %s failed" % (destination_path + string))
+    else:
+        print("Successfully removed the directory %s " % (destination_path + string))
+
+    os.mkdir(destination_path + string)
+
+    for item in files_in_basepath:
+        name = item.name
+        if string in str(name):
+            print('Moving: ', name)
+            print('--------------------------------------------')
+            shutil.copyfile(origin_path + name, destination_path + string + '/' + name)
+
+
 def divider_256(origin_path, destination_path):
     """
 

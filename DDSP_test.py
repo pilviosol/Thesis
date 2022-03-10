@@ -24,7 +24,7 @@ print('Done!')
 
 
 # --------------------------------------------------------------------
-audio, sr = librosa.load('scala_sustained.wav', sr=DEFAULT_SAMPLE_RATE)
+audio, sr = librosa.load('old_folder/scala_sustained.wav', sr=DEFAULT_SAMPLE_RATE)
 if len(audio.shape) == 1:
     audio = audio[np.newaxis, :]
 print('\nExtracting audio features...')
