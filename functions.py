@@ -138,3 +138,63 @@ def resample(origin_path, destination_path, new_sr):
         y, sr = librosa.load(item, sr=None)
         y_new_sr = librosa.resample(y, orig_sr=sr, target_sr=new_sr)
         scipy.io.wavfile.write(destination_path + '/' + 'Resampled_' + name, new_sr, y_new_sr)
+
+
+def rename_files_by_pitch(path):
+    files_dir = pathlib.Path(path)
+    files_in_basepath = files_dir.iterdir()
+    for item in sorted(files_in_basepath):
+        name = item.name
+        pitch = str(name)[-11: -8]
+        new_name = pitch + '_' + name
+        print('new_name: ', new_name)
+        os.rename(path + '/' + name, path + '/' + new_name)
+
+
+def count_pitches(list):
+    pitches = []
+    for item in sorted(list):
+        pitch = str(item)[0:3]
+        print('pitch', pitch)
+        pitches.append(pitch)
+    return sorted(set(pitches))
+
+
+def append_pitches_velocities(path):
+    pitches_velocities = []
+    files_dir = pathlib.Path(path)
+    files_in_basepath = files_dir.iterdir()
+    for item in sorted(files_in_basepath):
+        name = item.name
+        pitch_velocity = str(name)[-11: -4]
+        print('pitch_velocity', pitch_velocity)
+        pitches_velocities.append(pitch_velocity)
+    return pitches_velocities
+
+
+def remove_files_if_pitch_not_matching(path, elimination_list):
+    files_dir = pathlib.Path(path)
+    files_in_basepath = files_dir.iterdir()
+    for file in files_in_basepath:
+        name = file.name
+        if name[-11: -4] in elimination_list:
+            os.remove(path + '/' + name)
+
+
+def how_many_pitches(path):
+    counts = []
+    files_dir = pathlib.Path(path)
+    files_in_basepath = files_dir.iterdir()
+    count = 0
+    temp_pitch = '021'
+    for file in sorted(files_in_basepath):
+        name = file.name
+        pitch = name[0:3]
+        if pitch == temp_pitch:
+            count += 1
+            temp_pitch = pitch
+        else:
+            counts.append(count)
+            temp_pitch = pitch
+            count = 0
+    return counts
