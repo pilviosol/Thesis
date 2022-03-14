@@ -4,17 +4,18 @@ import numpy as np
 import pathlib
 from VV_autoencoder import VAE
 from utils import *
+from NSYNTH_feature_extractor import path_features_matching_flute, path_features_matching_vocal
 
 set_gpu(-1)
 
 LEARNING_RATE = 0.0005
-BATCH_SIZE = 32
+BATCH_SIZE = 16
 EPOCHS = 150
 
-x_train_SPECTROGRAMS_PATH = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/features_fl_train_resampled_256/')
+x_train_SPECTROGRAMS_PATH = pathlib.Path(path_features_matching_flute)
 x_train_SPECTROGRAMS_PATH_dir = x_train_SPECTROGRAMS_PATH.iterdir()
 
-y_train_SPECTROGRAMS_PATH = pathlib.Path('/nas/home/spol/Thesis/URPM_vn_fl/features_fl_train_resampled_256/')
+y_train_SPECTROGRAMS_PATH = pathlib.Path(path_features_matching_vocal)
 y_train_SPECTROGRAMS_PATH_dir = y_train_SPECTROGRAMS_PATH.iterdir()
 
 
@@ -24,7 +25,7 @@ def load_fsdd(spectrograms_path):
         for file_name in file_names:
             file_path = os.path.join(root, file_name)
             spectrogram = np.load(file_path)  # (n_bins, n_frames, 1)
-            # spectrogram = spectrogram[0:1024, 0:128]
+            spectrogram = spectrogram[0:512, 0:256]
             print("file_name: ", file_name)
             print("shape: ", spectrogram.shape)
             x_train.append(spectrogram)
