@@ -7,7 +7,6 @@ import librosa
 import librosa.display
 import scipy.io.wavfile
 
-
 # ---------------------------------------------------------------------------------------------------------------------
 # VARIABLES
 # ---------------------------------------------------------------------------------------------------------------------
@@ -15,7 +14,6 @@ CONSTANT_256 = 256
 
 
 def extract_subset(origin_path, destination_path, string):
-
     files_dir = pathlib.Path(origin_path)
     files_in_basepath = files_dir.iterdir()
     try:
@@ -78,23 +76,24 @@ def extract_features(file_name):
         audio, sample_rate = librosa.load(file_name, res_type='kaiser_fast', mono=True, sr=None)
         print('sample_rate: ', sample_rate)
         # cqt = librosa.cqt(y=audio, sr=sample_rate, hop_length=512, fmin=32.7, filter_scale=0.8,
-                          # bins_per_octave=48, n_bins=384)
+        # bins_per_octave=48, n_bins=384)
         # stft_full = librosa.stft(y=audio, n_fft=2048, hop_length=512)
         # stft_mag = np.abs(librosa.stft(y=audio, n_fft=2048, hop_length=512))
         # stft_mag_real = stft_mag.real
         # stft_mag_imag = stft_mag.imag
         # stft_phase = np.angle(librosa.stft(y=audio, hop_length=512))
         # mel_spectrogram = librosa.feature.melspectrogram(y=audio, sr=sample_rate,
-                                                         # n_fft=2048, hop_length=512,
-                                                         # n_mels=128)
+        # n_fft=2048, hop_length=512,
+        # n_mels=128)
         stft_mag = np.abs(librosa.stft(y=audio, n_fft=1024, hop_length=128, win_length=1024))
+        log_spectrogram = librosa.amplitude_to_db(stft_mag)
 
     except Exception as e:
         print("Error encountered while parsing file: ", file_name)
         return None
 
     # return cqt, stft_full, stft_mag, stft_mag_real, stft_mag_imag, stft_phase, mel_spectrogram
-    return stft_mag
+    return log_spectrogram
 
 
 def feature_calculation(path_songs, store_features_path):
@@ -129,7 +128,6 @@ def feature_calculation(path_songs, store_features_path):
 
 
 def resample(origin_path, destination_path, new_sr):
-
     files_dir = pathlib.Path(origin_path)
     files_in_basepath = files_dir.iterdir()
     for item in files_in_basepath:
@@ -198,3 +196,40 @@ def how_many_pitches(path):
             temp_pitch = pitch
             count = 0
     return counts
+
+
+def normalise(array):
+    original_min = array.min()
+    original_max = array.max()
+    norm_array = (array - array.min()) / (array.max() - array.min())
+    # norm_array = norm_array * (array.max() - array.min()) + array.min()
+    return norm_array, original_min, original_max
+
+
+def denormalise(norm_array, original_min, original_max):
+    array = (norm_array - norm_array.min()) / (norm_array.max() - norm_array.min())
+    array = array * (original_max - original_min) + original_min
+    return array
+
+
+def normalise_set_and_save_min_max(original_path, new_path):
+    min_max_array = []
+    files_dir = pathlib.Path(original_path)
+    files_in_basepath = files_dir.iterdir()
+    for file in sorted(files_in_basepath):
+        name = file.name
+        loaded_file = np.load(file)
+        normalised_spectrogram, original_min, original_max = normalise(loaded_file)
+        min_max_values = np.array([original_min, original_max])
+        min_max_array.append(min_max_values)
+        np.save(new_path + 'normalised_' + name, normalised_spectrogram)
+    return min_max_array
+
+
+# array = extract_features('/nas/home/spol/Thesis/scala_sustained.wav')
+# b, original_min, original_max = normalise(array)
+# c = denormalise(b, original_min, original_max)
+
+
+# print('debugg')
+
