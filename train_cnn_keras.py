@@ -14,7 +14,7 @@ from tensorflow.keras import datasets
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 
 import src.tensorflow_utils as arch
-from params import trained_models_root, model_name_keras, input_shape, batch_size, epochs
+from src.params import trained_models_root, model_name_keras, input_shape, batch_size, epochs
 from src.utils import set_gpu
 
 # set the computation device to be used (0: first GPU, None: CPU, -1 most free GPU)...

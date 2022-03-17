@@ -8,11 +8,17 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import MeanSquaredError
 import numpy as np
 import tensorflow as tf
-
+import wandb
+from wandb.keras import WandbCallback
+from WANDB import config
 
 tf.compat.v1.disable_eager_execution()
 
+train_loss = tf.keras.metrics.Mean(name="train_loss")
+train_kl_loss = tf.keras.metrics.Mean(name="train_kl_loss")
+train_reconstruction_loss = tf.keras.metrics.Mean(name="train_reconstruction_loss")
 
+callback_list = []
 class VAE:
     """
     VAE represents a Deep Convolutional variational autoencoder architecture
@@ -30,7 +36,9 @@ class VAE:
         self.conv_kernels = conv_kernels # [3, 5, 3]
         self.conv_strides = conv_strides # [1, 2, 2]
         self.latent_space_dim = latent_space_dim # 2
-        self.reconstruction_loss_weight = 1000000
+        # self.reconstruction_loss_weight = 1000000
+        self.reconstruction_loss_weight = config['kl_alpha']
+
 
         self.encoder = None
         self.decoder = None
@@ -63,11 +71,21 @@ class VAE:
     '''
 
     def train(self, x_train, y_train, batch_size, num_epochs):
+        callback_list.append(WandbCallback())
         self.model.fit(x_train,
                        y_train,
                        batch_size=batch_size,
                        epochs=num_epochs,
-                       shuffle=True)
+                       shuffle=False,
+                       callbacks=callback_list)
+        '''
+        t_loss = train_loss.result()
+        wandb.log({"train_loss": t_loss.numpy(), "global_step": num_epochs})
+        t_kl_loss = train_kl_loss.result()
+        wandb.log({"train_kl_loss": t_kl_loss.numpy(), "global_step": num_epochs})
+        t_reconstruction_loss = train_reconstruction_loss.result()
+        wandb.log({"reconstruction_loss": t_reconstruction_loss.numpy(), "global_step": num_epochs})
+        '''
 
     def save(self, save_folder="."):
         self._create_folder_if_it_doesnt_exist(save_folder)
@@ -97,16 +115,19 @@ class VAE:
         kl_loss = self._calculate_kl_loss(y_target, y_predicted)
         combined_loss = self.reconstruction_loss_weight * reconstruction_loss\
                                                          + kl_loss
+        train_loss(combined_loss)
         return combined_loss
 
     def _calculate_reconstruction_loss(self, y_target, y_predicted):
         error = y_target - y_predicted
         reconstruction_loss = K.mean(K.square(error), axis=[1, 2, 3])
+        train_reconstruction_loss(reconstruction_loss)
         return reconstruction_loss
 
     def _calculate_kl_loss(self, y_target, y_predicted):
         kl_loss = -0.5 * K.sum(1 + self.log_variance - K.square(self.mu) -
                                K.exp(self.log_variance), axis=1)
+        train_kl_loss(kl_loss)
         return kl_loss
 
     def _create_folder_if_it_doesnt_exist(self, folder):

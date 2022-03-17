@@ -219,6 +219,7 @@ def normalise_set_and_save_min_max(original_path, new_path):
     for file in sorted(files_in_basepath):
         name = file.name
         loaded_file = np.load(file)
+        loaded_file = loaded_file[0:512, 0:256]
         normalised_spectrogram, original_min, original_max = normalise(loaded_file)
         min_max_values = np.array([original_min, original_max])
         min_max_array.append(min_max_values)

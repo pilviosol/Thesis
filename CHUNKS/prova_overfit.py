@@ -1,6 +1,6 @@
 import numpy as np
 import tensorflow as tf
-import pix2pix_modified
+from CHUNKS import pix2pix_modified
 import pathlib
 import os
 import shutil
@@ -11,10 +11,7 @@ import librosa
 import librosa.display
 from utils import *
 import scipy.io.wavfile
-from tensorboardX import SummaryWriter
 import wandb
-from wandb.keras import WandbCallback
-
 
 '''
 TO DO:

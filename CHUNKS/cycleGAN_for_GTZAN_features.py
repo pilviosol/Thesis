@@ -1,12 +1,10 @@
 import numpy as np
 import tensorflow as tf
-import pix2pix_modified
+from CHUNKS import pix2pix_modified
 import pathlib
-import os
 import time
 import matplotlib.pyplot as plt
 from IPython.display import clear_output
-import cv2
 import librosa
 import librosa.display
 
