@@ -8,7 +8,7 @@ from VV_autoencoder import train_loss, train_kl_loss, train_reconstruction_loss
 from WANDB import config
 
 
-wandb.init(project="my-test-project", entity="pilviosol", name="x_train|y_train")
+wandb.init(project="my-test-project", entity="pilviosol", name="x_train|x_train")
 
 
 set_gpu(-1)
@@ -59,4 +59,4 @@ if __name__ == "__main__":
     x_train = load_fsdd(x_train_SPECTROGRAMS_PATH)
     y_train = load_fsdd(y_train_SPECTROGRAMS_PATH)
     autoencoder = train(x_train, y_train, LEARNING_RATE, BATCH_SIZE, EPOCHS)
-    autoencoder.save("/nas/home/spol/Thesis/saved_model/VV_model")
+    autoencoder.save("/nas/home/spol/Thesis/saved_model/VV_model_x_train_y_train_val02")

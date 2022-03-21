@@ -1,5 +1,5 @@
 from VV_autoencoder import VAE
-from functions import feature_calculation, normalise_set_and_save_min_max
+from functions import feature_calculation, normalise_set_and_save_min_max, denormalise
 import matplotlib.pyplot as plt
 import librosa.display
 import pathlib
@@ -16,7 +16,7 @@ min_max_flute_inference_path_file = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_S
 denormalised_spectrogram_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/denormalised_spectrogram/"
 
 # ---------------------------------------------------------------------------------------------------------------------
-# CALCULATE THE SPECTROGRAM SPECTROGRAM
+# CALCULATE THE SPECTROGRAM
 # ---------------------------------------------------------------------------------------------------------------------
 feature_calculation(test_path_file, test_path_feature)
 
@@ -69,12 +69,6 @@ for file in files_in_basepath:
 
 min_max_values = np.load(min_max_flute_inference_path_file)
 generated_spectrogram = np.squeeze(generated_spectrogram)
-
-
-def denormalise(norm_array, original_min, original_max):
-    array = (norm_array - norm_array.min()) / (norm_array.max() - norm_array.min())
-    array = array * (original_max - original_min) + original_min
-    return array
 
 
 denormalised_spectrogram = denormalise(generated_spectrogram, min_max_values[0][0], min_max_values[0][1])

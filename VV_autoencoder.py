@@ -77,7 +77,8 @@ class VAE:
                        batch_size=batch_size,
                        epochs=num_epochs,
                        shuffle=False,
-                       callbacks=callback_list)
+                       callbacks=callback_list,
+                       validation_split=0.2)
         '''
         t_loss = train_loss.result()
         wandb.log({"train_loss": t_loss.numpy(), "global_step": num_epochs})
