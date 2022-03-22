@@ -86,7 +86,7 @@ def extract_features(file_name):
         # n_fft=2048, hop_length=512,
         # n_mels=128)
         stft_mag = np.abs(librosa.stft(y=audio, n_fft=1024, hop_length=128, win_length=1024))
-        log_spectrogram = librosa.amplitude_to_db(stft_mag)
+        log_spectrogram = 10 * np.log10(stft_mag + 1e-1)
 
     except Exception as e:
         print("Error encountered while parsing file: ", file_name)
@@ -106,7 +106,7 @@ def feature_calculation(path_songs, store_features_path):
     data_dir = pathlib.Path(path_songs)
     files_in_basepath = data_dir.iterdir()
 
-    for item in files_in_basepath:
+    for item in sorted(files_in_basepath):
         if item.is_file():
             print(item.name)
             name = item.name[0:-4]
@@ -117,7 +117,7 @@ def feature_calculation(path_songs, store_features_path):
             # Saving all features in one folder (.npy format)
             # np.save(store_features_path + name + "_CQT", cqt)
             # np.save(store_features_path + name + "_STFTFULL", stft_full)
-            np.save(store_features_path + name + "_STFTMAG", stft_mag)
+            np.save(store_features_path + name + "_STFTMAG_NEW", stft_mag)
             # np.save(store_features_path + name + "_STFTMAG_REAL", stft_mag_real)
             # np.save(store_features_path + name + "_STFTMAG_IMAG", stft_mag_imag)
             # np.save(store_features_path + name + "_STFTPHASE", stft_phase)
@@ -223,7 +223,7 @@ def normalise_set_and_save_min_max(original_path, new_path):
         normalised_spectrogram, original_min, original_max = normalise(loaded_file)
         min_max_values = np.array([original_min, original_max])
         min_max_array.append(min_max_values)
-        np.save(new_path + 'normalised_' + name, normalised_spectrogram)
+        np.save(new_path + 'normalised_new_' + name, normalised_spectrogram)
     return min_max_array
 
 

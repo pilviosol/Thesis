@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import librosa.display
 import pathlib
 import numpy as np
+import scipy
 
 features_matching_flute = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/features_matching_flute/"
 features_matching_vocal = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/features_matching_vocal/"
@@ -26,7 +27,7 @@ vocals = np.array(vocals)
 
 
 fig, ax = plt.subplots()
-img = librosa.display.specshow(vocal[0], y_axis='linear', x_axis='time', ax=ax)
+img = librosa.display.specshow(flutes[1000], y_axis='linear', x_axis='time', ax=ax)
 ax.set_title('Flute Sample Power spectrogram')
 fig.colorbar(img, ax=ax, format="%+2.0f dB")
 plt.show()
