@@ -7,7 +7,7 @@ import wandb
 from VV_autoencoder import train_loss, train_kl_loss, train_reconstruction_loss
 from WANDB import config
 
-wandb.init(project="my-test-project", entity="pilviosol", name="x_train|y_train_new_formula")
+wandb.init(project="my-test-project", entity="pilviosol", name="x_train|x_train_x_val|x_val")
 set_gpu(-1)
 
 path_features_matching_flute_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/normalised_features_matching_flute_new_db_formula/'
@@ -57,9 +57,11 @@ def train(x_train, y_train, x_val, y_val, learning_rate, batch_size, epochs):
 if __name__ == "__main__":
     print('ollare')
     x_train = load_fsdd(x_train_SPECTROGRAMS_PATH)
-    y_train = load_fsdd(y_train_SPECTROGRAMS_PATH)
+    x_train = np.delete(x_train, 2776, axis=0)
+    # y_train = load_fsdd(y_train_SPECTROGRAMS_PATH)
+    # y_train = np.delete(y_train, 2776, axis=0)
     x_val = load_fsdd(x_val_SPECTROGRAMS_PATH)
-    y_val = load_fsdd(y_val_SPECTROGRAMS_PATH)
-    autoencoder = train(x_train, y_train, x_val, y_val, LEARNING_RATE, BATCH_SIZE, EPOCHS)
-    autoencoder.save("/nas/home/spol/Thesis/saved_model/VV_model_x_train_y_train_val02_new_formula")
+    # y_val = load_fsdd(y_val_SPECTROGRAMS_PATH)
+    autoencoder = train(x_train, x_train, x_val, x_val, LEARNING_RATE, BATCH_SIZE, EPOCHS)
+    autoencoder.save("/nas/home/spol/Thesis/saved_model/VV_model_x_train_x_train_x_val_x_val")
 
