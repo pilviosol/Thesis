@@ -62,3 +62,4 @@ if __name__ == "__main__":
     y_val = load_fsdd(y_val_SPECTROGRAMS_PATH)
     autoencoder = train(x_train, y_train, x_val, y_val, LEARNING_RATE, BATCH_SIZE, EPOCHS)
     autoencoder.save("/nas/home/spol/Thesis/saved_model/VV_model_x_train_y_train_val02_new_formula")
+
