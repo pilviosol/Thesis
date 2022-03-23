@@ -142,12 +142,9 @@ for file in files_in_basepath:
     name = name[0:-4]
     print(name)
     denorm_spectrogram = np.load(file)
-    '''
-    print('denorm_shape: ', denorm_spectrogram.shape)
-    padded_denorm_spectrogram = np.pad(denorm_spectrogram, ((0, 0), (0, 1024-256)), 'constant') 
-    print('padded_denorm_shape: ', padded_denorm_spectrogram.shape) '''
     reconstructed = librosa.griffinlim(denorm_spectrogram)
     scipy.io.wavfile.write(generated_vocal_path + 'REVERSED_' + name + '.wav', 16000, reconstructed)
 
 
 print('debug')
+

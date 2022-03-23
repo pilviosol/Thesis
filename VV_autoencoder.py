@@ -70,7 +70,7 @@ class VAE:
                        shuffle=True)
     '''
 
-    def train(self, x_train, y_train, batch_size, num_epochs):
+    def train(self, x_train, y_train, x_val, y_val, batch_size, num_epochs):
         callback_list.append(WandbCallback())
         self.model.fit(x_train,
                        y_train,
@@ -78,7 +78,7 @@ class VAE:
                        epochs=num_epochs,
                        shuffle=False,
                        callbacks=callback_list,
-                       validation_split=0.2)
+                       validation_data=(x_val, y_val))
         '''
         t_loss = train_loss.result()
         wandb.log({"train_loss": t_loss.numpy(), "global_step": num_epochs})
