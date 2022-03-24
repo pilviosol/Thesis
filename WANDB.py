@@ -14,7 +14,7 @@ wandb.config = {
     "output_activation": "relu",
     "epochs": 20,
     "learning_rate": 0.0005,
-    "batch_size": 32,
+    "batch_size": 16,
     "buffer_size": 60000,
     "buffer_size_dataset": True,
     "continue_training": False,

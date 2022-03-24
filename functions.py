@@ -86,14 +86,14 @@ def extract_features(file_name):
         # n_fft=2048, hop_length=512,
         # n_mels=128)
         stft_mag = np.abs(librosa.stft(y=audio, n_fft=1024, hop_length=128, win_length=1024))
-        log_spectrogram = 10 * np.log10(stft_mag + 1e-1)
+        # log_spectrogram = 10 * np.log10(stft_mag + 1e-1)
 
     except Exception as e:
         print("Error encountered while parsing file: ", file_name)
         return None
 
     # return cqt, stft_full, stft_mag, stft_mag_real, stft_mag_imag, stft_phase, mel_spectrogram
-    return log_spectrogram
+    return stft_mag
 
 
 def feature_calculation(path_songs, store_features_path):

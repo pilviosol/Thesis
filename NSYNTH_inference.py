@@ -10,13 +10,13 @@ import pickle
 # ---------------------------------------------------------------------------------------------------------------------
 # PATH, VARIABLES
 # ---------------------------------------------------------------------------------------------------------------------
-test_path_file = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/INFERENCE_flute/"
-test_path_feature = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/INFERENCE_flute_features/"
-normalised_test_path_feature = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/INFERENCE_normalised_flute_features/"
-generated_test_path_feature = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/INFERENCE_generated_flute_features/"
-min_max_flute_inference_path_file = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/INFERENCE_flute_min_max.npy"
-denormalised_spectrogram_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/INFERENCE_denormalised_spectrogram/"
-generated_vocal_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/INFERENCE_generated_vocal/"
+test_path_file = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/matching_flute_TEST/"
+test_path_feature = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/features_matching_flute_TEST/"
+normalised_test_path_feature = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/normalised_flute_features_TEST/"
+generated_test_path_feature = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/generated_vocal_features_TEST/"
+min_max_flute_inference_path_file = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/flute_min_max_TEST.npy"
+denormalised_spectrogram_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/denormalised_spectrogram_TEST/"
+generated_vocal_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/generated_vocal_TEST/"
 
 
 print('PATH, VARIABLES..........ok')
@@ -39,12 +39,14 @@ files_in_basepath = files_dir.iterdir()
 for file in files_in_basepath:
     name = file.name
     spectrogram = np.load(file)
+    spectrogram = spectrogram[0:512, 0:256]
+    '''
     fig = plt.figure()
     img = plt.imshow(spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 256, 0, 512],
                      aspect='auto')
     plt.title(name)
     plt.colorbar()
-    plt.show()
+    plt.show() '''
 
 
 print('PLOT THE SPECTROGRAMS..........ok')
@@ -63,7 +65,7 @@ print('NORMALIZE THE SPECTROGRAMS AND SAVE MIN MAX..........ok')
 # ---------------------------------------------------------------------------------------------------------------------
 # IMPORT THE MODEL
 # ---------------------------------------------------------------------------------------------------------------------
-vae = VAE.load("/nas/home/spol/Thesis/saved_model/VV_model_x_train_y_train_val02_new_formula")
+vae = VAE.load("/nas/home/spol/Thesis/saved_model/VV_model_x_train_x_train_x_val_x_val")
 
 
 print('IMPORT THE MODEL..........ok')
@@ -121,16 +123,16 @@ for file in files_in_basepath:
     name = file.name
     print(name)
     denorm_spectrogram = np.load(file)
+    denorm_spectrogram = 10**(denorm_spectrogram/10) - 1e-1
     fig = plt.figure()
     img = plt.imshow(denorm_spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 256, 0, 512],
                      aspect='auto')
-    plt.title(name)
+    plt.title('ollare')
     plt.colorbar()
     plt.show()
 
 
 print('PLOT THE RECONSTRUCTED SPECTROGRAMS..........ok')
-
 
 # ---------------------------------------------------------------------------------------------------------------------
 # SYNTHESIZE THE NEW AUDIO
