@@ -227,6 +227,19 @@ def normalise_given_min_max(array, minimum, maximum):
     return norm_array
 
 
+def denormalise_given_min_max(array, minimum, maximum):
+    """
+
+    :param array: array to be denormalised
+    :param minimum: given min val
+    :param maximum: given max val
+    :return: norm_array: array in range full range
+
+    """
+    array = array * (maximum - minimum) + minimum
+    return array
+
+
 def denormalise(norm_array, original_min, original_max):
     """
 

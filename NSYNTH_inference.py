@@ -1,5 +1,5 @@
 from VV_autoencoder import VAE
-from functions import feature_calculation, normalise_set_and_save_min_max, denormalise, min_max_array_saving, fw_normalise
+from functions import feature_calculation, denormalise_given_min_max, min_max_array_saving, fw_normalise
 import matplotlib.pyplot as plt
 import librosa.display
 import pathlib
@@ -41,13 +41,14 @@ for file in files_in_basepath:
     name = file.name
     spectrogram = np.load(file)
     spectrogram = spectrogram[0:512, 0:256]
-    '''
+
     fig = plt.figure()
     img = plt.imshow(spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 256, 0, 512],
                      aspect='auto')
     plt.title(name)
     plt.colorbar()
-    plt.show() '''
+    # plt.show()
+    plt.close()
 
 
 print('PLOT THE SPECTROGRAMS..........ok')
@@ -61,6 +62,27 @@ flute_folder_min_max = fw_normalise(test_path_feature, normalised_test_path_feat
 
 print('NORMALIZE THE SPECTROGRAMS AND SAVE MIN MAX..........ok')
 
+
+# ---------------------------------------------------------------------------------------------------------------------
+# PLOT THE NORMALIZED SPECTROGRAMS
+# ---------------------------------------------------------------------------------------------------------------------
+files_dir = pathlib.Path(normalised_test_path_feature)
+files_in_basepath = files_dir.iterdir()
+for file in files_in_basepath:
+    name = file.name
+    spectrogram = np.load(file)
+    spectrogram = spectrogram[0:512, 0:256]
+
+    fig = plt.figure()
+    img = plt.imshow(spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 256, 0, 512],
+                     aspect='auto')
+    plt.title('NORMALIZED' + name)
+    plt.colorbar()
+    # plt.show()
+    plt.close()
+
+
+print('PLOT THE NORMALIZED SPECTROGRAMS..........ok')
 
 # ---------------------------------------------------------------------------------------------------------------------
 # IMPORT THE MODEL
@@ -96,6 +118,28 @@ print('FEED THEM TO THE MODEL..........ok')
 
 
 # ---------------------------------------------------------------------------------------------------------------------
+# PLOT THE OUTPUT OF THE NETWORK
+# ---------------------------------------------------------------------------------------------------------------------
+files_dir = pathlib.Path(generated_test_path_feature)
+files_in_basepath = files_dir.iterdir()
+for file in files_in_basepath:
+    name = file.name
+    spectrogram = np.load(file)
+    spectrogram = spectrogram[0:512, 0:256]
+    out_spectrogram = np.squeeze(spectrogram)
+    fig = plt.figure()
+    img = plt.imshow(out_spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 256, 0, 512],
+                     aspect='auto')
+    plt.title('OUTPUT_' + name)
+    plt.colorbar()
+    plt.show()
+    plt.close()
+
+
+print('PLOT THE OUTPUT OF THE NETWORK..........ok')
+
+
+# ---------------------------------------------------------------------------------------------------------------------
 # GET THE OUTPUT AND DE-NORMALISE THEM
 # ---------------------------------------------------------------------------------------------------------------------
 
@@ -108,7 +152,8 @@ for idx, file in enumerate(files_in_basepath):
     name = file.name
     gen_spectrogram = np.load(file)
     gen_spectrogram = np.squeeze(gen_spectrogram)
-    denormalised_spectrogram = denormalise(gen_spectrogram, min_max_values[0][0], min_max_values[0][1])
+    denormalised_spectrogram = denormalise_given_min_max(gen_spectrogram, min_max_values[0][0], min_max_values[0][1])
+    # denormalised_spectrogram = denormalise(gen_spectrogram, min_max_values[0][0], min_max_values[0][1])
     np.save(denormalised_spectrogram_path + name, denormalised_spectrogram)
 
 
@@ -120,17 +165,18 @@ print('GET THE OUTPUT AND DE-NORMALISE THEM..........ok')
 # ---------------------------------------------------------------------------------------------------------------------
 files_dir = pathlib.Path(denormalised_spectrogram_path)
 files_in_basepath = files_dir.iterdir()
-for file in files_in_basepath:
+for file in sorted(files_in_basepath):
     name = file.name
     print(name)
     denorm_spectrogram = np.load(file)
-    denorm_spectrogram = 10**(denorm_spectrogram/10) - 1e-1
+    # denorm_spectrogram = 10**(denorm_spectrogram/10) - 1e-1
     fig = plt.figure()
     img = plt.imshow(denorm_spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 256, 0, 512],
                      aspect='auto')
     plt.title('ollare')
     plt.colorbar()
     plt.show()
+    plt.close()
 
 
 print('PLOT THE RECONSTRUCTED SPECTROGRAMS..........ok')
