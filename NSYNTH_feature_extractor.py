@@ -6,8 +6,8 @@ from functions import extract_features, feature_calculation
 
 path_matching_flute = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/matching_flute_VALID'
 path_matching_vocal = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/matching_vocal_VALID'
-path_features_matching_flute = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/features_matching_flute_nodb_VALID/'
-path_features_matching_vocal = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/features_matching_vocal_nodb_VALID/'
+path_features_matching_flute = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/features_matching_flute_new_db_formula_VALID/'
+path_features_matching_vocal = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/features_matching_vocal_new_db_formula_VALID/'
 
 
 try:

@@ -86,14 +86,14 @@ def extract_features(file_name):
         # n_fft=2048, hop_length=512,
         # n_mels=128)
         stft_mag = np.abs(librosa.stft(y=audio, n_fft=1024, hop_length=128, win_length=1024))
-        # log_spectrogram = 10 * np.log10(stft_mag + 1e-1)
+        log_spectrogram = 10 * np.log10(stft_mag + 1e-1)
 
     except Exception as e:
         print("Error encountered while parsing file: ", file_name)
         return None
 
     # return cqt, stft_full, stft_mag, stft_mag_real, stft_mag_imag, stft_phase, mel_spectrogram
-    return stft_mag
+    return log_spectrogram
 
 
 def feature_calculation(path_songs, store_features_path):
@@ -199,20 +199,80 @@ def how_many_pitches(path):
 
 
 def normalise(array):
+    """
+
+    :param array: array to be normalizes
+    :return:
+    norm_array: normalized based on his min and max
+    original_min: the min of the array
+    original_max: the max of the array
+
+    """
     original_min = array.min()
     original_max = array.max()
     norm_array = (array - array.min()) / (array.max() - array.min())
-    # norm_array = norm_array * (array.max() - array.min()) + array.min()
     return norm_array, original_min, original_max
 
 
+def normalise_given_min_max(array, minimum, maximum):
+    """
+
+    :param array: array to be normalised
+    :param minimum: given min val
+    :param maximum: given max val
+    :return: norm_array: normalized array in range 0-1
+
+    """
+    norm_array = (array - minimum) / (maximum - minimum)
+    return norm_array
+
+
 def denormalise(norm_array, original_min, original_max):
+    """
+
+    :param norm_array: normalised array to be denormalised
+    :param original_min: original min of the array that has been normlised
+    :param original_max: original max of the array that has been normalised
+    :return: array: the denormalised array
+
+    """
     array = (norm_array - norm_array.min()) / (norm_array.max() - norm_array.min())
     array = array * (original_max - original_min) + original_min
     return array
 
 
+def min_max_array_saving(spectrograms_path, saving_path):
+    """
+
+    :param spectrograms_path: path where all spectrograms are stored
+    :param saving_path: path where the min_max_array will be saved
+    :return: min_max_array: min max array with all min max values for each spectrogram + saves it at saving_path
+
+    """
+    min_max_array = []
+    files_dir = pathlib.Path(spectrograms_path)
+    files_in_basepath = files_dir.iterdir()
+    for file in sorted(files_in_basepath):
+        loaded_file = np.load(file)
+        loaded_file = loaded_file[0:512, 0:256]
+        minimum = loaded_file.min()
+        maximum = loaded_file.max()
+        min_max_values = np.array([minimum, maximum])
+        min_max_array.append(min_max_values)
+        np.save(saving_path + 'min_max_array', min_max_array)
+    return min_max_array
+
+
 def normalise_set_and_save_min_max(original_path, new_path):
+    """
+
+    :param original_path: path where all spectrograms are stored
+    :param new_path: path where all normalised spectrograms will be saved
+    :return: min_max_array: min max array with all min max values for each spectrogram + saves it at saving_path \
+             and saves all normalised spectrograms (ALL normalised with their own min and max, NOT folder-wise) \
+             in new_path
+
+    """
     min_max_array = []
     files_dir = pathlib.Path(original_path)
     files_in_basepath = files_dir.iterdir()
@@ -225,6 +285,31 @@ def normalise_set_and_save_min_max(original_path, new_path):
         min_max_array.append(min_max_values)
         np.save(new_path + 'normalised_new_' + name, normalised_spectrogram)
     return min_max_array
+
+
+def fw_normalise(original_path, new_path, min_max_array):
+    """
+
+    :param original_path: path where all spectrograms are stored
+    :param new_path: path where all normalised spectrograms will be saved
+    :param min_max_array: array with all min_max_values of the spectrograms to be normalised
+    :return: void but saves all normalised spectrograms into new_path
+    """
+    folder_min_max = []
+    min_max_np = np.array(min_max_array)
+    maximum = min_max_np.max()
+    minimum = min_max_np.min()
+    folder_min_max.append([maximum, minimum])
+
+    files_dir = pathlib.Path(original_path)
+    files_in_basepath = files_dir.iterdir()
+    for file in sorted(files_in_basepath):
+        name = file.name
+        loaded_file = np.load(file)
+        loaded_file = loaded_file[0:512, 0:256]
+        normalised_loaded_file = normalise_given_min_max(loaded_file, minimum, maximum)
+        np.save(new_path + 'normalised_FW_' + name, normalised_loaded_file)
+    return folder_min_max
 
 
 # array = extract_features('/nas/home/spol/Thesis/scala_sustained.wav')

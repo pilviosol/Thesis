@@ -8,13 +8,13 @@ from VV_autoencoder import train_loss, train_kl_loss, train_reconstruction_loss
 from WANDB import config
 import matplotlib.pyplot as plt
 
-wandb.init(project="my-test-project", entity="pilviosol", name="x_train|x_train_x_val|x_val")
+wandb.init(project="my-test-project", entity="pilviosol", name="FW_x_train|y_train_x_val|y_val")
 set_gpu(-1)
 
-path_features_matching_flute_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/normalised_features_matching_flute_nodb/'
-path_features_matching_vocal_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/normalised_features_matching_vocal_nodb/'
-path_features_matching_flute_val = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/normalised_features_matching_flute_nodb_VALID/"
-path_features_matching_vocal_val = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/normalised_features_matching_vocal_nodb_VALID/"
+path_features_matching_flute_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/FW_normalised_flute/'
+path_features_matching_vocal_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/FW_normalised_vocal/'
+path_features_matching_flute_val = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/FW_normalised_flute_VALID/"
+path_features_matching_vocal_val = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/FW_normalised_vocal_VALID/"
 
 
 x_train_SPECTROGRAMS_PATH = pathlib.Path(path_features_matching_flute_train)
@@ -76,5 +76,5 @@ if __name__ == "__main__":
     x_val = load_fsdd(x_val_SPECTROGRAMS_PATH)
     # y_val = load_fsdd(y_val_SPECTROGRAMS_PATH)
     autoencoder = train(x_train, x_train, x_val, x_val, LEARNING_RATE, BATCH_SIZE, EPOCHS)
-    autoencoder.save("/nas/home/spol/Thesis/saved_model/VV_model_x_train_x_train_x_val_x_val")
+    autoencoder.save("/nas/home/spol/Thesis/saved_model/VV_model_FW_x_train_y_train_x_val_y_val")
 

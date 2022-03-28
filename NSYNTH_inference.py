@@ -1,5 +1,5 @@
 from VV_autoencoder import VAE
-from functions import feature_calculation, normalise_set_and_save_min_max, denormalise
+from functions import feature_calculation, normalise_set_and_save_min_max, denormalise, min_max_array_saving, fw_normalise
 import matplotlib.pyplot as plt
 import librosa.display
 import pathlib
@@ -15,6 +15,7 @@ test_path_feature = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/features_ma
 normalised_test_path_feature = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/normalised_flute_features_TEST/"
 generated_test_path_feature = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/generated_vocal_features_TEST/"
 min_max_flute_inference_path_file = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/flute_min_max_TEST.npy"
+min_max_flute_path_file = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/flute_"
 denormalised_spectrogram_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/denormalised_spectrogram_TEST/"
 generated_vocal_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/generated_vocal_TEST/"
 
@@ -55,9 +56,8 @@ print('PLOT THE SPECTROGRAMS..........ok')
 # ---------------------------------------------------------------------------------------------------------------------
 # NORMALIZE THE SPECTROGRAMS AND SAVE MIN MAX
 # ---------------------------------------------------------------------------------------------------------------------
-min_max_flute_inference = normalise_set_and_save_min_max(test_path_feature, normalised_test_path_feature)
-np.save(min_max_flute_inference_path_file, min_max_flute_inference)
-
+min_max_flute = min_max_array_saving(test_path_feature, min_max_flute_path_file)
+flute_folder_min_max = fw_normalise(test_path_feature, normalised_test_path_feature, min_max_flute)
 
 print('NORMALIZE THE SPECTROGRAMS AND SAVE MIN MAX..........ok')
 
@@ -65,7 +65,7 @@ print('NORMALIZE THE SPECTROGRAMS AND SAVE MIN MAX..........ok')
 # ---------------------------------------------------------------------------------------------------------------------
 # IMPORT THE MODEL
 # ---------------------------------------------------------------------------------------------------------------------
-vae = VAE.load("/nas/home/spol/Thesis/saved_model/VV_model_x_train_x_train_x_val_x_val")
+vae = VAE.load("/nas/home/spol/Thesis/saved_model/VV_model_FW_x_train_y_train_x_val_y_val")
 
 
 print('IMPORT THE MODEL..........ok')
@@ -99,7 +99,8 @@ print('FEED THEM TO THE MODEL..........ok')
 # GET THE OUTPUT AND DE-NORMALISE THEM
 # ---------------------------------------------------------------------------------------------------------------------
 
-min_max_values = np.load(min_max_flute_inference_path_file)
+# min_max_values = np.load(min_max_flute_inference_path_file)
+min_max_values = flute_folder_min_max
 
 files_dir = pathlib.Path(generated_test_path_feature)
 files_in_basepath = files_dir.iterdir()
@@ -107,7 +108,7 @@ for idx, file in enumerate(files_in_basepath):
     name = file.name
     gen_spectrogram = np.load(file)
     gen_spectrogram = np.squeeze(gen_spectrogram)
-    denormalised_spectrogram = denormalise(gen_spectrogram, min_max_values[idx][0], min_max_values[idx][1])
+    denormalised_spectrogram = denormalise(gen_spectrogram, min_max_values[0][0], min_max_values[0][1])
     np.save(denormalised_spectrogram_path + name, denormalised_spectrogram)
 
 
