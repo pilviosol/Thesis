@@ -5,12 +5,12 @@ import pathlib
 from functions import normalise_set_and_save_min_max, feature_calculation, denormalise
 
 
-test_normalization_path_file = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/testing_normalization/"
-test_normalization_path_feature = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/testing_normalization_features/"
+test_normalization_path_file = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/TEST_VARI/testing_normalization/"
+test_normalization_path_feature = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/TEST_VARI/testing_normalization_features/"
 normalised_test_path_feature = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET" \
-                               "/normalised_testing_normalization_features/"
+                               "/TEST_VARI/normalised_testing_normalization_features/"
 denormalised_spectrogram_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET" \
-                                "/denormalised_spectrogram_test_normalization/"
+                                "/TEST_VARI/denormalised_spectrogram_test_normalization/"
 
 
 # ---------------------------------------------------------------------------------------------------------------------

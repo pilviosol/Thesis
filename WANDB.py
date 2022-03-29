@@ -8,7 +8,7 @@ wandb.config = {
     "n_iter": 1,
     "latent_dim": 32,
     "n_units": 2048,
-    "kl_alpha": 10,
+    "kl_alpha": 100000,
     "kl_beta": 0.0005,
     "batch_norm": True,
     "output_activation": "relu",
