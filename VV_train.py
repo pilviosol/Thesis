@@ -8,7 +8,8 @@ from VV_autoencoder import train_loss, train_kl_loss, train_reconstruction_loss
 from WANDB import config
 import matplotlib.pyplot as plt
 
-wandb.init(project="my-test-project", entity="pilviosol", name="FW_x_train|y_train_x_val|y_val")
+wandb.init(project="my-test-project", entity="pilviosol", name="VV_model_30_03_00_54",
+           config=config)
 set_gpu(-1)
 
 path_features_matching_flute_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/FW_normalised_flute/'
@@ -16,12 +17,10 @@ path_features_matching_vocal_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_
 path_features_matching_flute_val = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/FW_normalised_flute_VALID/"
 path_features_matching_vocal_val = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/FW_normalised_vocal_VALID/"
 
-
 x_train_SPECTROGRAMS_PATH = pathlib.Path(path_features_matching_flute_train)
 y_train_SPECTROGRAMS_PATH = pathlib.Path(path_features_matching_vocal_train)
 x_val_SPECTROGRAMS_PATH = pathlib.Path(path_features_matching_flute_val)
 y_val_SPECTROGRAMS_PATH = pathlib.Path(path_features_matching_vocal_val)
-
 
 LEARNING_RATE = config['learning_rate']
 BATCH_SIZE = config['batch_size']
@@ -40,7 +39,6 @@ def load_fsdd(spectrograms_path):
             count += 1
             print('count: ', count)
             if count % 100 == 0:
-
                 fig = plt.figure()
                 img = plt.imshow(spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 256, 0, 512],
                                  aspect='auto')
@@ -76,5 +74,4 @@ if __name__ == "__main__":
     x_val = load_fsdd(x_val_SPECTROGRAMS_PATH)
     y_val = load_fsdd(y_val_SPECTROGRAMS_PATH)
     autoencoder = train(x_train, y_train, x_val, y_val, LEARNING_RATE, BATCH_SIZE, EPOCHS)
-    autoencoder.save("/nas/home/spol/Thesis/saved_model/VV_model_FW_x_train_y_train_x_val_y_val")
-
+    autoencoder.save("/nas/home/spol/Thesis/saved_model/VV_model_30_03_00_54")
