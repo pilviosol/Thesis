@@ -6,11 +6,15 @@ import math
 import librosa
 import librosa.display
 import scipy.io.wavfile
+from WANDB import config
 
 # ---------------------------------------------------------------------------------------------------------------------
 # VARIABLES
 # ---------------------------------------------------------------------------------------------------------------------
 CONSTANT_256 = 256
+N_FFT = config['n_fft']
+HOP_LENGTH = config['hop_length']
+WIN_LENGTH = config['win_length']
 
 
 def extract_subset(origin_path, destination_path, string):
@@ -85,7 +89,7 @@ def extract_features(file_name):
         # mel_spectrogram = librosa.feature.melspectrogram(y=audio, sr=sample_rate,
         # n_fft=2048, hop_length=512,
         # n_mels=128)
-        stft_mag = np.abs(librosa.stft(y=audio, n_fft=1024, hop_length=128, win_length=1024))
+        stft_mag = np.abs(librosa.stft(y=audio, n_fft=N_FFT, hop_length=HOP_LENGTH, win_length=WIN_LENGTH))
         log_spectrogram = 10 * np.log10(stft_mag + 1e-1)
 
     except Exception as e:

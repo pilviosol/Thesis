@@ -8,9 +8,17 @@ from VV_autoencoder import train_loss, train_kl_loss, train_reconstruction_loss
 from WANDB import config
 import matplotlib.pyplot as plt
 
-wandb.init(project="my-test-project", entity="pilviosol", name="VV_model_30_03_00_54",
-           config=config)
+from datetime import datetime
+now = datetime.now()
+dt_string = now.strftime("%d-%m-%Y_%H:%M")
+print(dt_string)
+file2 = open(r"/nas/home/spol/Thesis/last_date.txt", "w+")
+file2.write(dt_string)
+file2.close()
+
+wandb.init(project="my-test-project", entity="pilviosol", name=dt_string, config=config)
 set_gpu(-1)
+
 
 path_features_matching_flute_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/FW_normalised_flute/'
 path_features_matching_vocal_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/FW_normalised_vocal/'
@@ -74,4 +82,4 @@ if __name__ == "__main__":
     x_val = load_fsdd(x_val_SPECTROGRAMS_PATH)
     y_val = load_fsdd(y_val_SPECTROGRAMS_PATH)
     autoencoder = train(x_train, y_train, x_val, y_val, LEARNING_RATE, BATCH_SIZE, EPOCHS)
-    autoencoder.save("/nas/home/spol/Thesis/saved_model/VV_model_30_03_00_54")
+    autoencoder.save("/nas/home/spol/Thesis/saved_model/" + dt_string)
