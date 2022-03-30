@@ -71,6 +71,7 @@ vocals_path = pathlib.Path(features_matching_vocal_TEST).iterdir()
 
 for flute, vocal in zip(sorted(flutes_path), sorted(vocals_path)):
     flute_name = flute.name
+    print('flute_name[19:-16]: ', flute_name[19:-16])
     flute_spectrogram = np.load(flute)
     flute_spectrogram = flute_spectrogram[0:512, 0:256]
     vocal_name = vocal.name
@@ -92,8 +93,9 @@ for flute, vocal in zip(sorted(flutes_path), sorted(vocals_path)):
     divider2 = make_axes_locatable(ax2)
     cax2 = divider2.append_axes("right", size="5%", pad=0.05)
     cbar2 = plt.colorbar(img2, cax=cax2)
-
     plt.savefig(Figures_TEST + 'input-expected_output/' + flute_name[19:-16])
+    plt.show()
+
     plt.close()
 
 print('PLOT THE SPECTROGRAMS..........ok')
