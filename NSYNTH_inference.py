@@ -19,12 +19,13 @@ with open('/nas/home/spol/Thesis/last_date.txt') as f:
 main_folder = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/" + date + "/"
 os.mkdir(main_folder)
 
-test_path_file = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/matching_flute_TEST/"
+matching_flute_TEST = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/matching_flute_TEST/"
+
 features_matching_flute_TEST = main_folder + "features_matching_flute_TEST/"
 os.mkdir(features_matching_flute_TEST)
 
-matching_vocal_TEST = main_folder + "matching_vocal_TEST/"
-os.mkdir(matching_vocal_TEST)
+matching_vocal_TEST = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/matching_vocal_TEST/"
+
 
 features_matching_vocal_TEST = main_folder + "features_matching_vocal_TEST/"
 os.mkdir(features_matching_vocal_TEST)
@@ -57,7 +58,7 @@ print('PATH, VARIABLES..........ok')
 # ---------------------------------------------------------------------------------------------------------------------
 # CALCULATE SPECTROGRAMS
 # ---------------------------------------------------------------------------------------------------------------------
-feature_calculation(test_path_file, features_matching_flute_TEST)
+feature_calculation(matching_flute_TEST, features_matching_flute_TEST)
 feature_calculation(matching_vocal_TEST, features_matching_vocal_TEST)
 
 print('CALCULATE SPECTROGRAMS..........ok')
@@ -94,7 +95,7 @@ for flute, vocal in zip(sorted(flutes_path), sorted(vocals_path)):
     cax2 = divider2.append_axes("right", size="5%", pad=0.05)
     cbar2 = plt.colorbar(img2, cax=cax2)
     plt.savefig(Figures_TEST + 'input-expected_output/' + flute_name[19:-16])
-    plt.show()
+    # plt.show()
 
     plt.close()
 
@@ -136,6 +137,7 @@ print('PLOT THE NORMALIZED SPECTROGRAMS..........ok')
 # il migliore ad oggi:
 # vae = VAE.load("/nas/home/spol/Thesis/saved_model/VV_model_FW_x_train_y_train_x_val_y_val")
 vae = VAE.load("/nas/home/spol/Thesis/saved_model/" + date)
+
 
 print('IMPORT THE MODEL..........ok')
 
