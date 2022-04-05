@@ -9,7 +9,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from WANDB import config
 import os
 
-x_train_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_OVERFIT_SUBSET/FW_normalised_flute/"
+x_train_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_OVERFIT_SUBSET/normalised_flute_ls/"
 generated_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_OVERFIT_SUBSET/generated_vocal/"
 # ---------------------------------------------------------------------------------------------------------------------
 # IMPORT THE MODEL
@@ -67,5 +67,7 @@ for inpt, output in zip(sorted(VAE_input), sorted(VAE_output)):
 
     plt.show()
     plt.close()
+
+    print(np.mean((out_spectrogram-input_spectrogram)**2))
 
 

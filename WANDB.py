@@ -21,9 +21,9 @@ wandb.config = {
     "batch_size": 32,
 
     "latent_dim": 64,
-    "kl_alpha": 11,
-    "OVERFIT_epochs": 50000,
-    "OVERFIT_learning_rate": 0.0001,
+    "kl_alpha": 1,
+    "OVERFIT_epochs": 5000,
+    "OVERFIT_learning_rate": 0.001,
     "OVERFIT_batch_size": 1,
 
     # "buffer_size": 60000,

@@ -9,7 +9,7 @@ wandb.init(project="my-test-project", entity="pilviosol", name='OVERFIT_XX', con
 # set_gpu(-1)
 
 
-path_features_matching_flute_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_OVERFIT_SUBSET/FW_normalised_flute/'
+path_features_matching_flute_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_OVERFIT_SUBSET/normalised_flute_ls/'
 # path_features_matching_vocal_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/FW_normalised_vocal/'
 
 
