@@ -62,10 +62,10 @@ class VAE:
                            metrics=[self._calculate_reconstruction_loss,
                                     self._calculate_kl_loss])
 
-    def train_overfit(self, x_train, batch_size, num_epochs):
+    def train_overfit(self, x_train, y_train, batch_size, num_epochs):
         callback_list.append(WandbCallback())
         self.model.fit(x_train,
-                       x_train,
+                       y_train,
                        batch_size=batch_size,
                        epochs=num_epochs,
                        shuffle=False,

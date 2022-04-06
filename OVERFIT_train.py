@@ -9,12 +9,12 @@ wandb.init(project="my-test-project", entity="pilviosol", name='OVERFIT_XX', con
 # set_gpu(-1)
 
 
-path_features_matching_flute_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_OVERFIT_SUBSET/normalised_flute_ls/'
-# path_features_matching_vocal_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/FW_normalised_vocal/'
+path_features_matching_flute_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_OVERFIT_SUBSET/FW_normalised_flute/'
+path_features_matching_vocal_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_OVERFIT_SUBSET/FW_normalised_vocal/'
 
 
 x_train_SPECTROGRAMS_PATH = pathlib.Path(path_features_matching_flute_train)
-# y_train_SPECTROGRAMS_PATH = pathlib.Path(path_features_matching_vocal_train)
+y_train_SPECTROGRAMS_PATH = pathlib.Path(path_features_matching_vocal_train)
 
 
 LEARNING_RATE = config['OVERFIT_learning_rate']
@@ -22,7 +22,7 @@ BATCH_SIZE = config['OVERFIT_batch_size']
 EPOCHS = config['OVERFIT_epochs']
 
 
-def train_overfit(x_train, learning_rate, batch_size, epochs):
+def train_overfit(x_train, y_train, learning_rate, batch_size, epochs):
     autoencoder = VAE(
         input_shape=(512, 256, 1),
         conv_filters=(512, 256, 128, 64, 32),
@@ -32,13 +32,13 @@ def train_overfit(x_train, learning_rate, batch_size, epochs):
     )
     autoencoder.summary()
     autoencoder.compile(learning_rate)
-    autoencoder.train_overfit(x_train, batch_size, epochs)
+    autoencoder.train_overfit(x_train, y_train, batch_size, epochs)
     return autoencoder
 
 
 if __name__ == "__main__":
     print('ollare')
     x_train = load_fsdd(x_train_SPECTROGRAMS_PATH)
-    # y_train = load_fsdd(y_train_SPECTROGRAMS_PATH)
-    autoencoder = train_overfit(x_train, LEARNING_RATE, BATCH_SIZE, EPOCHS)
+    y_train = load_fsdd(y_train_SPECTROGRAMS_PATH)
+    autoencoder = train_overfit(x_train, y_train, LEARNING_RATE, BATCH_SIZE, EPOCHS)
     autoencoder.save("/nas/home/spol/Thesis/saved_model/OVERFIT")
