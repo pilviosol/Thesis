@@ -9,7 +9,6 @@ from functions import feature_calculation, normalise_set_and_save_min_max, denor
 from WANDB import config
 import scipy.io.wavfile
 
-
 # ---------------------------------------------------------------------------------------------------------------------
 # PATH, VARIABLES
 # ---------------------------------------------------------------------------------------------------------------------
@@ -27,8 +26,6 @@ generated_vocal_normalised = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_OVERFIT_SUBSET
 generated_vocal_denormalised = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_OVERFIT_SUBSET/generated_vocal_features_denormalised/"
 generated_vocal_audio = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_OVERFIT_SUBSET/vocal_generated/"
 
-
-
 x_train_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_OVERFIT_SUBSET/FW_normalised_flute/"
 y_train_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_OVERFIT_SUBSET/FW_normalised_vocal/"
 SR = config['sample_rate']
@@ -41,7 +38,6 @@ SR = config['sample_rate']
 flute, _ = librosa.load(flute_audio_path, res_type='kaiser_fast', mono=True, sr=None)
 vocal, _ = librosa.load(vocal_audio_path, res_type='kaiser_fast', mono=True, sr=None)
 
-
 fig, ax = plt.subplots(nrows=2)
 
 librosa.display.waveshow(flute, sr=SR, ax=ax[0])
@@ -53,15 +49,13 @@ ax[1].set(title='vocal')
 ax[1].label_outer()
 plt.show()
 
-
 # ---------------------------------------------------------------------------------------------------------------------
 # CALCULATE SPECTROGRAMS
 # ---------------------------------------------------------------------------------------------------------------------
 
 
-feature_calculation(flute_folder_audio_path, flute_features_normalised)
-feature_calculation(vocal_folder_audio_path, vocal_features_normalised)
-
+feature_calculation(flute_folder_audio_path, flute_features)
+feature_calculation(vocal_folder_audio_path, vocal_features)
 
 # ---------------------------------------------------------------------------------------------------------------------
 # NORMALISE SPECTROGRAMS AND SAVE MIN MAX
@@ -70,7 +64,6 @@ feature_calculation(vocal_folder_audio_path, vocal_features_normalised)
 
 min_max_flute = normalise_set_and_save_min_max(flute_features, flute_features_normalised)
 min_max_vocal = normalise_set_and_save_min_max(vocal_features, vocal_features_normalised)
-
 
 # ---------------------------------------------------------------------------------------------------------------------
 # IMPORT THE MODEL AND DEFINE GENERATE FUNCTION
@@ -103,7 +96,6 @@ for file in sorted(normalised_features_path):
     print('generated_spectrogram.shape:', generated_spectrogram.shape)
     np.save(generated_vocal_normalised + 'GENERATED_' + name, generated_spectrogram)
 
-
 # ---------------------------------------------------------------------------------------------------------------------
 # PLOT INPUT, OUTPUT and EXPECTED OUTPUT OF THE NETWORK
 # ---------------------------------------------------------------------------------------------------------------------
@@ -125,6 +117,7 @@ for inpt, output, expected_output in zip(sorted(VAE_input), sorted(VAE_output), 
 
     expected_output_name = expected_output.name
     expected_output_spectrogram = np.load(expected_output)
+    expected_output_spectrogram = expected_output_spectrogram
     print('expected_output_spectrogram dims: ', expected_output_spectrogram.shape)
 
     fig2, (ax1, ax2, ax3) = plt.subplots(1, 3)
@@ -144,7 +137,8 @@ for inpt, output, expected_output in zip(sorted(VAE_input), sorted(VAE_output), 
     cbar2 = plt.colorbar(img2, cax=cax2)
 
     # EXPECTED OUTPUT
-    img3 = ax3.imshow(expected_output_spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 256, 0, 512], aspect='auto')
+    img3 = ax3.imshow(expected_output_spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 256, 0, 512],
+                      aspect='auto')
     ax3.set_title('EXPECTED OUTPUT')
     divider3 = make_axes_locatable(ax3)
     cax3 = divider3.append_axes("right", size="5%", pad=0.05)
@@ -154,8 +148,7 @@ for inpt, output, expected_output in zip(sorted(VAE_input), sorted(VAE_output), 
     plt.show()
     plt.close()
 
-    print(np.mean((out_spectrogram-expected_output_spectrogram)**2))
-
+    print(np.mean((out_spectrogram - expected_output_spectrogram) ** 2))
 
 # ---------------------------------------------------------------------------------------------------------------------
 # DENORMALISE THE GENERATED SPECTROGRAM
@@ -165,6 +158,7 @@ for inpt, output, expected_output in zip(sorted(VAE_input), sorted(VAE_output), 
 generated_spectrogram_path = pathlib.Path(generated_vocal_normalised).iterdir()
 
 for idx, file in enumerate(sorted(generated_spectrogram_path)):
+    print('idx: ', idx)
     name = file.name
     gen_spectrogram = np.load(file)
     gen_spectrogram = np.squeeze(gen_spectrogram)
@@ -172,6 +166,22 @@ for idx, file in enumerate(sorted(generated_spectrogram_path)):
     denormalised_spectrogram = denormalise(gen_spectrogram, min_max_flute[idx][0], min_max_flute[idx][1])
     np.save(generated_vocal_denormalised + name, denormalised_spectrogram)
 
+
+# ---------------------------------------------------------------------------------------------------------------------
+# PLOT THE DENORMALISED GENERATED SPECTROGRAM
+# ---------------------------------------------------------------------------------------------------------------------
+
+
+denosrmalised_generated_spectrogram_path = pathlib.Path(generated_vocal_denormalised).iterdir()
+for file in denosrmalised_generated_spectrogram_path:
+
+    spectrogram = np.load(file)
+    fig = plt.figure()
+    img = plt.imshow(spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 256, 0, 512],
+                     aspect='auto')
+    plt.title('DENORMALISED')
+    plt.colorbar()
+    plt.show()
 
 # ---------------------------------------------------------------------------------------------------------------------
 # RESYNTHESIZE THE GENERATED SPECTROGRAM
@@ -184,16 +194,17 @@ for file in sorted(denormalised_generated_spectrogram_path):
     name = name[0:-4]
     print(name)
     denorm_spectrogram = np.load(file)
-    reconstructed = librosa.griffinlim(denorm_spectrogram)
+    reconstructed = librosa.griffinlim(denorm_spectrogram, hop_length=256)
+    reconstructed = reconstructed[0:64000]
     scipy.io.wavfile.write(generated_vocal_audio + 'REVERSED_' + name + '.wav', SR, reconstructed)
-
 
 # ---------------------------------------------------------------------------------------------------------------------
 # COMPARE GENERATED WAVEFORM WITH GROUND TRUTH
 # ---------------------------------------------------------------------------------------------------------------------
 
-generated_vocal, _ = librosa.load(generated_vocal_audio, res_type='kaiser_fast', mono=True, sr=None)
-
+generated_vocal, _ = librosa.load(generated_vocal_audio +
+                                  "REVERSED_GENERATED_normalised_new_flute_acoustic_002-091-050_STFTMAG_NEW.wav",
+                                  res_type='kaiser_fast', mono=True, sr=None)
 
 fig, ax = plt.subplots(nrows=3)
 
@@ -204,11 +215,11 @@ ax[0].label_outer()
 librosa.display.waveshow(generated_vocal, sr=SR, ax=ax[1])
 ax[1].set(title='GENERATED VOCAL')
 ax[1].label_outer()
-plt.show()
 
-librosa.display.waveshow(vocal-generated_vocal, sr=SR, ax=ax[3])
-ax[3].set(title='DIFFERENCE')
-ax[3].label_outer()
+librosa.display.waveshow(vocal - generated_vocal, sr=SR, ax=ax[2])
+ax[2].set(title='DIFFERENCE')
+ax[2].label_outer()
+
 plt.tight_layout()
 plt.show()
 plt.close()
