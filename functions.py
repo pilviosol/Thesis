@@ -90,7 +90,7 @@ def extract_features(file_name):
         # n_fft=2048, hop_length=512,
         # n_mels=128)
         stft_mag = np.abs(librosa.stft(y=audio, n_fft=N_FFT, hop_length=HOP_LENGTH, win_length=WIN_LENGTH))
-        log_spectrogram = 10 * np.log10(stft_mag + 1e-5)
+        log_spectrogram = 10 * np.log10(stft_mag + 1e-1)
         # cambiare 1e-5 FARE PROVE
 
     except Exception as e:
@@ -286,7 +286,7 @@ def normalise_set_and_save_min_max(original_path, new_path):
 
     :param original_path: path where all spectrograms are stored
     :param new_path: path where all normalised spectrograms will be saved
-    :return: min_max_array: min max array with all min max values for each spectrogram + saves it at saving_path \
+    :return: min_max_array: min max array with all min max values for each spectrogram \
              and saves all normalised spectrograms (ALL normalised with their own min and max, NOT folder-wise) \
              in new_path
 

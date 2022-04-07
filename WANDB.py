@@ -20,7 +20,7 @@ wandb.config = {
     "learning_rate": 0.0005,
     "batch_size": 32,
 
-    "latent_dim": 128,
+    "latent_dim": 2,
     "kl_alpha": 0.1,
     "OVERFIT_epochs": 17000,
     "OVERFIT_learning_rate": 0.001,
