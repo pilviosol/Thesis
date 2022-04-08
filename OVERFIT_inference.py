@@ -25,9 +25,8 @@ vocal_features_normalised = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_OVERFIT_SUBSET/
 generated_vocal_normalised = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_OVERFIT_SUBSET/generated_vocal_features_normalised/"
 generated_vocal_denormalised = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_OVERFIT_SUBSET/generated_vocal_features_denormalised/"
 generated_vocal_audio = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_OVERFIT_SUBSET/vocal_generated/"
+generated_vocal_features = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_OVERFIT_SUBSET/vocal_generated_features/"
 
-x_train_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_OVERFIT_SUBSET/FW_normalised_flute/"
-y_train_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_OVERFIT_SUBSET/FW_normalised_vocal/"
 SR = config['sample_rate']
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -148,7 +147,9 @@ for inpt, output, expected_output in zip(sorted(VAE_input), sorted(VAE_output), 
     plt.show()
     plt.close()
 
-    print(np.mean((out_spectrogram - expected_output_spectrogram) ** 2))
+    print("MSE(net out spec, expected out spec): ", np.mean((out_spectrogram - expected_output_spectrogram) ** 2))
+    print("NMSE(net out spec, expected out spec): ", np.mean((out_spectrogram - expected_output_spectrogram) ** 2 /
+          (expected_output_spectrogram) ** 2))
 
 # ---------------------------------------------------------------------------------------------------------------------
 # DENORMALISE THE GENERATED SPECTROGRAM
@@ -166,14 +167,13 @@ for idx, file in enumerate(sorted(generated_spectrogram_path)):
     denormalised_spectrogram = denormalise(gen_spectrogram, min_max_flute[idx][0], min_max_flute[idx][1])
     np.save(generated_vocal_denormalised + name, denormalised_spectrogram)
 
-
 # ---------------------------------------------------------------------------------------------------------------------
 # PLOT THE DENORMALISED GENERATED SPECTROGRAM AND RESYNTHESIZE IT
 # ---------------------------------------------------------------------------------------------------------------------
 
+
 denormalised_generated_spectrogram_path = pathlib.Path(generated_vocal_denormalised).iterdir()
 for file in sorted(denormalised_generated_spectrogram_path):
-
     name = file.name
     name = name[0:-4]
     print(name)
@@ -193,6 +193,7 @@ for file in sorted(denormalised_generated_spectrogram_path):
 # ---------------------------------------------------------------------------------------------------------------------
 # COMPARE GENERATED WAVEFORM WITH GROUND TRUTH
 # ---------------------------------------------------------------------------------------------------------------------
+
 
 generated_vocal, _ = librosa.load(generated_vocal_audio +
                                   "REVERSED_GENERATED_normalised_new_flute_acoustic_002-091-050_STFTMAG_NEW.wav",
@@ -215,3 +216,23 @@ ax[2].label_outer()
 plt.tight_layout()
 plt.show()
 plt.close()
+
+print("MSE(resyntesized audio, original audio): ", np.mean((vocal[0:32640] - generated_vocal[0:32640]) ** 2))
+print("NMSE(resyntesized audio, original audio): ", np.mean((vocal[0:32640] - generated_vocal[0:32640]) ** 2 /
+      vocal[0:32640] ** 2))
+
+# ---------------------------------------------------------------------------------------------------------------------
+# CALCULATE THE SPECTROGRAM OF THE RESYNTHESIZED AUDIO TO COMPARE WITH GROUND TRUTH
+# ---------------------------------------------------------------------------------------------------------------------
+
+feature_calculation(generated_vocal_audio, generated_vocal_features)
+
+original_vocal = pathlib.Path(vocal_features).iterdir()
+resynthesized_vocal = pathlib.Path(generated_vocal_features).iterdir()
+for original, generated in zip(original_vocal, resynthesized_vocal):
+    original_spectrogram = np.load(original)[0:512, 0:256]
+    resynthesized_spectrogram = np.load(generated)[0:512, 0:256]
+    print("MSE(resynthesized spectrogram, original spectrogram): ",
+          np.mean((original_spectrogram - resynthesized_spectrogram) ** 2))
+    print("NMSE(resynthesized spectrogram, original spectrogram): ",
+          np.mean((original_spectrogram - resynthesized_spectrogram) ** 2 / original_spectrogram ** 2))
