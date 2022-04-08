@@ -168,34 +168,26 @@ for idx, file in enumerate(sorted(generated_spectrogram_path)):
 
 
 # ---------------------------------------------------------------------------------------------------------------------
-# PLOT THE DENORMALISED GENERATED SPECTROGRAM
+# PLOT THE DENORMALISED GENERATED SPECTROGRAM AND RESYNTHESIZE IT
 # ---------------------------------------------------------------------------------------------------------------------
 
+denormalised_generated_spectrogram_path = pathlib.Path(generated_vocal_denormalised).iterdir()
+for file in sorted(denormalised_generated_spectrogram_path):
 
-denosrmalised_generated_spectrogram_path = pathlib.Path(generated_vocal_denormalised).iterdir()
-for file in denosrmalised_generated_spectrogram_path:
+    name = file.name
+    name = name[0:-4]
+    print(name)
 
-    spectrogram = np.load(file)
+    denorm_spectrogram = np.load(file)
     fig = plt.figure()
-    img = plt.imshow(spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 256, 0, 512],
+    img = plt.imshow(denorm_spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 256, 0, 512],
                      aspect='auto')
     plt.title('DENORMALISED')
     plt.colorbar()
     plt.show()
 
-# ---------------------------------------------------------------------------------------------------------------------
-# RESYNTHESIZE THE GENERATED SPECTROGRAM
-# ---------------------------------------------------------------------------------------------------------------------
-
-
-denormalised_generated_spectrogram_path = pathlib.Path(generated_vocal_denormalised).iterdir()
-for file in sorted(denormalised_generated_spectrogram_path):
-    name = file.name
-    name = name[0:-4]
-    print(name)
-    denorm_spectrogram = np.load(file)
-    reconstructed = librosa.griffinlim(denorm_spectrogram, hop_length=256)
-    reconstructed = reconstructed[0:64000]
+    spectrogram = 10 ** (denorm_spectrogram / 10) - 1e-1
+    reconstructed = librosa.griffinlim(spectrogram, n_iter=1000, hop_length=128)
     scipy.io.wavfile.write(generated_vocal_audio + 'REVERSED_' + name + '.wav', SR, reconstructed)
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -208,7 +200,7 @@ generated_vocal, _ = librosa.load(generated_vocal_audio +
 
 fig, ax = plt.subplots(nrows=3)
 
-librosa.display.waveshow(vocal, sr=SR, ax=ax[0])
+librosa.display.waveshow(vocal[0:32640], sr=SR, ax=ax[0])
 ax[0].set(title='ORIGINAL VOCAL')
 ax[0].label_outer()
 
@@ -216,7 +208,7 @@ librosa.display.waveshow(generated_vocal, sr=SR, ax=ax[1])
 ax[1].set(title='GENERATED VOCAL')
 ax[1].label_outer()
 
-librosa.display.waveshow(vocal - generated_vocal, sr=SR, ax=ax[2])
+librosa.display.waveshow(vocal[0:32640] - generated_vocal, sr=SR, ax=ax[2])
 ax[2].set(title='DIFFERENCE')
 ax[2].label_outer()
 

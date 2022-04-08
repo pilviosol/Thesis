@@ -6,11 +6,11 @@ from WANDB import config
 from VV_train import load_fsdd, train
 
 wandb.init(project="my-test-project", entity="pilviosol", name='OVERFIT_XX', config=config)
-# set_gpu(-1)
+set_gpu(-1)
 
 
-path_features_matching_flute_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_OVERFIT_SUBSET/FW_normalised_flute/'
-path_features_matching_vocal_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_OVERFIT_SUBSET/FW_normalised_vocal/'
+path_features_matching_flute_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_OVERFIT_SUBSET/flute_features_normalised/'
+path_features_matching_vocal_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_OVERFIT_SUBSET/vocal_features_normalised/'
 
 
 x_train_SPECTROGRAMS_PATH = pathlib.Path(path_features_matching_flute_train)
