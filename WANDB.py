@@ -14,10 +14,10 @@ wandb.config = {
     # "output_activation": "relu",
 
     "using_validation_set": True,
-    "training_on_x_train_only": True,
+    "training_on_x_train_only": False,
     "normalization_type": "min_max_folderwise",
-    "epochs": 15,
-    "learning_rate": 0.0005,
+    "epochs": 5000,
+    "learning_rate": 0.001,
     "batch_size": 32,
 
     "latent_dim": 64,
