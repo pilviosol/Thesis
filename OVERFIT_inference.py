@@ -116,7 +116,6 @@ for inpt, output, expected_output in zip(sorted(VAE_input), sorted(VAE_output), 
 
     expected_output_name = expected_output.name
     expected_output_spectrogram = np.load(expected_output)
-    expected_output_spectrogram = expected_output_spectrogram
     print('expected_output_spectrogram dims: ', expected_output_spectrogram.shape)
 
     fig2, (ax1, ax2, ax3) = plt.subplots(1, 3)
@@ -149,7 +148,7 @@ for inpt, output, expected_output in zip(sorted(VAE_input), sorted(VAE_output), 
 
     print("MSE(net out spec, expected out spec): ", np.mean((out_spectrogram - expected_output_spectrogram) ** 2))
     print("NMSE(net out spec, expected out spec): ", np.mean((out_spectrogram - expected_output_spectrogram) ** 2 /
-          (expected_output_spectrogram) ** 2))
+                                                             expected_output_spectrogram ** 2))
 
 # ---------------------------------------------------------------------------------------------------------------------
 # DENORMALISE THE GENERATED SPECTROGRAM
@@ -185,6 +184,7 @@ for file in sorted(denormalised_generated_spectrogram_path):
     plt.title('DENORMALISED')
     plt.colorbar()
     plt.show()
+    plt.close()
 
     spectrogram = 10 ** (denorm_spectrogram / 10) - 1e-1
     reconstructed = librosa.griffinlim(spectrogram, n_iter=1000, hop_length=128)

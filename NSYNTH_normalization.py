@@ -5,12 +5,11 @@ from functions import min_max_array_saving, fw_normalise
 # ---------------------------------------------------------------------------------------------------------------------
 # PATHS
 # ---------------------------------------------------------------------------------------------------------------------
-original_flute_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/features_matching_flute_new_db_formula_VALID/"
-original_vocal_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/features_matching_vocal_new_db_formula_VALID/"
+original_flute_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/features_matching_flute_0904_VALID/'
+original_vocal_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/features_matching_vocal_0904_VALID/'
 
 new_flute_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/FW_normalised_flute_VALID/"
 new_vocal_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/FW_normalised_vocal_VALID/"
-
 min_max_flute_path_file = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/flute_"
 min_max_vocal_path_file = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/vocal_"
 

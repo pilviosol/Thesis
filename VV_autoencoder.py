@@ -18,13 +18,16 @@ train_loss = tf.keras.metrics.Mean(name="train_loss")
 train_kl_loss = tf.keras.metrics.Mean(name="train_kl_loss")
 train_reconstruction_loss = tf.keras.metrics.Mean(name="train_reconstruction_loss")
 
+# gpus = tf.config.list_logical_devices('GPU')
+# strategy = tf.distribute.MirroredStrategy(gpus)
+
 callback_list = []
 class VAE:
     """
     VAE represents a Deep Convolutional variational autoencoder architecture
     with mirrored encoder and decoder components.
     """
-
+    # with strategy.scope():
     def __init__(self,
                  input_shape,
                  conv_filters,

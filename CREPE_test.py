@@ -23,7 +23,7 @@ plt.figure()
 plt.scatter(time, frequency)
 plt.show()
 
-
+print('debug')
 
 
 def tf_float32(x):
@@ -154,7 +154,6 @@ def compute_f0(audio, frame_rate, viterbi=True, padding='center'):
     return f0_hz, f0_confidence
 
 
-f0_hz, f0_confidence = compute_f0(audio, frame_rate=250, viterbi=True, padding='center')
+# f0_hz, f0_confidence = compute_f0(audio, frame_rate=250, viterbi=True, padding='center')
 
 
-print('debug')

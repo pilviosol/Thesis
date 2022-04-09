@@ -90,7 +90,7 @@ def extract_features(file_name):
         # n_fft=2048, hop_length=512,
         # n_mels=128)
         stft_mag = np.abs(librosa.stft(y=audio, n_fft=N_FFT, hop_length=HOP_LENGTH, win_length=WIN_LENGTH))
-        log_spectrogram = 10 * np.log10(stft_mag + 1e-1)
+        log_spectrogram = 10 * np.log10(stft_mag + 1e-5)
         log_spectrogram = log_spectrogram[0:512, 0:256]
         # cambiare 1e-5 FARE PROVE
 
