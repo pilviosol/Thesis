@@ -16,8 +16,8 @@ wandb.config = {
     "using_validation_set": True,
     "training_on_x_train_only": False,
     "normalization_type": "min_max_folderwise",
-    "epochs": 200,
-    "learning_rate": 0.0005,
+    "epochs": 80,
+    "learning_rate": 0.001,
     "batch_size": 32,
 
     "latent_dim": 32,

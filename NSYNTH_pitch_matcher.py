@@ -9,15 +9,15 @@ import scipy.io.wavfile
 from functions import rename_files_by_pitch, count_pitches, append_pitches_velocities,\
     remove_files_if_pitch_not_matching, how_many_pitches
 
-nsynth_train_path_subset_flute = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/flute_acoustic'
-nsynth_train_path_subset_vocal = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/vocal_synthetic'
+nsynth_train_path_subset_flute = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/matching_flute'
+nsynth_train_path_subset_string = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/string_acoustic'
 
-matching_flute_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/matching_flute'
-matching_vocal_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/matching_vocal'
+matching_flute_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/matching_flute2'
+matching_string_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/matching_string'
 
 
 flute_pitches_velocities = append_pitches_velocities(nsynth_train_path_subset_flute)
-vocal_pitches_velocities = append_pitches_velocities(nsynth_train_path_subset_vocal)
+vocal_pitches_velocities = append_pitches_velocities(nsynth_train_path_subset_string)
 
 not_present_A = []
 not_present_B = []
@@ -43,29 +43,35 @@ def pitches_count(path):
 
 
 flute_pitches = pitches_count(nsynth_train_path_subset_flute)
-vocal_pitches = pitches_count(nsynth_train_path_subset_vocal)
+string_pitches = pitches_count(nsynth_train_path_subset_string)
 
 
 flute_counts = how_many_pitches(nsynth_train_path_subset_flute)
-vocal_counts = how_many_pitches(nsynth_train_path_subset_vocal)
+string_counts = how_many_pitches(nsynth_train_path_subset_string)
 
-print('sum(vocal_counts):', sum(vocal_counts))
+print('sum(vocal_counts):', sum(string_counts))
 print('sum(flute_counts):', sum(flute_counts))
+
+
 
 
 matching = []
 for i, flute_count in enumerate(flute_counts):
-    if flute_counts[i] < vocal_counts[i]:
+    if flute_counts[i] < string_counts[i]:
         matching.append(flute_counts[i])
     else:
-        matching.append(vocal_counts[i])
+        matching.append(string_counts[i])
 
 print('sum(matching):', sum(matching))
 
 
 '''
+Here you have to put the 2 folders to be defined i.e. matching_flute and matching_string
+Watch out for line "if name[0:3] == str(string_pitches[idx])" and
+"shutil.copy(song, matching_string_path)" that also have to be changed
+'''
 for idx, count in enumerate(matching):
-    files_dir = pathlib.Path(nsynth_train_path_subset_flute)
+    files_dir = pathlib.Path(nsynth_train_path_subset_string)
     files_in_basepath = files_dir.iterdir()
     print('---------------count: ', count)
     print('--idx: ', idx)
@@ -73,16 +79,16 @@ for idx, count in enumerate(matching):
     for song in sorted(files_in_basepath):
         name = song.name
         print('name: ', name)
-        if name[0:3] == str(flute_pitches[idx]):
+        if name[0:3] == str(string_pitches[idx]):
             print('name[0:3]', name[0:3])
-            print('str(flute_pitches[idx]):', str(flute_pitches[idx]))
+            print('str(string_pitches[idx]):', str(string_pitches[idx]))
             print('copying file')
-            shutil.copy(song, matching_flute_path)
+            shutil.copy(song, matching_string_path)
             c += 1
             print('c: ', c)
             if c == count:
                 print('break')
-                break '''
+                break
 
 
 print('debug')

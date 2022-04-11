@@ -11,6 +11,8 @@ import tensorflow as tf
 import wandb
 from wandb.keras import WandbCallback
 from WANDB import config
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau, TensorBoard, LambdaCallback
+import matplotlib.pyplot as plt
 
 tf.compat.v1.disable_eager_execution()
 
@@ -58,6 +60,24 @@ class VAE:
         self.decoder.summary()
         self.model.summary()
 
+    def generate(self, model, spectrogram):
+        generated_spectrograms, latent_representations = model.reconstruct(spectrogram)
+        return generated_spectrograms, latent_representations
+
+    def plot_status(self, epoch, logs):
+        """ insert plot function"""
+        if epoch % 10 == 0:
+            generated_spectrograms, latent_representations = generate(model, spectrogram)
+            fig = plt.figure()
+            img = plt.imshow(generated_spectrograms, cmap=plt.cm.viridis, origin='lower', extent=[0, 256, 0, 512],
+                             aspect='auto')
+            plt.title(str(epoch))
+            plt.colorbar()
+            plt.show()
+            plt.close()
+
+            wandb.log({"Gate and CM": [wandb.Image(fig, caption=f'Gate #{epoch}')]})
+
     def compile(self, learning_rate=0.0001):
         optimizer = Adam(learning_rate=learning_rate)
         self.model.compile(optimizer=optimizer,
@@ -76,6 +96,7 @@ class VAE:
 
     def train(self, x_train, y_train, x_val, y_val, batch_size, num_epochs):
         callback_list.append(WandbCallback())
+        callback_list.append(LambdaCallback(on_epoch_end=plot_status))
         self.model.fit(x_train,
                        y_train,
                        batch_size=batch_size,
@@ -83,6 +104,7 @@ class VAE:
                        shuffle=False,
                        callbacks=callback_list,
                        validation_data=(x_val, y_val))
+
         '''
         t_loss = train_loss.result()
         wandb.log({"train_loss": t_loss.numpy(), "global_step": num_epochs})
@@ -91,6 +113,8 @@ class VAE:
         t_reconstruction_loss = train_reconstruction_loss.result()
         wandb.log({"reconstruction_loss": t_reconstruction_loss.numpy(), "global_step": num_epochs})
         '''
+
+
 
     def save(self, save_folder="."):
         self._create_folder_if_it_doesnt_exist(save_folder)

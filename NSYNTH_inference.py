@@ -53,10 +53,11 @@ generated_vocal_TEST = main_folder + "generated_vocal_TEST/"
 os.mkdir(generated_vocal_TEST)
 
 generated_vocal_features = main_folder + "vocal_generated_features/"
-os.mkdir(generated_vocal_TEST)
+os.mkdir(generated_vocal_features)
 
 os.mkdir(Figures_TEST + 'input-output-expected_output/')
 os.mkdir(Figures_TEST + 'denormalised-output/')
+os.mkdir(Figures_TEST + 'original-generated-difference/')
 
 SR = config['sample_rate']
 print('PATH, VARIABLES..........ok')
@@ -166,7 +167,7 @@ for inpt, output, expected_output in zip(sorted(VAE_input), sorted(VAE_output), 
     cbar3 = plt.colorbar(img3, cax=cax3)
 
     plt.tight_layout()
-    plt.savefig(Figures_TEST + 'input-output-expected_output/' + input_name[34:-16])
+    plt.savefig(Figures_TEST + 'input-output-expected_output/' + input_name[33:-16])
 
     plt.show()
     plt.close()
@@ -191,7 +192,7 @@ for file in sorted(generated_spectrograms_path):
     gen_spectrogram = np.load(file)
     gen_spectrogram = np.squeeze(gen_spectrogram)
     # denormalised_spectrogram = denormalise_given_min_max(gen_spectrogram, min_max_values[0][0], min_max_values[0][1])
-    denormalised_spectrogram = denormalise(gen_spectrogram, flute_folder_min_max[1], flute_folder_min_max[0])
+    denormalised_spectrogram = denormalise(gen_spectrogram, flute_folder_min_max[0][1], flute_folder_min_max[0][0])
     np.save(denormalised_spectrogram_TEST + name, denormalised_spectrogram)
 
 print('GET THE OUTPUT AND DE-NORMALISE THEM..........ok')
@@ -202,14 +203,13 @@ print('GET THE OUTPUT AND DE-NORMALISE THEM..........ok')
 denormalised_generated_spectrogram_path = pathlib.Path(denormalised_spectrogram_TEST).iterdir()
 for file in sorted(denormalised_generated_spectrogram_path):
     name = file.name
-    name = name[0:-4]
     print(name)
 
     denorm_spectrogram = np.load(file)
 
     fig = plt.figure()
     img = plt.imshow(denorm_spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 256, 0, 512], aspect='auto')
-    plt.title('DENORMALIZED_' + name[44:-16])
+    plt.title('DENORMALIZED_' + name[43:-16])
     plt.colorbar()
     plt.savefig(Figures_TEST + 'denormalised-output/' + name[44:-20])
     plt.show()
@@ -228,7 +228,9 @@ print('PLOT THE RECONSTRUCTED SPECTROGRAMS..........ok')
 vocals = pathlib.Path(matching_vocal_TEST).iterdir()
 generated_vocal_path = pathlib.Path(generated_vocal_TEST).iterdir()
 for vocal, generated_vocal in zip(sorted(vocals), sorted(generated_vocal_path)):
-
+    name = vocal.name
+    name = name[0:-4]
+    print('generated_vocal_TEST.name: ', name)
     vocal, _ = librosa.load(vocal,  res_type='kaiser_fast', mono=True, sr=None)
     generated_vocal, _ = librosa.load(generated_vocal,  res_type='kaiser_fast', mono=True, sr=None)
 
@@ -247,6 +249,7 @@ for vocal, generated_vocal in zip(sorted(vocals), sorted(generated_vocal_path)):
     ax[2].label_outer()
 
     plt.tight_layout()
+    plt.savefig(Figures_TEST + 'original-generated-difference/' + name)
     plt.show()
     plt.close()
 

@@ -190,7 +190,7 @@ def how_many_pitches(path):
     files_dir = pathlib.Path(path)
     files_in_basepath = files_dir.iterdir()
     count = 0
-    temp_pitch = '021'
+    temp_pitch = '023'
     for file in sorted(files_in_basepath):
         name = file.name
         pitch = name[0:3]
