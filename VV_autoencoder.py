@@ -95,8 +95,6 @@ class VAE:
 
             if epoch % 10 == 0:
                 a = self.model.predict(y_val)
-                print('a.shape: ', a.shape)
-                print('len(y_val): ', len(y_val))
 
                 for i in range(len(y_val)):
                     element = a[i]

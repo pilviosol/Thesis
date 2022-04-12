@@ -313,6 +313,7 @@ def fw_normalise(original_path, new_path, min_max_array):
     :param new_path: path where all normalised spectrograms will be saved
     :param min_max_array: array with all min_max_values of the spectrograms to be normalised
     :return: void but saves all normalised spectrograms into new_path
+
     """
     folder_min_max = []
     min_max_np = np.array(min_max_array)
@@ -331,10 +332,33 @@ def fw_normalise(original_path, new_path, min_max_array):
     return folder_min_max
 
 
-# array = extract_features('/nas/home/spol/Thesis/scala_sustained.wav')
-# b, original_min, original_max = normalise(array)
-# c = denormalise(b, original_min, original_max)
+def load_fsdd(spectrograms_path):
+    """
 
+    :param spectrograms_path: where the normalised spectrograms are
+    :return: x_train, array with all spectrograms data appended
+
+    """
+    x_train = []
+    for root, _, file_names in os.walk(spectrograms_path):
+        count = 0
+        for file_name in sorted(file_names):
+            file_path = os.path.join(root, file_name)
+            spectrogram = np.load(file_path)  # (n_bins, n_frames, 1)
+            x_train.append(spectrogram)
+            '''
+            if count % 100 == 0:
+                print(count, ", file_name: ", file_name)
+                plt.figure()
+                plt.imshow(spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 256, 0, 512],
+                           aspect='auto')
+                plt.title(str(count))
+                plt.colorbar()
+                plt.show()
+                plt.close()'''
+            count += 1
+    x_train = np.array(x_train)
+    x_train = x_train[..., np.newaxis]  # -> (4130, 512, 256, 1)
+    return x_train
 
 # print('debugg')
-

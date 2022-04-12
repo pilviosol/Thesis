@@ -1,14 +1,15 @@
-import os
-import numpy as np
+from functions import load_fsdd
 import pathlib
 from VV_autoencoder import VAE
 from utils import *
 import wandb
-from VV_autoencoder import train_loss, train_kl_loss, train_reconstruction_loss
 from WANDB import config
-import matplotlib.pyplot as plt
-import tensorflow as tf
 from datetime import datetime
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# SET UP WANDB, SELECT GPU AND INSTANTIATING DATE AND TIME TO SAVE MODEL WITH THAT NAME
+# ---------------------------------------------------------------------------------------------------------------------
 
 now = datetime.now()
 dt_string = now.strftime("%d-%m-%Y_%H:%M")
@@ -19,6 +20,10 @@ file2.close()
 
 wandb.init(project="my-test-project", entity="pilviosol", name=dt_string, config=config)
 set_gpu(-1)
+
+# ---------------------------------------------------------------------------------------------------------------------
+# PATH, VARIABLES
+# ---------------------------------------------------------------------------------------------------------------------
 
 path_features_matching_flute_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/FW_normalised_flute_TRAIN/'
 path_features_matching_vocal_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/FW_normalised_string_TRAIN/'
@@ -33,44 +38,34 @@ y_val_SPECTROGRAMS_PATH = pathlib.Path(path_features_matching_vocal_val)
 LEARNING_RATE = config['learning_rate']
 BATCH_SIZE = config['batch_size']
 EPOCHS = config['epochs']
+LATENT_DIM = config['latent_dim']
+INPUT_SHAPE = config['input_shape']
+CONV_FILTERS = config['conv_filters']
+CONV_KERNELS = config['conv_kernels']
+CONV_STRIDES = config['conv_strides']
 
-
-def load_fsdd(spectrograms_path):
-    x_train = []
-    for root, _, file_names in os.walk(spectrograms_path):
-        count = 0
-        for file_name in sorted(file_names):
-            file_path = os.path.join(root, file_name)
-            spectrogram = np.load(file_path)  # (n_bins, n_frames, 1)
-            x_train.append(spectrogram)
-            '''
-            if count % 100 == 0:
-                print(count, ", file_name: ", file_name)
-                plt.figure()
-                plt.imshow(spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 256, 0, 512],
-                           aspect='auto')
-                plt.title(str(count))
-                plt.colorbar()
-                plt.show()
-                plt.close()'''
-            count += 1
-    x_train = np.array(x_train)
-    x_train = x_train[..., np.newaxis]  # -> (4130, 512, 256, 1)
-    return x_train
+# ---------------------------------------------------------------------------------------------------------------------
+# DEFINE TRAIN FUNCTION
+# ---------------------------------------------------------------------------------------------------------------------
 
 
 def train(x_train, y_train, x_val, y_val, learning_rate, batch_size, epochs):
     autoencoder = VAE(
-        input_shape=(512, 256, 1),
-        conv_filters=(512, 256, 128, 64, 32),
-        conv_kernels=(3, 3, 3, 3, 3),
-        conv_strides=(2, 2, 2, 2, (2, 1)),
-        latent_space_dim=config['latent_dim']
+        input_shape=INPUT_SHAPE,
+        conv_filters=CONV_FILTERS,
+        conv_kernels=CONV_KERNELS,
+        conv_strides=CONV_STRIDES,
+        latent_space_dim=LATENT_DIM
     )
     autoencoder.summary()
     autoencoder.compile(learning_rate)
     autoencoder.train(x_train, y_train, x_val, y_val, batch_size, epochs)
     return autoencoder
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# RUN THE MAIN
+# ---------------------------------------------------------------------------------------------------------------------
 
 
 if __name__ == "__main__":
@@ -83,5 +78,5 @@ if __name__ == "__main__":
     print('y_train.shape: ', y_train.shape)
     print('x_val.shape: ', x_val.shape)
     print('y_val.shape: ', y_val.shape)
-    autoencoder = train(x_val, y_val, x_val, y_val, LEARNING_RATE, BATCH_SIZE, EPOCHS)
+    autoencoder = train(x_train, y_train, x_val, y_val, LEARNING_RATE, BATCH_SIZE, EPOCHS)
     autoencoder.save("/nas/home/spol/Thesis/saved_model/" + dt_string)

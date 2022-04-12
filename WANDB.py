@@ -5,38 +5,25 @@ wandb.config = {
     "n_fft": 1024,
     "hop_length": 128,
     "win_length": 1024,
-    # "bins_per_octave": 48,
-    # "num_octaves": 8,
-    # "n_iter": 1,
-    # "n_units": 2048,
-    # "kl_beta": 0.0005,
-    # "batch_norm": True,
-    # "output_activation": "relu",
+    "normalization_type": "min_max_folderwise",
 
     "using_validation_set": True,
     "training_on_x_train_only": False,
-    "normalization_type": "min_max_folderwise",
-    "epochs": 80,
-    "learning_rate": 0.001,
+    "epochs": 105,
+    "learning_rate": 0.0005,
     "batch_size": 32,
-
     "latent_dim": 16,
-    "kl_alpha": 10,
-    "OVERFIT_epochs": 17000,
-    "OVERFIT_learning_rate": 0.001,
-    "OVERFIT_batch_size": 1,
+    "kl_alpha": 1,
 
-    # "buffer_size": 60000,
-    # "buffer_size_dataset": True,
-    # "continue_training": False,
-    # "max_ckpts_to_keep": 2,
-    # "checkpoint_epochs": 15,
-    # "save_best_only": True,
-    # "learning_schedule": False,
-    # "early_patience_epoch": 50,
-    # "early_delta": 1e-9,
-    # "adam_beta_1": 0.9,
-    # "adam_beta_2": 0.999
+    "input_shape": (512, 256, 1),
+    "conv_filters": (512, 256, 128, 64, 32),
+    "conv_kernels": (3, 3, 3, 3, 3),
+    "conv_strides": (2, 2, 2, 2, (2, 1)),
+
+    # "OVERFIT_epochs": 17000,
+    # "OVERFIT_learning_rate": 0.001,
+    # "OVERFIT_batch_size": 1,
+
 }
 
 config = wandb.config
