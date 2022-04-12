@@ -13,6 +13,7 @@ from wandb.keras import WandbCallback
 from WANDB import config
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau, TensorBoard, LambdaCallback
 import matplotlib.pyplot as plt
+from datetime import datetime
 
 tf.compat.v1.disable_eager_execution()
 
@@ -23,12 +24,23 @@ train_reconstruction_loss = tf.keras.metrics.Mean(name="train_reconstruction_los
 # gpus = tf.config.list_logical_devices('GPU')
 # strategy = tf.distribute.MirroredStrategy(gpus)
 
+
+now = datetime.now()
+dt_string = now.strftime("%d-%m-%Y_%H:%M")
+try:
+    os.makedirs('/nas/home/spol/Thesis/saved_model/images/' + dt_string + '/')
+except OSError:
+    print("Creation of the directory  failed")
+
 callback_list = []
+
+
 class VAE:
     """
     VAE represents a Deep Convolutional variational autoencoder architecture
     with mirrored encoder and decoder components.
     """
+
     # with strategy.scope():
     def __init__(self,
                  input_shape,
@@ -36,14 +48,13 @@ class VAE:
                  conv_kernels,
                  conv_strides,
                  latent_space_dim):
-        self.input_shape = input_shape # [28, 28, 1]
-        self.conv_filters = conv_filters # [2, 4, 8]
-        self.conv_kernels = conv_kernels # [3, 5, 3]
-        self.conv_strides = conv_strides # [1, 2, 2]
-        self.latent_space_dim = latent_space_dim # 2
+        self.input_shape = input_shape  # [28, 28, 1]
+        self.conv_filters = conv_filters  # [2, 4, 8]
+        self.conv_kernels = conv_kernels  # [3, 5, 3]
+        self.conv_strides = conv_strides  # [1, 2, 2]
+        self.latent_space_dim = latent_space_dim  # 2
         # self.reconstruction_loss_weight = 1000000
         self.reconstruction_loss_weight = config['kl_alpha']
-
 
         self.encoder = None
         self.decoder = None
@@ -60,19 +71,6 @@ class VAE:
         self.decoder.summary()
         self.model.summary()
 
-    def plot_status(self, epoch, logs):
-        if epoch % 2 == 0:
-            generated_spectrograms, _ = self.model.reconstruct(x_val)
-            fig = plt.figure()
-            img = plt.imshow(generated_spectrograms, cmap=plt.cm.viridis, origin='lower', extent=[0, 256, 0, 512],
-                             aspect='auto')
-            plt.title(str(epoch))
-            plt.colorbar()
-            plt.show()
-            plt.close()
-
-            wandb.log({"Gate and CM": [wandb.Image(fig, caption=f'Gate #{epoch}')]})
-
     def compile(self, learning_rate=0.0001):
         optimizer = Adam(learning_rate=learning_rate)
         self.model.compile(optimizer=optimizer,
@@ -82,6 +80,7 @@ class VAE:
 
     def train_overfit(self, x_train, y_train, batch_size, num_epochs):
         callback_list.append(WandbCallback())
+
         self.model.fit(x_train,
                        y_train,
                        batch_size=batch_size,
@@ -91,7 +90,33 @@ class VAE:
 
     def train(self, x_train, y_train, x_val, y_val, batch_size, num_epochs):
         callback_list.append(WandbCallback())
-        callback_list.append(LambdaCallback(on_epoch_end=self.plot_status(x_val)))
+
+        def plot_and_save_while_training(epoch, logs):
+
+            if epoch % 10 == 0:
+                a = self.model.predict(y_val)
+                print('a.shape: ', a.shape)
+                print('len(y_val): ', len(y_val))
+
+                for i in range(len(y_val)):
+                    element = a[i]
+                    element = np.squeeze(element)
+
+                    if i % 10 == 0:
+                        fig = plt.figure()
+                        img = plt.imshow(element, cmap=plt.cm.viridis, origin='lower', extent=[0, 256, 0, 512],
+                                         aspect='auto')
+                        title = str(epoch) + '_' + str(i)
+                        plt.title(title)
+                        plt.colorbar()
+                        plt.tight_layout()
+                        plt.savefig('/nas/home/spol/Thesis/saved_model/images/' + dt_string + '/' + title)
+
+                        plt.close()
+                        wandb.log({"Validation set plots": [wandb.Image(fig, caption=title)]})
+
+        callback_list.append(LambdaCallback(on_epoch_end=plot_and_save_while_training))
+
         self.model.fit(x_train,
                        y_train,
                        batch_size=batch_size,
@@ -108,7 +133,6 @@ class VAE:
         t_reconstruction_loss = train_reconstruction_loss.result()
         wandb.log({"reconstruction_loss": t_reconstruction_loss.numpy(), "global_step": num_epochs})
         '''
-
 
     def save(self, save_folder="."):
         self._create_folder_if_it_doesnt_exist(save_folder)
@@ -136,8 +160,8 @@ class VAE:
     def _calculate_combined_loss(self, y_target, y_predicted):
         reconstruction_loss = self._calculate_reconstruction_loss(y_target, y_predicted)
         kl_loss = self._calculate_kl_loss(y_target, y_predicted)
-        combined_loss = self.reconstruction_loss_weight * reconstruction_loss\
-                                                         + kl_loss
+        combined_loss = self.reconstruction_loss_weight * reconstruction_loss \
+                        + kl_loss
         train_loss(combined_loss)
         return combined_loss
 
@@ -195,7 +219,7 @@ class VAE:
         return Input(shape=self.latent_space_dim, name="decoder_input")
 
     def _add_dense_layer(self, decoder_input):
-        num_neurons = np.prod(self._shape_before_bottleneck) # [1, 2, 4] -> 8
+        num_neurons = np.prod(self._shape_before_bottleneck)  # [1, 2, 4] -> 8
         dense_layer = Dense(num_neurons, name="decoder_dense")(decoder_input)
         return dense_layer
 
@@ -301,7 +325,3 @@ if __name__ == "__main__":
         latent_space_dim=2
     )
     autoencoder.summary()
-
-
-
-

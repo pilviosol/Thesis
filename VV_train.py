@@ -8,8 +8,6 @@ from VV_autoencoder import train_loss, train_kl_loss, train_reconstruction_loss
 from WANDB import config
 import matplotlib.pyplot as plt
 import tensorflow as tf
-
-
 from datetime import datetime
 
 now = datetime.now()
@@ -22,10 +20,10 @@ file2.close()
 wandb.init(project="my-test-project", entity="pilviosol", name=dt_string, config=config)
 set_gpu(-1)
 
-path_features_matching_flute_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/FW_normalised_flute/'
-path_features_matching_vocal_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/FW_normalised_vocal/'
+path_features_matching_flute_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/FW_normalised_flute_TRAIN/'
+path_features_matching_vocal_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/FW_normalised_string_TRAIN/'
 path_features_matching_flute_val = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/FW_normalised_flute_VALID/"
-path_features_matching_vocal_val = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/FW_normalised_vocal_VALID/"
+path_features_matching_vocal_val = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/FW_normalised_string_VALID/"
 
 x_train_SPECTROGRAMS_PATH = pathlib.Path(path_features_matching_flute_train)
 y_train_SPECTROGRAMS_PATH = pathlib.Path(path_features_matching_vocal_train)
@@ -81,5 +79,9 @@ if __name__ == "__main__":
     y_train = load_fsdd(y_train_SPECTROGRAMS_PATH)
     x_val = load_fsdd(x_val_SPECTROGRAMS_PATH)
     y_val = load_fsdd(y_val_SPECTROGRAMS_PATH)
-    autoencoder = train(x_train, x_train, x_val, x_val, LEARNING_RATE, BATCH_SIZE, EPOCHS)
+    print('x_train.shape: ', x_train.shape)
+    print('y_train.shape: ', y_train.shape)
+    print('x_val.shape: ', x_val.shape)
+    print('y_val.shape: ', y_val.shape)
+    autoencoder = train(x_val, y_val, x_val, y_val, LEARNING_RATE, BATCH_SIZE, EPOCHS)
     autoencoder.save("/nas/home/spol/Thesis/saved_model/" + dt_string)
