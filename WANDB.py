@@ -12,8 +12,8 @@ wandb.config = {
     "epochs": 105,
     "learning_rate": 0.0005,
     "batch_size": 32,
-    "latent_dim": 16,
-    "kl_alpha": 1,
+    "latent_dim": 128,
+    "kl_alpha": 0.001,
 
     "input_shape": (512, 256, 1),
     "conv_filters": (512, 256, 128, 64, 32),

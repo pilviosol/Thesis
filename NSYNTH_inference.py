@@ -24,10 +24,10 @@ matching_flute_TEST = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/matching_
 features_matching_flute_TEST = main_folder + "features_matching_flute_TEST/"
 os.mkdir(features_matching_flute_TEST)
 
-matching_vocal_TEST = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/matching_vocal_TEST/"
+matching_string_TEST = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/matching_string_TEST/"
 
-features_matching_vocal_TEST = main_folder + "features_matching_vocal_TEST/"
-os.mkdir(features_matching_vocal_TEST)
+features_matching_string_TEST = main_folder + "features_matching_string_TEST/"
+os.mkdir(features_matching_string_TEST)
 
 Figures_TEST = main_folder + "Figures_TEST/"
 os.mkdir(Figures_TEST)
@@ -35,25 +35,25 @@ os.mkdir(Figures_TEST)
 normalised_flute_features_TEST = main_folder + "normalised_flute_features_TEST/"
 os.mkdir(normalised_flute_features_TEST)
 
-normalised_vocal_features_TEST = main_folder + "normalised_vocal_features_TEST/"
-os.mkdir(normalised_vocal_features_TEST)
+normalised_string_features_TEST = main_folder + "normalised_string_features_TEST/"
+os.mkdir(normalised_string_features_TEST)
 
-generated_vocal_features_TEST = main_folder + "generated_vocal_features_TEST/"
-os.mkdir(generated_vocal_features_TEST)
+generated_string_features_TEST = main_folder + "generated_string_features_TEST/"
+os.mkdir(generated_string_features_TEST)
 
 # min_max_flute_inference_path_file = main_folder + "flute_min_max_TEST.npy"
 min_max_flute_path_file = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/flute_"
-min_max_vocal_path_file = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/vocal_"
+min_max_string_path_file = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/string_"
 
 
 denormalised_spectrogram_TEST = main_folder + "denormalised_spectrogram_TEST/"
 os.mkdir(denormalised_spectrogram_TEST)
 
-generated_vocal_TEST = main_folder + "generated_vocal_TEST/"
-os.mkdir(generated_vocal_TEST)
+generated_string_TEST = main_folder + "generated_string_TEST/"
+os.mkdir(generated_string_TEST)
 
-generated_vocal_features = main_folder + "vocal_generated_features/"
-os.mkdir(generated_vocal_features)
+generated_string_features = main_folder + "string_generated_features/"
+os.mkdir(generated_string_features)
 
 os.mkdir(Figures_TEST + 'input-output-expected_output/')
 os.mkdir(Figures_TEST + 'denormalised-output/')
@@ -68,7 +68,7 @@ print('PATH, VARIABLES..........ok')
 
 
 feature_calculation(matching_flute_TEST, features_matching_flute_TEST)
-feature_calculation(matching_vocal_TEST, features_matching_vocal_TEST)
+feature_calculation(matching_string_TEST, features_matching_string_TEST)
 
 print('CALCULATE SPECTROGRAMS..........ok')
 
@@ -80,8 +80,8 @@ min_max_flute = min_max_array_saving(features_matching_flute_TEST, min_max_flute
 flute_folder_min_max = fw_normalise(features_matching_flute_TEST, normalised_flute_features_TEST, min_max_flute)
 # min_max_flute = normalise_set_and_save_min_max(features_matching_flute_TEST, normalised_flute_features_TEST)
 
-min_max_vocal = min_max_array_saving(features_matching_vocal_TEST, min_max_vocal_path_file)
-vocal_folder_min_max = fw_normalise(features_matching_vocal_TEST, normalised_vocal_features_TEST, min_max_vocal)
+min_max_string = min_max_array_saving(features_matching_string_TEST, min_max_string_path_file)
+string_folder_min_max = fw_normalise(features_matching_string_TEST, normalised_string_features_TEST, min_max_string)
 
 print('NORMALIZE THE SPECTROGRAMS AND SAVE MIN MAX..........ok')
 
@@ -114,7 +114,7 @@ for file in sorted(normalised_features_path):
     print('spectrogram expanded dims: ', spectrogram.shape)
 
     generated_spectrogram, latent_representation = generate(spectrogram)
-    np.save(generated_vocal_features_TEST + 'GENERATED_' + name, generated_spectrogram)
+    np.save(generated_string_features_TEST + 'GENERATED_' + name, generated_spectrogram)
 
 print('FEED THEM TO THE MODEL AND GENERATE NEW SPECTROGRAMS..........ok')
 
@@ -123,8 +123,8 @@ print('FEED THEM TO THE MODEL AND GENERATE NEW SPECTROGRAMS..........ok')
 # PLOT INPUT, OUTPUT and EXPECTED OUTPUT OF THE NETWORK
 # ---------------------------------------------------------------------------------------------------------------------
 VAE_input = pathlib.Path(normalised_flute_features_TEST).iterdir()
-VAE_output = pathlib.Path(generated_vocal_features_TEST).iterdir()
-VAE_expected_output = pathlib.Path(normalised_vocal_features_TEST).iterdir()
+VAE_output = pathlib.Path(generated_string_features_TEST).iterdir()
+VAE_expected_output = pathlib.Path(normalised_string_features_TEST).iterdir()
 
 for inpt, output, expected_output in zip(sorted(VAE_input), sorted(VAE_output), sorted(VAE_expected_output)):
     input_name = inpt.name
@@ -186,7 +186,7 @@ print('PLOT THE OUTPUT OF THE NETWORK..........ok')
 # min_max_values = np.load(min_max_flute_inference_path_file)
 # min_max_values = flute_folder_min_max
 
-generated_spectrograms_path = pathlib.Path(generated_vocal_features_TEST).iterdir()
+generated_spectrograms_path = pathlib.Path(generated_string_features_TEST).iterdir()
 for file in sorted(generated_spectrograms_path):
     name = file.name
     gen_spectrogram = np.load(file)
@@ -217,7 +217,7 @@ for file in sorted(denormalised_generated_spectrogram_path):
 
     spectrogram = 10 ** (denorm_spectrogram / 10) - 1e-5
     reconstructed = librosa.griffinlim(spectrogram, n_iter=1000, hop_length=128)
-    scipy.io.wavfile.write(generated_vocal_TEST + 'REVERSED_' + name + '.wav', SR, reconstructed)
+    scipy.io.wavfile.write(generated_string_TEST + 'REVERSED_' + name + '.wav', SR, reconstructed)
 
 print('PLOT THE RECONSTRUCTED SPECTROGRAMS..........ok')
 
@@ -225,26 +225,26 @@ print('PLOT THE RECONSTRUCTED SPECTROGRAMS..........ok')
 # ---------------------------------------------------------------------------------------------------------------------
 # COMPARE GENERATED WAVEFORM WITH GROUND TRUTH
 # ---------------------------------------------------------------------------------------------------------------------
-vocals = pathlib.Path(matching_vocal_TEST).iterdir()
-generated_vocal_path = pathlib.Path(generated_vocal_TEST).iterdir()
-for vocal, generated_vocal in zip(sorted(vocals), sorted(generated_vocal_path)):
-    name = vocal.name
+strings = pathlib.Path(matching_string_TEST).iterdir()
+generated_string_path = pathlib.Path(generated_string_TEST).iterdir()
+for string, generated_string in zip(sorted(strings), sorted(generated_string_path)):
+    name = string.name
     name = name[0:-4]
-    print('generated_vocal_TEST.name: ', name)
-    vocal, _ = librosa.load(vocal,  res_type='kaiser_fast', mono=True, sr=None)
-    generated_vocal, _ = librosa.load(generated_vocal,  res_type='kaiser_fast', mono=True, sr=None)
+    print('generated_string_TEST.name: ', name)
+    string, _ = librosa.load(string,  res_type='kaiser_fast', mono=True, sr=None)
+    generated_string, _ = librosa.load(generated_string,  res_type='kaiser_fast', mono=True, sr=None)
 
     fig, ax = plt.subplots(nrows=3)
 
-    librosa.display.waveshow(vocal[0:32640], sr=SR, ax=ax[0])
-    ax[0].set(title='ORIGINAL VOCAL')
+    librosa.display.waveshow(string[0:32640], sr=SR, ax=ax[0])
+    ax[0].set(title='ORIGINAL string')
     ax[0].label_outer()
 
-    librosa.display.waveshow(generated_vocal[0:32640], sr=SR, ax=ax[1])
-    ax[1].set(title='GENERATED VOCAL')
+    librosa.display.waveshow(generated_string[0:32640], sr=SR, ax=ax[1])
+    ax[1].set(title='GENERATED string')
     ax[1].label_outer()
 
-    librosa.display.waveshow(vocal[0:32640] - generated_vocal[0:32640], sr=SR, ax=ax[2])
+    librosa.display.waveshow(string[0:32640] - generated_string[0:32640], sr=SR, ax=ax[2])
     ax[2].set(title='DIFFERENCE')
     ax[2].label_outer()
 
@@ -253,19 +253,19 @@ for vocal, generated_vocal in zip(sorted(vocals), sorted(generated_vocal_path)):
     plt.show()
     plt.close()
 
-    print("MSE(resyntesized audio, original audio): ", np.mean((vocal[0:32640] - generated_vocal[0:32640]) ** 2))
-    print("NMSE(resyntesized audio, original audio): ", np.mean((vocal[0:32640] - generated_vocal[0:32640]) ** 2 /
-          vocal[0:32640] ** 2))
+    print("MSE(resyntesized audio, original audio): ", np.mean((string[0:32640] - generated_string[0:32640]) ** 2))
+    print("NMSE(resyntesized audio, original audio): ", np.mean((string[0:32640] - generated_string[0:32640]) ** 2 /
+          string[0:32640] ** 2))
 
 # ---------------------------------------------------------------------------------------------------------------------
 # CALCULATE THE SPECTROGRAM OF THE RESYNTHESIZED AUDIO TO COMPARE WITH GROUND TRUTH
 # ---------------------------------------------------------------------------------------------------------------------
 
-feature_calculation(generated_vocal_TEST, generated_vocal_features)
+feature_calculation(generated_string_TEST, generated_string_features)
 
-original_vocal = pathlib.Path(features_matching_vocal_TEST).iterdir()
-resynthesized_vocal = pathlib.Path(generated_vocal_features).iterdir()
-for original, generated in zip(original_vocal, resynthesized_vocal):
+original_string = pathlib.Path(features_matching_string_TEST).iterdir()
+resynthesized_string = pathlib.Path(generated_string_features).iterdir()
+for original, generated in zip(original_string, resynthesized_string):
     original_spectrogram = np.load(original)[0:512, 0:256]
     resynthesized_spectrogram = np.load(generated)[0:512, 0:256]
     print("MSE(resynthesized spectrogram, original spectrogram): ",
