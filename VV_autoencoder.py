@@ -55,6 +55,7 @@ class VAE:
         self.latent_space_dim = latent_space_dim  # 2
         # self.reconstruction_loss_weight = 1000000
         self.reconstruction_loss_weight = config['kl_alpha']
+        self.kl_loss_weight = config['kl_beta']
 
         self.encoder = None
         self.decoder = None
@@ -81,6 +82,27 @@ class VAE:
     def train_overfit(self, x_train, y_train, batch_size, num_epochs):
         callback_list.append(WandbCallback())
 
+        def plot_and_save_while_training_overfit(epoch, logs):
+
+            if epoch % 10 == 0:
+                a = self.model.predict(y_train)
+
+                for i in range(len(y_train)):
+                    element = a[i]
+                    element = np.squeeze(element)
+
+                    fig = plt.figure()
+                    img = plt.imshow(element, cmap=plt.cm.viridis, origin='lower', extent=[0, 256, 0, 512],
+                                     aspect='auto')
+                    title = str(epoch) + '_' + str(i)
+                    plt.title(title)
+                    plt.colorbar()
+                    plt.tight_layout()
+                    plt.savefig('/nas/home/spol/Thesis/saved_model/images_overfit/' + title)
+                    plt.close()
+                    wandb.log({"Y_train plots": [wandb.Image(fig, caption=title)]})
+        callback_list.append(LambdaCallback(on_epoch_end=plot_and_save_while_training_overfit))
+
         self.model.fit(x_train,
                        y_train,
                        batch_size=batch_size,
@@ -93,7 +115,7 @@ class VAE:
 
         def plot_and_save_while_training(epoch, logs):
 
-            if epoch % 10 == 0:
+            if epoch % 5 == 0:
                 a = self.model.predict(y_val)
 
                 for i in range(len(y_val)):
@@ -158,8 +180,7 @@ class VAE:
     def _calculate_combined_loss(self, y_target, y_predicted):
         reconstruction_loss = self._calculate_reconstruction_loss(y_target, y_predicted)
         kl_loss = self._calculate_kl_loss(y_target, y_predicted)
-        combined_loss = self.reconstruction_loss_weight * reconstruction_loss \
-                        + kl_loss
+        combined_loss = reconstruction_loss + self.kl_loss_weight*kl_loss
         train_loss(combined_loss)
         return combined_loss
 

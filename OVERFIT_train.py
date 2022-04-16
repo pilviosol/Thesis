@@ -39,6 +39,6 @@ def train_overfit(x_train, y_train, learning_rate, batch_size, epochs):
 if __name__ == "__main__":
     print('ollare')
     x_train = load_fsdd(x_train_SPECTROGRAMS_PATH)
-    y_train = load_fsdd(y_train_SPECTROGRAMS_PATH)
-    autoencoder = train_overfit(x_train, y_train, LEARNING_RATE, BATCH_SIZE, EPOCHS)
+    # y_train = load_fsdd(y_train_SPECTROGRAMS_PATH)
+    autoencoder = train_overfit(x_train, x_train, LEARNING_RATE, BATCH_SIZE, EPOCHS)
     autoencoder.save("/nas/home/spol/Thesis/saved_model/OVERFIT")
