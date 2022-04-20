@@ -54,7 +54,7 @@ class VAE:
         self.conv_strides = conv_strides  # [1, 2, 2]
         self.latent_space_dim = latent_space_dim  # 2
         # self.reconstruction_loss_weight = 1000000
-        self.reconstruction_loss_weight = config['kl_alpha']
+        # self.reconstruction_loss_weight = config['kl_alpha']
         self.kl_loss_weight = config['kl_beta']
 
         self.encoder = None

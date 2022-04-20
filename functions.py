@@ -91,7 +91,7 @@ def extract_features(file_name):
         # n_mels=128)
         stft_mag = np.abs(librosa.stft(y=audio, n_fft=N_FFT, hop_length=HOP_LENGTH, win_length=WIN_LENGTH))
         log_spectrogram = 10 * np.log10(stft_mag + 1e-5)
-        log_spectrogram = log_spectrogram[0:512, 0:256]
+        log_spectrogram = log_spectrogram[0:512, 0:64]
         # cambiare 1e-5 FARE PROVE
 
     except Exception as e:
@@ -326,7 +326,7 @@ def fw_normalise(original_path, new_path, min_max_array):
     for file in sorted(files_in_basepath):
         name = file.name
         loaded_file = np.load(file)
-        loaded_file = loaded_file[0:512, 0:256]
+        loaded_file = loaded_file[0:512, 0:64]
         normalised_loaded_file = normalise_given_min_max(loaded_file, minimum, maximum)
         np.save(new_path + 'normalised_FW_' + name, normalised_loaded_file)
     return folder_min_max
@@ -345,6 +345,7 @@ def load_fsdd(spectrograms_path):
         for file_name in sorted(file_names):
             file_path = os.path.join(root, file_name)
             spectrogram = np.load(file_path)  # (n_bins, n_frames, 1)
+            spectrogram = spectrogram[0:512, 0:64]
             x_train.append(spectrogram)
             '''
             if count % 100 == 0:

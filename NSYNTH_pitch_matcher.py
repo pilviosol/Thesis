@@ -9,11 +9,11 @@ import scipy.io.wavfile
 from functions import rename_files_by_pitch, count_pitches, append_pitches_velocities,\
     remove_files_if_pitch_not_matching, how_many_pitches
 
-nsynth_train_path_subset_flute = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/matching_flute'
-nsynth_train_path_subset_string = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/string_acoustic'
+nsynth_train_path_subset_flute = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/HQ_matching_flute_TRAIN'
+nsynth_train_path_subset_string = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/HQ_matching_string_TRAIN'
 
-matching_flute_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/matching_flute2'
-matching_string_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/matching_string'
+matching_flute_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/NEW_HQ_matching_flute_TRAIN'
+matching_string_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/NEW_HQ_matching_string_TRAIN'
 
 
 flute_pitches_velocities = append_pitches_velocities(nsynth_train_path_subset_flute)
@@ -94,9 +94,3 @@ for idx, count in enumerate(matching):
 print('debug')
 
 
-
-# TODO
-"""
-Rinominare i file per pitch e fare un count di quanti pitch ho dell'uno e dell'altro
-Far matchare il numero di pitches di uno e dell'altro in modo da trainare ordinatamente
-"""
