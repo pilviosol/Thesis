@@ -345,7 +345,7 @@ def load_fsdd(spectrograms_path):
         for file_name in sorted(file_names):
             file_path = os.path.join(root, file_name)
             spectrogram = np.load(file_path)  # (n_bins, n_frames, 1)
-            spectrogram = spectrogram[0:512, 0:64]
+            # spectrogram = spectrogram[0:512, 0:64]
             x_train.append(spectrogram)
             '''
             if count % 100 == 0:

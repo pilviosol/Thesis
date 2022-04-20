@@ -4,11 +4,11 @@ import matplotlib.pyplot as plt
 import shutil
 from functions import extract_features, feature_calculation
 
-which_set = 'TRAIN'
+which_set = 'VALID'
 
 
-path_matching_flute = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_' + which_set + '_SUBSET/NEW_HQ_matching_flute_' + which_set
-path_matching_string = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_' + which_set + '_SUBSET/NEW_HQ_matching_string_' \
+path_matching_flute = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_' + which_set + '_SUBSET/matching_flute_' + which_set
+path_matching_string = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_' + which_set + '_SUBSET/matching_string_' \
                        + which_set
 path_features_matching_flute = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_' + which_set +\
                               '_SUBSET/NEW_HQ_features_matching_flute_2004_' + which_set + '/'

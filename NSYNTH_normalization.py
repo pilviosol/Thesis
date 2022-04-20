@@ -6,7 +6,7 @@ import os
 # ---------------------------------------------------------------------------------------------------------------------
 # PATHS
 # ---------------------------------------------------------------------------------------------------------------------
-which_set = 'TRAIN'
+which_set = 'VALID'
 
 
 original_flute_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_' + which_set + '_SUBSET/NEW_HQ_features_matching_flute_2004_' +\
