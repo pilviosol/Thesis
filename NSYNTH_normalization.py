@@ -6,17 +6,17 @@ import os
 # ---------------------------------------------------------------------------------------------------------------------
 # PATHS
 # ---------------------------------------------------------------------------------------------------------------------
-which_set = 'VALID'
+which_set = 'TRAIN'
 
 
-original_flute_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_' + which_set + '_SUBSET/NEW_HQ_features_matching_flute_2004_' +\
+original_flute_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_' + which_set + '_SUBSET/features_flutes_2204_' +\
                       which_set + '/'
-original_string_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_' + which_set + '_SUBSET/NEW_HQ_features_matching_string_2004_' +\
+original_string_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_' + which_set + '_SUBSET/features_strings_2204_' +\
                        which_set + '/'
 
-normalised_flute_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_' + which_set + '_SUBSET/NEW_HQ_FW_normalised_flute_' \
+normalised_flute_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_' + which_set + '_SUBSET/FW_normalised_flutes_' \
                         + which_set + '/'
-normalised_string_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_' + which_set + '_SUBSET/NEW_HQ_FW_normalised_string_' \
+normalised_string_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_' + which_set + '_SUBSET/FW_normalised_strings_' \
                          + which_set + '/'
 min_max_flute_path_file = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_' + which_set + '_SUBSET/flute_'
 min_max_string_path_file = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_' + which_set + '_SUBSET/string_'

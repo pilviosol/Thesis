@@ -185,12 +185,12 @@ def remove_files_if_pitch_not_matching(path, elimination_list):
             os.remove(path + '/' + name)
 
 
-def how_many_pitches(path):
+def how_many_pitches(path, temp_pitch):
     counts = []
     files_dir = pathlib.Path(path)
     files_in_basepath = files_dir.iterdir()
     count = 0
-    temp_pitch = '023'
+    temp_pitch = temp_pitch
     for file in sorted(files_in_basepath):
         name = file.name
         pitch = name[0:3]
@@ -200,7 +200,7 @@ def how_many_pitches(path):
         else:
             counts.append(count)
             temp_pitch = pitch
-            count = 0
+            count = 1
     return counts
 
 
