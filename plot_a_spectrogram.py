@@ -6,7 +6,7 @@ path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/FW_normalised_flute/nor
 spectrogram = np.load(path)
 
 fig = plt.figure()
-img = plt.imshow(spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 256, 0, 512],
+img = plt.imshow(spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 4, 0, 8192],
                  aspect='auto')
 plt.title('spectrogram')
 plt.colorbar()

@@ -145,21 +145,21 @@ for inpt, output, expected_output in zip(sorted(VAE_input), sorted(VAE_output), 
     fig2, (ax1, ax2, ax3) = plt.subplots(1, 3)
 
     # VAE INPUT
-    img1 = ax1.imshow(input_spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 256, 0, 512], aspect='auto')
+    img1 = ax1.imshow(input_spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 64, 0, 512], aspect='auto')
     ax1.set_title('INPUT_' + input_name[34:-16])
     divider1 = make_axes_locatable(ax1)
     cax1 = divider1.append_axes("right", size="5%", pad=0.05)
     cbar1 = plt.colorbar(img1, cax=cax1)
 
     # VAE OUTPUT
-    img2 = ax2.imshow(out_spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 256, 0, 512], aspect='auto')
+    img2 = ax2.imshow(out_spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 64, 0, 512], aspect='auto')
     ax2.set_title('OUTPUT_' + output_name[44:-16])
     divider2 = make_axes_locatable(ax2)
     cax2 = divider2.append_axes("right", size="5%", pad=0.05)
     cbar2 = plt.colorbar(img2, cax=cax2)
 
     # EXPECTED OUTPUT
-    img3 = ax3.imshow(expected_output_spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 256, 0, 512],
+    img3 = ax3.imshow(expected_output_spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 64, 0, 512],
                       aspect='auto')
     ax3.set_title('EXPECTED OUTPUT' + expected_output_name[44:-16])
     divider3 = make_axes_locatable(ax3)
@@ -208,7 +208,7 @@ for file in sorted(denormalised_generated_spectrogram_path):
     denorm_spectrogram = np.load(file)
 
     fig = plt.figure()
-    img = plt.imshow(denorm_spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 256, 0, 512], aspect='auto')
+    img = plt.imshow(denorm_spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 64, 0, 512], aspect='auto')
     plt.title('DENORMALIZED_' + name[43:-16])
     plt.colorbar()
     plt.savefig(Figures_TEST + 'denormalised-output/' + name[44:-20])
@@ -236,15 +236,15 @@ for string, generated_string in zip(sorted(strings), sorted(generated_string_pat
 
     fig, ax = plt.subplots(nrows=3)
 
-    librosa.display.waveshow(string[0:32640], sr=SR, ax=ax[0])
+    librosa.display.waveshow(string[0:8064], sr=SR, ax=ax[0])
     ax[0].set(title='ORIGINAL string')
     ax[0].label_outer()
 
-    librosa.display.waveshow(generated_string[0:32640], sr=SR, ax=ax[1])
+    librosa.display.waveshow(generated_string[0:8064], sr=SR, ax=ax[1])
     ax[1].set(title='GENERATED string')
     ax[1].label_outer()
 
-    librosa.display.waveshow(string[0:32640] - generated_string[0:32640], sr=SR, ax=ax[2])
+    librosa.display.waveshow(string[0:8064] - generated_string[0:8064], sr=SR, ax=ax[2])
     ax[2].set(title='DIFFERENCE')
     ax[2].label_outer()
 
@@ -253,9 +253,9 @@ for string, generated_string in zip(sorted(strings), sorted(generated_string_pat
     plt.show()
     plt.close()
 
-    print("MSE(resyntesized audio, original audio): ", np.mean((string[0:32640] - generated_string[0:32640]) ** 2))
-    print("NMSE(resyntesized audio, original audio): ", np.mean((string[0:32640] - generated_string[0:32640]) ** 2 /
-          string[0:32640] ** 2))
+    print("MSE(resyntesized audio, original audio): ", np.mean((string[0:8064] - generated_string[0:8064]) ** 2))
+    print("NMSE(resyntesized audio, original audio): ", np.mean((string[0:8064] - generated_string[0:8064]) ** 2 /
+          string[0:8064] ** 2))
 
 # ---------------------------------------------------------------------------------------------------------------------
 # CALCULATE THE SPECTROGRAM OF THE RESYNTHESIZED AUDIO TO COMPARE WITH GROUND TRUTH
@@ -266,8 +266,8 @@ feature_calculation(generated_string_TEST, generated_string_features)
 original_string = pathlib.Path(features_matching_string_TEST).iterdir()
 resynthesized_string = pathlib.Path(generated_string_features).iterdir()
 for original, generated in zip(original_string, resynthesized_string):
-    original_spectrogram = np.load(original)[0:512, 0:256]
-    resynthesized_spectrogram = np.load(generated)[0:512, 0:256]
+    original_spectrogram = np.load(original)[0:512, 0:64]
+    resynthesized_spectrogram = np.load(generated)[0:512, 0:64]
     print("MSE(resynthesized spectrogram, original spectrogram): ",
           np.mean((original_spectrogram - resynthesized_spectrogram) ** 2))
     print("NMSE(resynthesized spectrogram, original spectrogram): ",
