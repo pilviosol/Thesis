@@ -8,8 +8,8 @@ wandb.config = {
     "normalization_type": "min_max_folderwise",
 
     "using_validation_set": True,
-    "training_on_x_train_only": True,
-    "epochs": 150,
+    "training_on_x_train_only": False,
+    "epochs": 300,
     "learning_rate": 0.0001,
     "batch_size": 16,
     "latent_dim": 64,
@@ -18,7 +18,7 @@ wandb.config = {
 
 
     "input_shape": (512, 64, 1),
-    "conv_filters": (512*4, 256*4, 128*4, 64*4, 32*4),
+    "conv_filters": (512*2, 256*2, 128*2, 64*2, 32*2),
     "conv_kernels": (6, 6, 6, 6, 6),
     "conv_strides": (2, 2, 2, 2, (2, 1)),
 

@@ -91,7 +91,9 @@ print('NORMALIZE THE SPECTROGRAMS AND SAVE MIN MAX..........ok')
 # ---------------------------------------------------------------------------------------------------------------------
 
 
-vae = VAE.load("/nas/home/spol/Thesis/saved_model/" + date)
+# vae = VAE.load("/nas/home/spol/Thesis/saved_model/" + date)
+vae = VAE.load("/nas/home/spol/Thesis/saved_model/EULER/25-04-2022_12:28")
+
 
 def generate(spectrograms):
     generated_spectrograms, latent_representations = vae.reconstruct(spectrograms)
@@ -216,7 +218,7 @@ for file in sorted(denormalised_generated_spectrogram_path):
     plt.close()
 
     spectrogram = 10 ** (denorm_spectrogram / 10) - 1e-5
-    reconstructed = librosa.griffinlim(spectrogram, n_iter=1000, hop_length=128)
+    reconstructed = librosa.griffinlim(spectrogram, n_iter=32, hop_length=128)
     scipy.io.wavfile.write(generated_string_TEST + 'REVERSED_' + name + '.wav', SR, reconstructed)
 
 print('PLOT THE RECONSTRUCTED SPECTROGRAMS..........ok')

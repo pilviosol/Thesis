@@ -3,9 +3,9 @@ import pathlib
 import matplotlib.pyplot as plt
 
 
-path_features_matching_flute_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/FW_normalised_vocal_VALID'
+path_features_matching_flute_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/FW_normalised_flutes_TRAIN/'
 y_train_SPECTROGRAMS_PATH = pathlib.Path(path_features_matching_flute_train).iterdir()
-savefig_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/VOCAL_SPECTROGRAMS_VALID/'
+savefig_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/IMAGES_FW_normalised_flutes_TRAIN/'
 
 
 for file in sorted(y_train_SPECTROGRAMS_PATH):

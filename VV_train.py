@@ -25,8 +25,8 @@ set_gpu(-1)
 # PATH, VARIABLES
 # ---------------------------------------------------------------------------------------------------------------------
 
-path_features_matching_flute_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/NEW_HQ_FW_normalised_flute_TRAIN/'
-path_features_matching_vocal_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/NEW_HQ_FW_normalised_string_TRAIN/'
+path_features_matching_flute_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/FW_normalised_flutes_TRAIN/'
+path_features_matching_vocal_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/FW_normalised_strings_TRAIN/'
 path_features_matching_flute_val = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/NEW_HQ_FW_normalised_flute_VALID/"
 path_features_matching_vocal_val = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/NEW_HQ_FW_normalised_string_VALID/"
 
