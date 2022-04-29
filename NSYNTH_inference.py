@@ -92,7 +92,7 @@ print('NORMALIZE THE SPECTROGRAMS AND SAVE MIN MAX..........ok')
 
 
 # vae = VAE.load("/nas/home/spol/Thesis/saved_model/" + date)
-vae = VAE.load("/nas/home/spol/Thesis/saved_model/EULER/25-04-2022_12:28")
+vae = VAE.load("/nas/home/spol/Thesis/saved_model/REDUCTED/26-04-2022_22:36")
 
 
 def generate(spectrograms):

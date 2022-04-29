@@ -21,6 +21,8 @@ train_loss = tf.keras.metrics.Mean(name="train_loss")
 train_kl_loss = tf.keras.metrics.Mean(name="train_kl_loss")
 train_reconstruction_loss = tf.keras.metrics.Mean(name="train_reconstruction_loss")
 
+callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=25, verbose=1, restore_best_weights=True)
+
 # gpus = tf.config.list_logical_devices('GPU')
 # strategy = tf.distribute.MirroredStrategy(gpus)
 
@@ -136,7 +138,7 @@ class VAE:
                         wandb.log({"Validation set plots": [wandb.Image(fig, caption=title)]})
 
         callback_list.append(LambdaCallback(on_epoch_end=plot_and_save_while_training))
-
+        callback_list.append(callback)
         self.model.fit(x_train,
                        y_train,
                        batch_size=batch_size,

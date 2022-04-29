@@ -25,8 +25,8 @@ set_gpu(-1)
 # PATH, VARIABLES
 # ---------------------------------------------------------------------------------------------------------------------
 
-path_features_matching_flute_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/FW_normalised_flutes_TRAIN/'
-path_features_matching_vocal_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/FW_normalised_strings_TRAIN/'
+path_features_matching_flute_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/reducted_flutes/'
+path_features_matching_vocal_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/reducted_strings/'
 path_features_matching_flute_val = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/NEW_HQ_FW_normalised_flute_VALID/"
 path_features_matching_vocal_val = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/NEW_HQ_FW_normalised_string_VALID/"
 
@@ -79,4 +79,4 @@ if __name__ == "__main__":
     print('x_val.shape: ', x_val.shape)
     print('y_val.shape: ', y_val.shape)
     autoencoder = train(x_train, y_train, x_val, y_val, LEARNING_RATE, BATCH_SIZE, EPOCHS)
-    autoencoder.save("/nas/home/spol/Thesis/saved_model/" + dt_string)
+    autoencoder.save("/nas/home/spol/Thesis/saved_model/REDUCTED/" + dt_string)
