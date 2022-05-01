@@ -9,7 +9,7 @@ wandb.config = {
 
     "using_validation_set": True,
     "training_on_x_train_only": False,
-    "epochs": 300,
+    "epochs": 1000,
     "learning_rate": 0.0001,
     "batch_size": 16,
     "latent_dim": 64,
