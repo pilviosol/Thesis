@@ -1,13 +1,12 @@
 import numpy as np
-import matplotlib.pyplot as plt
-from tsne import bh_sne
-from keras.layers import Input, Dense, Lambda
-from keras.models import Model
-from keras.datasets import mnist
-from keras import backend as K
-from keras import objectives
+from tensorflow.keras.layers import Input, Dense, Lambda
+from tensorflow.keras import Model
+from tensorflow.keras.datasets import mnist
+from tensorflow.keras import backend as K
+# from tensorflow.keras import objectives
 from matplotlib import pyplot as plt
 from tsne import bh_sne
+import tensorflow as tf
 
 
 image_size = 28
@@ -24,12 +23,14 @@ x_train = x_train.reshape((len(x_train), np.prod(x_train.shape[1:])))
 x_test = x_test.reshape((len(x_test), np.prod(x_test.shape[1:])))
 x_train = x_train[:n_samples]
 y_train = y_train[:n_samples]
+print(x_train.shape, x_test.shape, y_train.shape, y_test.shape)
 
 
 def sampling(args):
     z_mean, z_log_std = args
-    epsilon = K.random_normal(shape=(latent_dim,), mean=0., std=1.)
-    return z_mean + K.exp(z_log_std) * epsilon
+    epsilon = K.random_normal(shape=(latent_dim,), mean=0., stddev=1.)
+    sampled_point = z_mean + K.exp(z_log_std / 2) * epsilon
+    return sampled_point
 
 
 def vae_loss(x, x_decoded_mean):
@@ -39,14 +40,14 @@ def vae_loss(x, x_decoded_mean):
 
 
 x = Input(shape=(original_dim,))
-h = Dense(intermediate_dim, activation='relu')(x)
-h = Dense(intermediate_dim, activation='relu')(h)
-z_mean = Dense(latent_dim)(h)
-z_log_std = Dense(latent_dim)(h)
-z = Lambda(sampling)([z_mean, z_log_std])
-decoder_h1 = Dense(intermediate_dim, activation='relu')
-decoder_h2 = Dense(intermediate_dim, activation='relu')
-decoder_mean = Dense(original_dim, activation='sigmoid')
+h = Dense(intermediate_dim, activation='relu', name="1")(x)
+h = Dense(intermediate_dim, activation='relu', name="2")(h)
+z_mean = Dense(latent_dim, name="z_mean")(h)
+z_log_std = Dense(latent_dim, name="z_log_std")(h)
+z = Lambda(sampling, name="Lambda")([z_mean, z_log_std])
+decoder_h1 = Dense(intermediate_dim, activation='relu', name="dioporco")
+decoder_h2 = Dense(intermediate_dim, activation='relu', name="diocane")
+decoder_mean = Dense(original_dim, activation='sigmoid', name="diomerda")
 h1_decoded = decoder_h1(z)
 h2_decoded = decoder_h2(h1_decoded)
 x_decoded_mean = decoder_mean(h2_decoded)
@@ -54,12 +55,12 @@ x_decoded_mean = decoder_mean(h2_decoded)
 
 vae = Model(x, x_decoded_mean)
 encoder = Model(x, z_mean)
-vae.compile(optimizer='rmsprop', loss=vae_loss)
+vae.compile(optimizer='rmsprop', loss=vae_loss, experimental_run_tf_function=False)
 
 
 vae.fit(x_train, x_train,
         shuffle=True,
-        nb_epoch=50,
+        epochs=50,
         batch_size=256,
         validation_data=(x_test, x_test))
 

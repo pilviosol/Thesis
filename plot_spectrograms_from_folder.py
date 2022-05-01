@@ -5,18 +5,11 @@ import numpy as np
 import scipy
 
 # features_matching_flute = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/features_matching_flute/"
-features_matching_string = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/NEW_HQ_FW_normalised_string_TRAIN/"
-saving_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/"
+features_matching_string = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/NEW_HQ_FW_normalised_flute_VALID/"
+saving_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/"
 flutes = []
 # vocals = []
-'''
-files_dir = pathlib.Path(features_matching_flute)
-features_matching_flute = files_dir.iterdir()
-for file in sorted(features_matching_flute):
-    print(file.name)
-    flute = np.load(file)
-    flutes.append(flute)
-flutes = np.array(flutes) '''
+
 
 files_dir = pathlib.Path(features_matching_string)
 features_matching_string = files_dir.iterdir()
@@ -29,7 +22,7 @@ for file in sorted(features_matching_string):
     img = plt.imshow(string, cmap=plt.cm.viridis, origin='lower', extent=[0, 64, 0, 512], aspect='auto')
     plt.title(name)
     plt.colorbar()
-    plt.savefig(saving_path + 'IMAGES_NEW_HQ_FW_normalised_string_TRAIN/' + name)
+    plt.savefig(saving_path + 'IMAGES_NEW_HQ_FW_normalised_flute_VALID/' + name)
     # plt.show()
     plt.close()
 

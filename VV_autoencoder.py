@@ -14,6 +14,7 @@ from WANDB import config
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau, TensorBoard, LambdaCallback
 import matplotlib.pyplot as plt
 from datetime import datetime
+from tsne import bh_sne
 
 tf.compat.v1.disable_eager_execution()
 
@@ -335,6 +336,23 @@ class VAE:
         x = Lambda(sample_point_from_normal_distribution,
                    name="encoder_output")([self.mu, self.log_variance])
         return x
+
+    def tsne(self, x_train, perplexity):
+        encoded_inputs = self.encoder.predict(x_train)
+
+        # perform t-SNE embedding
+        vis_data = bh_sne(encoded_inputs.astype('float64'), perplexity=perplexity)
+
+        # plot the result
+        vis_x = vis_data[:, 0]
+        vis_y = vis_data[:, 1]
+
+        plt.scatter(vis_x, vis_y, cmap=plt.cm.get_cmap("jet", 10))
+        plt.colorbar(ticks=range(10))
+        plt.clim(-0.5, 9.5)
+        plt.show()
+
+
 
 
 if __name__ == "__main__":
