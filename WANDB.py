@@ -12,7 +12,7 @@ wandb.config = {
     "epochs": 1000,
     "learning_rate": 0.0001,
     "batch_size": 16,
-    "latent_dim": 64,
+    "latent_dim": 2,
     # "kl_alpha": 1000,
     "kl_beta": 0.0001,
 

@@ -337,7 +337,8 @@ class VAE:
                    name="encoder_output")([self.mu, self.log_variance])
         return x
 
-    def tsne(self, x_train, perplexity):
+    def tsne(self, x_train, perplexity, title):
+
         encoded_inputs = self.encoder.predict(x_train)
 
         # perform t-SNE embedding
@@ -350,7 +351,9 @@ class VAE:
         plt.scatter(vis_x, vis_y, cmap=plt.cm.get_cmap("jet", 10))
         plt.colorbar(ticks=range(10))
         plt.clim(-0.5, 9.5)
+        plt.title(title)
         plt.show()
+        return encoded_inputs
 
 
 

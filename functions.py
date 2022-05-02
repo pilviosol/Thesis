@@ -362,4 +362,17 @@ def load_fsdd(spectrograms_path):
     x_train = x_train[..., np.newaxis]  # -> (4130, 512, 256, 1)
     return x_train
 
+
+def interpolate(v1, v2, n=10):
+    """
+    interpolates between two vectors in latent space
+    """
+    ratios = np.linspace(0, 1, n)
+    int_vecs = list()
+    for ratio in ratios:
+        v = (1.0 - ratio) * v1 + ratio * v2
+        int_vecs.append(v)
+
+    return int_vecs
+
 # print('debugg')
