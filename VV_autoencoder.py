@@ -22,7 +22,7 @@ train_loss = tf.keras.metrics.Mean(name="train_loss")
 train_kl_loss = tf.keras.metrics.Mean(name="train_kl_loss")
 train_reconstruction_loss = tf.keras.metrics.Mean(name="train_reconstruction_loss")
 
-callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=100, verbose=1, restore_best_weights=False)
+callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=150, verbose=1, restore_best_weights=False)
 
 # gpus = tf.config.list_logical_devices('GPU')
 # strategy = tf.distribute.MirroredStrategy(gpus)
@@ -337,7 +337,7 @@ class VAE:
                    name="encoder_output")([self.mu, self.log_variance])
         return x
 
-    def tsne(self, x_train, perplexity, title):
+    def tsne(self, x_train, perplexity, title, annotations):
 
         encoded_inputs = self.encoder.predict(x_train)
 
@@ -352,6 +352,10 @@ class VAE:
         plt.colorbar(ticks=range(10))
         plt.clim(-0.5, 9.5)
         plt.title(title)
+        for i, txt in enumerate(annotations):
+            print('i: ', i)
+            print('txt: ', txt)
+            plt.annotate(txt, (vis_x[i], vis_y[i]))
         plt.show()
         return encoded_inputs
 

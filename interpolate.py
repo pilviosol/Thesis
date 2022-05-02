@@ -1,7 +1,7 @@
 import numpy as np
 from VV_autoencoder import VAE
 import pathlib
-from functions import load_fsdd, interpolate
+from functions import load_fsdd, interpolate, denormalise
 import matplotlib.pyplot as plt
 import librosa
 import scipy.io.wavfile
@@ -15,6 +15,7 @@ spectrograms_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLAT
 spectrograms = pathlib.Path(spectrograms_path)
 images_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION/images/"
 wav_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION/wav/"
+min_max = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/string_folder_min_max.npy"
 SR = 16000
 
 
@@ -40,6 +41,10 @@ generated_spectrograms = vae.decoder.predict(generated_image_vectors)
 # ---------------------------------------------------------------------------------------------------------------------
 # PLOT PREDICTIONS, SAVE IMAGES, RE-SYNTHESIZE AND SAVE AUDIO
 # ---------------------------------------------------------------------------------------------------------------------
+min_and_max = np.load(min_max)
+minimum = min_and_max[0][1]
+maximum = min_and_max[0][0]
+
 
 
 for idx, file in enumerate(generated_spectrograms):
@@ -51,9 +56,11 @@ for idx, file in enumerate(generated_spectrograms):
     plt.show()
     plt.savefig(images_path + str(idx))
     plt.close()
-
-    spectrogram = 10 ** (spectrogram / 10) - 1e-5
+    denormalised_spectrogram = denormalise(spectrogram, minimum, maximum)
+    spectrogram = 10 ** (denormalised_spectrogram / 10) - 1e-5
     reconstructed = librosa.griffinlim(spectrogram, n_iter=32, hop_length=128)
     scipy.io.wavfile.write(wav_path + str(idx) + '.wav', SR, reconstructed)
+
+
 
 print('debug')
