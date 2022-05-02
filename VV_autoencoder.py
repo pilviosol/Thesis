@@ -348,13 +348,11 @@ class VAE:
         vis_x = vis_data[:, 0]
         vis_y = vis_data[:, 1]
 
-        plt.scatter(vis_x, vis_y, cmap=plt.cm.get_cmap("jet", 10))
+        plt.scatter(vis_x, vis_y, cmap=plt.cm.get_cmap("jet", 10), s=1)
         plt.colorbar(ticks=range(10))
         plt.clim(-0.5, 9.5)
         plt.title(title)
         for i, txt in enumerate(annotations):
-            print('i: ', i)
-            print('txt: ', txt)
             plt.annotate(txt, (vis_x[i], vis_y[i]))
         plt.show()
         return encoded_inputs

@@ -10,11 +10,11 @@ import scipy.io.wavfile
 # PATH, VARIABLES
 # ---------------------------------------------------------------------------------------------------------------------
 
-
-spectrograms_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION/inputs/"
+folder_number = str(9)
+spectrograms_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION/inputs/input" + folder_number + "/"
 spectrograms = pathlib.Path(spectrograms_path)
-images_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION/images/"
-wav_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION/wav/"
+images_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION/images/image" + folder_number + "/"
+wav_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION/wavs/wav" + folder_number + "/"
 min_max = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/string_folder_min_max.npy"
 SR = 16000
 
@@ -24,7 +24,7 @@ SR = 16000
 # ---------------------------------------------------------------------------------------------------------------------
 
 
-vae = VAE.load("/nas/home/spol/Thesis/saved_model/REDUCTED/30-04-2022_14:54")
+vae = VAE.load("/nas/home/spol/Thesis/saved_model/REDUCTED/30-04-2022_00:28")
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -53,8 +53,8 @@ for idx, file in enumerate(generated_spectrograms):
     img = plt.imshow(spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 64, 0, 512], aspect='auto')
     plt.colorbar()
     plt.title(idx)
-    plt.show()
     plt.savefig(images_path + str(idx))
+    plt.show()
     plt.close()
     denormalised_spectrogram = denormalise(spectrogram, minimum, maximum)
     spectrogram = 10 ** (denormalised_spectrogram / 10) - 1e-5

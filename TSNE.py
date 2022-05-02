@@ -32,7 +32,7 @@ x_v = x_val_SPECTROGRAMS_PATH.iterdir()
 annotations = []
 for file in x_v:
     name = file.name
-    pitch = name[33:-20]
+    pitch = name[33:-16]
     print(pitch)
     annotations.append(pitch)
 # ---------------------------------------------------------------------------------------------------------------------
@@ -40,7 +40,7 @@ for file in x_v:
 # ---------------------------------------------------------------------------------------------------------------------
 
 # vae = VAE.load("/nas/home/spol/Thesis/saved_model/" + date)
-vae = VAE.load("/nas/home/spol/Thesis/saved_model/REDUCTED/30-04-2022_14:54")
+vae = VAE.load("/nas/home/spol/Thesis/saved_model/REDUCTED/30-04-2022_00:28")
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -54,7 +54,7 @@ if __name__ == "__main__":
     # print('x_train.shape: ', x_train.shape)
     print('x_val.shape: ', x_val.shape)
     # encoded_x_train = vae.tsne(x_train, perplexity=5, title='x_train')
-    encoded_x_val = vae.tsne(x_val, perplexity=5, title='x_val', annotations=annotations)
+    encoded_x_val = vae.tsne(x_val, perplexity=16, title='x_val', annotations=annotations)
 
 
 print('debug')
