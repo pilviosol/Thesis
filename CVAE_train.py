@@ -7,6 +7,8 @@ from WANDB import config
 from datetime import datetime
 from VV_train import train
 import tensorflow as tf
+from VV_autoencoder import cond01, cond10
+import numpy as np
 
 # ---------------------------------------------------------------------------------------------------------------------
 # SET UP WANDB, SELECT GPU AND INSTANTIATING DATE AND TIME TO SAVE MODEL WITH THAT NAME
@@ -52,15 +54,7 @@ INPUT_SHAPE = config['input_shape']
 CONV_FILTERS = config['conv_filters']
 CONV_KERNELS = config['conv_kernels']
 CONV_STRIDES = config['conv_strides']
-cond = [[0, 1], [1, 0]]
 
-cond01 = []
-for a in range(825):
-    cond01.append(cond[0])
-
-cond10 = []
-for a in range(825):
-    cond01.append(cond[1])
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -72,25 +66,30 @@ if __name__ == "__main__":
     print('ollare CVAE')
 
     # LOAD X_TRAIN, Y_TRAIN, X_VAL AND Y_VAL
-    x_train0 = load_fsdd(x_train_SPECTROGRAMS_PATH)
-    x_train0 = tf.concat((x_train0, cond01), axis=1)
-    x_train1 = load_fsdd(x_train_SPECTROGRAMS_PATH)
-    x_train1 = tf.concat((x_train1, cond10), axis=1)
+    x_train0 = np.squeeze(load_fsdd(x_train_SPECTROGRAMS_PATH))
+    x_train0 = np.concatenate((x_train0, cond01), axis=1)
+    x_train1 = np.squeeze(load_fsdd(x_train_SPECTROGRAMS_PATH))
+    x_train1 = np.concatenate((x_train1, cond10), axis=1)
     x_train = [x_train0, x_train1]
 
     y_train0 = load_fsdd(y_train0_SPECTROGRAMS_PATH)
     y_train1 = load_fsdd(y_train1_SPECTROGRAMS_PATH)
     y_train = [y_train0, y_train1]
 
-    x_val0 = load_fsdd(x_val_SPECTROGRAMS_PATH)
-    x_val0 = tf.concat((x_val0, cond01), axis=1)
-    x_val1 = load_fsdd(x_val_SPECTROGRAMS_PATH)
-    x_val1 = tf.concat((x_val1, cond10), axis=1)
+    x_val0 = np.squeeze(load_fsdd(x_val_SPECTROGRAMS_PATH))
+    x_val0 = np.concatenate((x_val0, cond01), axis=1)
+    x_val1 = np.squeeze(load_fsdd(x_val_SPECTROGRAMS_PATH))
+    x_val1 = np.concat((x_val1, cond10), axis=1)
     x_val = [x_val0, x_val1]
 
     y_val0 = load_fsdd(y_val0_SPECTROGRAMS_PATH)
     y_val1 = load_fsdd(y_val1_SPECTROGRAMS_PATH)
     y_val = [y_val0, y_val1]
+
+    x_train = np.expand_dims(x_train, axis=(0, -1))
+    # y_train = np.expand_dims(y_train, axis=(0, -1))
+    x_val = np.expand_dims(x_val, axis=(0, -1))
+    # y_val = np.expand_dims(y_val, axis=(0, -1))
 
     # PRINT SHAPES
     print('x_train.shape: ', x_train.shape)

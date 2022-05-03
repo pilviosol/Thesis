@@ -38,6 +38,19 @@ except OSError:
 callback_list = []
 
 
+cond = [[0, 1], [1, 0]]
+
+cond01 = []
+for a in range(825):
+    cond01.append(cond[0])
+
+cond10 = []
+for a in range(825):
+    cond10.append(cond[1])
+
+full_cond = cond01 + cond10
+
+
 class VAE:
     """
     VAE represents a Deep Convolutional variational autoencoder architecture
@@ -335,7 +348,12 @@ class VAE:
 
         x = Lambda(sample_point_from_normal_distribution,
                    name="encoder_output")([self.mu, self.log_variance])
-        return x
+
+        # here i added the following line (x_cond = np.concatenate((x, full_cond), axis=1))
+        # and changed the return from 'x' to 'x_cond'
+
+        x_cond = np.concatenate((x, full_cond), axis=1)
+        return x_cond
 
     def tsne(self, x_train, perplexity, title, annotations, color):
 
