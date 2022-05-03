@@ -1,8 +1,8 @@
 import shutil
 import pathlib
 
-origin_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/FW_normalised_flutes_TRAIN/"
-destination_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/reducted_flutes/"
+origin_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/keyboard_acoustic/"
+destination_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/matching_keyboard_VALID/"
 
 origin = pathlib.Path(origin_path).iterdir()
 destination = pathlib.Path(destination_path)
