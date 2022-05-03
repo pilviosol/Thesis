@@ -337,7 +337,7 @@ class VAE:
                    name="encoder_output")([self.mu, self.log_variance])
         return x
 
-    def tsne(self, x_train, perplexity, title, annotations):
+    def tsne(self, x_train, perplexity, title, annotations, color):
 
         encoded_inputs = self.encoder.predict(x_train)
 
@@ -348,7 +348,7 @@ class VAE:
         vis_x = vis_data[:, 0]
         vis_y = vis_data[:, 1]
 
-        plt.scatter(vis_x, vis_y, cmap=plt.cm.get_cmap("jet", 10), s=1)
+        plt.scatter(vis_x, vis_y, cmap=plt.cm.get_cmap("jet", 10), s=1000, c=color)
         plt.colorbar(ticks=range(10))
         plt.clim(-0.5, 9.5)
         plt.title(title)
@@ -357,6 +357,48 @@ class VAE:
         plt.show()
         return encoded_inputs
 
+    def tsne_hq(self, x_train, interpolation_points, perplexity, title, annotations, color):
+
+        encoded_inputs = self.encoder.predict(x_train)
+
+        # perform t-SNE embedding
+        vis_data = bh_sne(encoded_inputs.astype('float64'), perplexity=perplexity)
+        interp_data = bh_sne(interpolation_points.astype('float64'), perplexity=perplexity)
+
+        # plot the result
+        vis_x = vis_data[:, 0]
+        vis_y = vis_data[:, 1]
+
+        plt.scatter(vis_x, vis_y, cmap=plt.cm.get_cmap("jet", 10), s=1000, c=color[0])
+        plt.scatter(vis_x, interp_data, cmap=plt.cm.get_cmap("jet", 10), s=1000, c=color[1])
+
+        plt.colorbar(ticks=range(10))
+        plt.clim(-0.5, 9.5)
+        plt.title(title)
+        for i, txt in enumerate(annotations):
+            plt.annotate(txt, (vis_x[i], vis_y[i]))
+        plt.show()
+        return encoded_inputs
+
+    def tsne_interpolation(self, interpolation_points, perplexity, title, annotations, color):
+
+
+        # perform t-SNE embedding
+        vis_data = bh_sne(interpolation_points.astype('float64'), perplexity=perplexity)
+
+        # plot the result
+        vis_x = vis_data[:, 0]
+        vis_y = vis_data[:, 1]
+
+        plt.scatter(vis_x, vis_y, cmap=plt.cm.get_cmap("jet", 10), s=100, c=color[0])
+
+        plt.colorbar(ticks=range(10))
+        plt.clim(-0.5, 9.5)
+        plt.title(title)
+        for i, txt in enumerate(annotations):
+            plt.annotate(txt, (vis_x[i], vis_y[i]))
+        plt.show()
+        return vis_data
 
 
 

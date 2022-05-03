@@ -54,7 +54,7 @@ if __name__ == "__main__":
     # print('x_train.shape: ', x_train.shape)
     print('x_val.shape: ', x_val.shape)
     # encoded_x_train = vae.tsne(x_train, perplexity=5, title='x_train')
-    encoded_x_val = vae.tsne(x_val, perplexity=16, title='x_val', annotations=annotations)
+    encoded_x_val = vae.tsne(x_val, perplexity=16, title='x_val', annotations=annotations, color='red')
 
 
 print('debug')

@@ -17,6 +17,9 @@ images_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION/im
 wav_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION/wavs/wav" + folder_number + "/"
 min_max = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/string_folder_min_max.npy"
 SR = 16000
+annotations = []
+for i in range(10):
+    annotations.append(str(i))
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -36,6 +39,14 @@ spectrograms = load_fsdd(spectrograms)
 encoded_spectrograms = vae.encoder.predict(spectrograms)
 generated_image_vectors = np.asarray(interpolate(encoded_spectrograms[0].flatten(), encoded_spectrograms[1].flatten()))
 generated_spectrograms = vae.decoder.predict(generated_image_vectors)
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# TSNE ON GENERATED POINTS
+# ---------------------------------------------------------------------------------------------------------------------
+
+
+encoded_generated = vae.tsne_interpolation(generated_image_vectors, perplexity=3, title='x_val', annotations=annotations, color='red')
 
 
 # ---------------------------------------------------------------------------------------------------------------------
