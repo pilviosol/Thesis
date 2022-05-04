@@ -238,6 +238,9 @@ class VAE:
         self._build_autoencoder()
 
     def _build_autoencoder(self):
+        # qua gli devo passare anche un parametro al decoder in cui gli dico
+        # cosa decodare. Creo un parametro che passo nella costruzione della classe VAE che poi verrà
+        # utilizzato qui
         model_input = self._model_input
         model_output = self.decoder(self.encoder(model_input))
         self.model = Model(model_input, model_output, name="autoencoder")
@@ -251,7 +254,7 @@ class VAE:
         self.decoder = Model(decoder_input, decoder_output, name="decoder")
 
     def _add_decoder_input(self):
-        return Input(shape=self.latent_space_dim, name="decoder_input")
+        return Input(shape=self.latent_space_dim + 2, name="decoder_input")
 
     def _add_dense_layer(self, decoder_input):
         num_neurons = np.prod(self._shape_before_bottleneck)  # [1, 2, 4] -> 8
@@ -351,8 +354,13 @@ class VAE:
 
         # here i added the following line (x_cond = np.concatenate((x, full_cond), axis=1))
         # and changed the return from 'x' to 'x_cond'
+        indices = [0, 1]
+        depth = 2
+        one_hot = tf.one_hot(indices, depth)
+        # one_hot = tf.expand_dims(one_hot, axis=0)
+        # x_cond = tf.concat((x, one_hot[0]), axis=1)
+        x_cond = tf.concat([x, tf.expand_dims(one_hot[0], axis=0)], axis=1)
 
-        x_cond = np.concatenate((x, full_cond), axis=1)
         return x_cond
 
     def tsne(self, x_train, perplexity, title, annotations, color):
@@ -422,10 +430,10 @@ class VAE:
 
 if __name__ == "__main__":
     autoencoder = VAE(
-        input_shape=(28, 28, 1),
-        conv_filters=(32, 64, 64, 64),
-        conv_kernels=(3, 3, 3, 3),
-        conv_strides=(1, 2, 2, 1),
-        latent_space_dim=2
+        input_shape=(512, 64, 2),
+        conv_filters=(32, 32, 64, 64, 128),
+        conv_kernels=(6, 6, 6, 6, 6),
+        conv_strides=(2, 2, 2, 2, (2, 1)),
+        latent_space_dim=64
     )
     autoencoder.summary()

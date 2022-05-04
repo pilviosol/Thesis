@@ -1,4 +1,4 @@
-from functions import load_fsdd
+from functions import load_fsdd_concat, load_fsdd
 import pathlib
 from utils import *
 import wandb
@@ -56,47 +56,6 @@ CONV_STRIDES = config['conv_strides']
 
 
 # ---------------------------------------------------------------------------------------------------------------------
-# CONDITIONAL INPUTS
-# ---------------------------------------------------------------------------------------------------------------------
-
-def conditional_input(spectrograms_path, label):
-    """
-
-        :param spectrograms_path: where the normalised spectrograms are
-        :return: x_train, array with all spectrograms data appended
-
-        """
-    x_train = []
-    for root, _, file_names in os.walk(spectrograms_path):
-        count = 0
-        for file_name in sorted(file_names):
-            file_path = os.path.join(root, file_name)
-            spectrogram = np.load(file_path)  # (n_bins, n_frames, 1)
-            spectrogram = spectrogram[0:512, 0:63]
-            spectrogram_conc = np.concatenate((spectrogram, label), axis=1)
-            x_train.append(spectrogram_conc)
-            count += 1
-    x_train = np.array(x_train)
-    x_train = x_train[..., np.newaxis]  # -> (4130, 512, 256, 1)
-    return x_train
-
-
-
-    """ Builds the conditional input and returns the original input images, their labels and the conditional input."""
-
-    input_img = tf.keras.layers.InputLayer(input_shape=self.image_dim, dtype='float32')(inputs[0])
-    input_label = tf.keras.layers.InputLayer(input_shape=(self.label_dim,), dtype='float32')(inputs[1])
-    labels = tf.reshape(inputs[1], [-1, 1, 1, self.label_dim])  # batch_size, 1, 1, label_size
-    ones = tf.ones([inputs[0].shape[0]] + self.image_dim[0:-1] + [self.label_dim])  # batch_size, 64, 64, label_size
-    labels = ones * labels  # batch_size, 64, 64, label_size
-    conditional_input = tf.keras.layers.InputLayer(
-        input_shape=(self.image_dim[0], self.image_dim[1], self.image_dim[2] + self.label_dim), dtype='float32')(
-        tf.concat([inputs[0], labels], axis=3))
-
-    return input_img, input_label, conditional_input
-
-
-# ---------------------------------------------------------------------------------------------------------------------
 # RUN THE MAIN
 # ---------------------------------------------------------------------------------------------------------------------
 
@@ -105,30 +64,22 @@ if __name__ == "__main__":
     print('ollare CVAE')
 
     # LOAD X_TRAIN, Y_TRAIN, X_VAL AND Y_VAL
-    x_train0 = np.squeeze(load_fsdd(x_train_SPECTROGRAMS_PATH))
-    x_train0 = np.concatenate((x_train0, cond01), axis=1)
-    x_train1 = np.squeeze(load_fsdd(x_train_SPECTROGRAMS_PATH))
-    x_train1 = np.concatenate((x_train1, cond10), axis=1)
-    x_train = [x_train0, x_train1]
+    x_train0 = load_fsdd_concat(x_train_SPECTROGRAMS_PATH, 0)
+    x_train1 = load_fsdd_concat(x_train_SPECTROGRAMS_PATH, 1)
+    x_train = np.concatenate((x_train0, x_train1), axis=0)
 
     y_train0 = load_fsdd(y_train0_SPECTROGRAMS_PATH)
     y_train1 = load_fsdd(y_train1_SPECTROGRAMS_PATH)
-    y_train = [y_train0, y_train1]
+    y_train = np.concatenate((y_train0, y_train1), axis=0)
 
-    x_val0 = np.squeeze(load_fsdd(x_val_SPECTROGRAMS_PATH))
-    x_val0 = np.concatenate((x_val0, cond01), axis=1)
-    x_val1 = np.squeeze(load_fsdd(x_val_SPECTROGRAMS_PATH))
-    x_val1 = np.concat((x_val1, cond10), axis=1)
-    x_val = [x_val0, x_val1]
+    x_val0 = load_fsdd_concat(x_val_SPECTROGRAMS_PATH, 0)
+    x_val1 = load_fsdd_concat(x_val_SPECTROGRAMS_PATH, 1)
+    x_val = np.concatenate((x_val0, x_val1), axis=0)
 
     y_val0 = load_fsdd(y_val0_SPECTROGRAMS_PATH)
     y_val1 = load_fsdd(y_val1_SPECTROGRAMS_PATH)
-    y_val = [y_val0, y_val1]
+    y_val = np.concatenate((y_val0, y_val1), axis=0)
 
-    x_train = np.expand_dims(x_train, axis=(0, -1))
-    # y_train = np.expand_dims(y_train, axis=(0, -1))
-    x_val = np.expand_dims(x_val, axis=(0, -1))
-    # y_val = np.expand_dims(y_val, axis=(0, -1))
 
     # PRINT SHAPES
     print('x_train.shape: ', x_train.shape)

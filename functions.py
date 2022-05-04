@@ -347,19 +347,44 @@ def load_fsdd(spectrograms_path):
             spectrogram = np.load(file_path)  # (n_bins, n_frames, 1)
             # spectrogram = spectrogram[0:512, 0:64]
             x_train.append(spectrogram)
-            '''
-            if count % 100 == 0:
-                print(count, ", file_name: ", file_name)
-                plt.figure()
-                plt.imshow(spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 256, 0, 512],
-                           aspect='auto')
-                plt.title(str(count))
-                plt.colorbar()
-                plt.show()
-                plt.close()'''
             count += 1
     x_train = np.array(x_train)
     x_train = x_train[..., np.newaxis]  # -> (4130, 512, 256, 1)
+    return x_train
+
+
+def load_fsdd_concat(spectrograms_path, label):
+    """
+
+    :param spectrograms_path: where the normalised spectrograms are
+            label 1 or 0 depending on the label
+    :return: x_train, array with all spectrograms data appended
+
+    """
+    ones = np.ones([512, 64], dtype=float)
+    ones = np.expand_dims(ones, -1)
+    zeros = np.zeros([512, 64], dtype=float)
+    zeros = np.expand_dims(zeros, -1)
+
+    x_train = []
+    for root, _, file_names in os.walk(spectrograms_path):
+        count = 0
+        for file_name in sorted(file_names):
+            file_path = os.path.join(root, file_name)
+            spectrogram = np.load(file_path)  # (n_bins, n_frames, 1)
+            # spectrogram = spectrogram[0:512, 0:64]
+            spectrogram = np.expand_dims(spectrogram, -1)
+
+            if label == 1:
+                spectrogram = np.concatenate((spectrogram, ones), axis=2)
+            else:
+                spectrogram = np.concatenate((spectrogram, ones), axis=2)
+
+            x_train.append(spectrogram)
+            count += 1
+    x_train = np.array(x_train)
+    print(x_train.shape)
+    # x_train = x_train[..., np.newaxis]  # -> (825, 512, 256, 1)
     return x_train
 
 

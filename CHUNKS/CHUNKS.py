@@ -103,3 +103,42 @@ def train_step(self, data):
 def train(self, x_train, y_train, train_step):
     for inputs, target in zip(sorted(x_train), sorted(y_train)):
         train_step(inputs, target)
+
+
+
+
+def conditional_input(spectrograms_path, label):
+    """
+
+        :param spectrograms_path: where the normalised spectrograms are
+        :return: x_train, array with all spectrograms data appended
+
+        """
+    x_train = []
+    for root, _, file_names in os.walk(spectrograms_path):
+        count = 0
+        for file_name in sorted(file_names):
+            file_path = os.path.join(root, file_name)
+            spectrogram = np.load(file_path)  # (n_bins, n_frames, 1)
+            spectrogram = spectrogram[0:512, 0:63]
+            spectrogram_conc = np.concatenate((spectrogram, label), axis=1)
+            x_train.append(spectrogram_conc)
+            count += 1
+    x_train = np.array(x_train)
+    x_train = x_train[..., np.newaxis]  # -> (4130, 512, 256, 1)
+    return x_train
+
+
+
+    """ Builds the conditional input and returns the original input images, their labels and the conditional input."""
+
+    input_img = tf.keras.layers.InputLayer(input_shape=self.image_dim, dtype='float32')(inputs[0])
+    input_label = tf.keras.layers.InputLayer(input_shape=(self.label_dim,), dtype='float32')(inputs[1])
+    labels = tf.reshape(inputs[1], [-1, 1, 1, self.label_dim])  # batch_size, 1, 1, label_size
+    ones = tf.ones([inputs[0].shape[0]] + self.image_dim[0:-1] + [self.label_dim])  # batch_size, 64, 64, label_size
+    labels = ones * labels  # batch_size, 64, 64, label_size
+    conditional_input = tf.keras.layers.InputLayer(
+        input_shape=(self.image_dim[0], self.image_dim[1], self.image_dim[2] + self.label_dim), dtype='float32')(
+        tf.concat([inputs[0], labels], axis=3))
+
+    return input_img, input_label, conditional_input
