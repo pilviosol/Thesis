@@ -1,12 +1,10 @@
 from functions import load_fsdd
 import pathlib
-from VV_autoencoder import VAE
 from utils import *
 import wandb
 from WANDB import config
 from datetime import datetime
 from VV_train import train
-import tensorflow as tf
 from VV_autoencoder import cond01, cond10
 import numpy as np
 
