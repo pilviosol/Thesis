@@ -52,7 +52,7 @@ class VAE:
                  conv_kernels,
                  conv_strides,
                  latent_space_dim):
-        self.input_shape = input_shape  # [512, 64, 2]
+        self.input_shape = input_shape  # [512, 64, 1]
         self.conv_filters = conv_filters
         self.conv_kernels = conv_kernels
         self.conv_strides = conv_strides
