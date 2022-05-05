@@ -2,7 +2,7 @@ import os
 import pickle
 from tensorflow.keras import Model
 from tensorflow.keras.layers import Input, Conv2D, ReLU, BatchNormalization, \
-    Flatten, Dense, Reshape, Conv2DTranspose, Activation, Lambda
+    Flatten, Dense, Reshape, Conv2DTranspose, Activation, Lambda, Concatenate
 from tensorflow.keras import backend as K
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import MeanSquaredError
@@ -36,7 +36,6 @@ except OSError:
     print("Creation of the directory  failed")
 
 callback_list = []
-
 
 cond = [[0, 1], [1, 0]]
 
@@ -117,6 +116,7 @@ class VAE:
                     plt.savefig('/nas/home/spol/Thesis/saved_model/images_overfit/' + title)
                     plt.close()
                     wandb.log({"Y_train plots": [wandb.Image(fig, caption=title)]})
+
         callback_list.append(LambdaCallback(on_epoch_end=plot_and_save_while_training_overfit))
 
         self.model.fit(x_train,
@@ -128,7 +128,7 @@ class VAE:
 
     def train(self, x_train, y_train, x_val, y_val, batch_size, num_epochs):
         callback_list.append(WandbCallback())
-
+        '''
         def plot_and_save_while_training(epoch, logs):
 
             if epoch % 5 == 0:
@@ -151,7 +151,7 @@ class VAE:
                         plt.close()
                         wandb.log({"Validation set plots": [wandb.Image(fig, caption=title)]})
 
-        callback_list.append(LambdaCallback(on_epoch_end=plot_and_save_while_training))
+        callback_list.append(LambdaCallback(on_epoch_end=plot_and_save_while_training))'''
         callback_list.append(callback)
         self.model.fit(x_train,
                        y_train,
@@ -196,7 +196,7 @@ class VAE:
     def _calculate_combined_loss(self, y_target, y_predicted):
         reconstruction_loss = self._calculate_reconstruction_loss(y_target, y_predicted)
         kl_loss = self._calculate_kl_loss(y_target, y_predicted)
-        combined_loss = reconstruction_loss + self.kl_loss_weight*kl_loss
+        combined_loss = reconstruction_loss + self.kl_loss_weight * kl_loss
         train_loss(combined_loss)
         return combined_loss
 
@@ -254,7 +254,7 @@ class VAE:
         self.decoder = Model(decoder_input, decoder_output, name="decoder")
 
     def _add_decoder_input(self):
-        return Input(shape=self.latent_space_dim + 2, name="decoder_input")
+        return Input(shape=self.latent_space_dim +2, name="decoder_input")
 
     def _add_dense_layer(self, decoder_input):
         num_neurons = np.prod(self._shape_before_bottleneck)  # [1, 2, 4] -> 8
@@ -347,21 +347,15 @@ class VAE:
             epsilon = K.random_normal(shape=K.shape(self.mu), mean=0.,
                                       stddev=1.)
             sampled_point = mu + K.exp(log_variance / 2) * epsilon
-            return sampled_point
+            y = tf.constant([0, 1], dtype=float)
+            y = tf.expand_dims(y, axis=0)
+            sampled_point_concat = tf.concat((sampled_point, y), axis=-1)
+            return sampled_point_concat
 
         x = Lambda(sample_point_from_normal_distribution,
                    name="encoder_output")([self.mu, self.log_variance])
 
-        # here i added the following line (x_cond = np.concatenate((x, full_cond), axis=1))
-        # and changed the return from 'x' to 'x_cond'
-        indices = [0, 1]
-        depth = 2
-        one_hot = tf.one_hot(indices, depth)
-        # one_hot = tf.expand_dims(one_hot, axis=0)
-        # x_cond = tf.concat((x, one_hot[0]), axis=1)
-        x_cond = tf.concat([x, tf.expand_dims(one_hot[0], axis=0)], axis=1)
-
-        return x_cond
+        return x
 
     def tsne(self, x_train, perplexity, title, annotations, color):
 
@@ -408,7 +402,6 @@ class VAE:
 
     def tsne_interpolation(self, interpolation_points, perplexity, title, annotations, color):
 
-
         # perform t-SNE embedding
         vis_data = bh_sne(interpolation_points.astype('float64'), perplexity=perplexity)
 
@@ -425,7 +418,6 @@ class VAE:
             plt.annotate(txt, (vis_x[i], vis_y[i]))
         plt.show()
         return vis_data
-
 
 
 if __name__ == "__main__":

@@ -30,7 +30,7 @@ set_gpu(-1)
 
 path_features_matching_flute_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/reducted_flutes/'
 path_features_matching_string_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/reducted_strings/'
-path_features_matching_keyboard_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/reducted_strings/'
+path_features_matching_keyboard_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/reducted_keyboards/'
 
 path_features_matching_flute_val = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/FW_normalised_flute_0305_VALID/"
 path_features_matching_string_val = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/FW_normalised_string_0305_VALID/"
@@ -68,16 +68,26 @@ if __name__ == "__main__":
     x_train1 = load_fsdd_concat(x_train_SPECTROGRAMS_PATH, 1)
     x_train = np.concatenate((x_train0, x_train1), axis=0)
 
+    '''
     y_train0 = load_fsdd(y_train0_SPECTROGRAMS_PATH)
     y_train1 = load_fsdd(y_train1_SPECTROGRAMS_PATH)
+    y_train = np.concatenate((y_train0, y_train1), axis=0) '''
+
+    y_train0 = load_fsdd_concat(y_train0_SPECTROGRAMS_PATH, 0)
+    y_train1 = load_fsdd_concat(y_train1_SPECTROGRAMS_PATH, 1)
     y_train = np.concatenate((y_train0, y_train1), axis=0)
 
     x_val0 = load_fsdd_concat(x_val_SPECTROGRAMS_PATH, 0)
     x_val1 = load_fsdd_concat(x_val_SPECTROGRAMS_PATH, 1)
     x_val = np.concatenate((x_val0, x_val1), axis=0)
 
+    '''
     y_val0 = load_fsdd(y_val0_SPECTROGRAMS_PATH)
     y_val1 = load_fsdd(y_val1_SPECTROGRAMS_PATH)
+    y_val = np.concatenate((y_val0, y_val1), axis=0)'''
+
+    y_val0 = load_fsdd_concat(y_val0_SPECTROGRAMS_PATH, 0)
+    y_val1 = load_fsdd_concat(y_val1_SPECTROGRAMS_PATH, 1)
     y_val = np.concatenate((y_val0, y_val1), axis=0)
 
 

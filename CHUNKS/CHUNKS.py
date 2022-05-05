@@ -142,3 +142,69 @@ def conditional_input(spectrograms_path, label):
         tf.concat([inputs[0], labels], axis=3))
 
     return input_img, input_label, conditional_input
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# here i added the following line (x_cond = np.concatenate((x, full_cond), axis=1))
+        # and changed the return from 'x' to 'x_cond'
+        indices = [0, 1]
+        depth = 2
+        one_hot = tf.one_hot(indices, depth)
+        first = one_hot[0]
+        first = tf.constant([
+                             [0, 1]
+                             ], dtype=tf.float32)
+        def concaten(args):
+            x = args
+            shape0 = tf.shape(x)[0]
+            shape1 = tf.shape(x)[1]
+
+            conditioning = tf.constant([0, 1], shape=(shape0, shape1, 2), dtype=tf.float32)
+            # conditioning = tf.expand_dims(conditioning, axis=0)
+            x_cond = tf.concat([x, conditioning], axis=2)
+
+
+
+            a = np.asarray([0, 1])
+            b = np.asarray([0, 1])
+            for i in range(shape1-1):
+                b = np.concatenate((b, a), axis=0)
+
+            c = np.reshape(b, (16, 2))
+            d = np.expand_dims(c, -1)
+            e = tf.convert_to_tensor(d)
+            x_cond = tf.concat([x, e], axis=2)
+            return x_cond
+
+        # first = tf.transpose(first)
+        # one_hot = tf.expand_dims(one_hot, axis=0)
+        # x_cond = tf.concat((x, one_hot[0]), axis=1)
+        # print('oooooooooooooooooootf.shape(x)', tf.shape(first))
+        # x_cond = Lambda(tf.concat([x, first], axis=1), name='concat')
+        x_cond = Lambda(concaten, name="concat")([x])
+        # x_cond = tf.keras.layers.concatenate([x, first], axis=1, name='concat')

@@ -383,7 +383,7 @@ def load_fsdd_concat(spectrograms_path, label):
             x_train.append(spectrogram)
             count += 1
     x_train = np.array(x_train)
-    print(x_train.shape)
+    # print(x_train.shape)
     # x_train = x_train[..., np.newaxis]  # -> (825, 512, 256, 1)
     return x_train
 
