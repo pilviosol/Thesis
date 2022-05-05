@@ -208,3 +208,8 @@ def conditional_input(spectrograms_path, label):
         # x_cond = Lambda(tf.concat([x, first], axis=1), name='concat')
         x_cond = Lambda(concaten, name="concat")([x])
         # x_cond = tf.keras.layers.concatenate([x, first], axis=1, name='concat')
+
+
+x_train0 = load_fsdd_concat(x_train_SPECTROGRAMS_PATH, 0)
+x_train1 = load_fsdd_concat(x_train_SPECTROGRAMS_PATH, 1)
+x_train = np.concatenate((x_train0, x_train1), axis=0)

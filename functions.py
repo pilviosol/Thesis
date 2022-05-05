@@ -378,13 +378,12 @@ def load_fsdd_concat(spectrograms_path, label):
             if label == 1:
                 spectrogram = np.concatenate((spectrogram, ones), axis=2)
             else:
-                spectrogram = np.concatenate((spectrogram, ones), axis=2)
+                spectrogram = np.concatenate((spectrogram, zeros), axis=2)
 
             x_train.append(spectrogram)
             count += 1
     x_train = np.array(x_train)
-    # print(x_train.shape)
-    # x_train = x_train[..., np.newaxis]  # -> (825, 512, 256, 1)
+
     return x_train
 
 

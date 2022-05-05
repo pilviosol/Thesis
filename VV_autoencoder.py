@@ -37,17 +37,6 @@ except OSError:
 
 callback_list = []
 
-cond = [[0, 1], [1, 0]]
-
-cond01 = []
-for a in range(825):
-    cond01.append(cond[0])
-
-cond10 = []
-for a in range(825):
-    cond10.append(cond[1])
-
-full_cond = cond01 + cond10
 
 
 class VAE:
@@ -63,11 +52,11 @@ class VAE:
                  conv_kernels,
                  conv_strides,
                  latent_space_dim):
-        self.input_shape = input_shape  # [28, 28, 1]
-        self.conv_filters = conv_filters  # [2, 4, 8]
-        self.conv_kernels = conv_kernels  # [3, 5, 3]
-        self.conv_strides = conv_strides  # [1, 2, 2]
-        self.latent_space_dim = latent_space_dim  # 2
+        self.input_shape = input_shape  # [512, 64, 2]
+        self.conv_filters = conv_filters
+        self.conv_kernels = conv_kernels
+        self.conv_strides = conv_strides
+        self.latent_space_dim = latent_space_dim
         # self.reconstruction_loss_weight = 1000000
         # self.reconstruction_loss_weight = config['kl_alpha']
         self.kl_loss_weight = config['kl_beta']
@@ -238,9 +227,6 @@ class VAE:
         self._build_autoencoder()
 
     def _build_autoencoder(self):
-        # qua gli devo passare anche un parametro al decoder in cui gli dico
-        # cosa decodare. Creo un parametro che passo nella costruzione della classe VAE che poi verrà
-        # utilizzato qui
         model_input = self._model_input
         model_output = self.decoder(self.encoder(model_input))
         self.model = Model(model_input, model_output, name="autoencoder")
@@ -254,11 +240,12 @@ class VAE:
         self.decoder = Model(decoder_input, decoder_output, name="decoder")
 
     def _add_decoder_input(self):
-        return Input(shape=self.latent_space_dim +2, name="decoder_input")
+        X = Input(shape=self.latent_space_dim, name="decoder_input")
+        return X
 
     def _add_dense_layer(self, decoder_input):
         num_neurons = np.prod(self._shape_before_bottleneck)  # [1, 2, 4] -> 8
-        dense_layer = Dense(num_neurons, name="decoder_dense")(decoder_input)
+        dense_layer = Dense(num_neurons + 2, name="decoder_dense")(decoder_input)
         return dense_layer
 
     def _add_reshape_layer(self, dense_layer):
@@ -300,13 +287,34 @@ class VAE:
 
     def _build_encoder(self):
         encoder_input = self._add_encoder_input()
-        conv_layers = self._add_conv_layers(encoder_input)
+        encoder_cond = self._add_encoder_cond()
+        decoder_cond = self._add_decoder_cond()
+        encoder_concat = self._add_encoder_concatenation(encoder_input, encoder_cond)
+        conv_layers = self._add_conv_layers(encoder_concat)
         bottleneck = self._add_bottleneck(conv_layers)
-        self._model_input = encoder_input
-        self.encoder = Model(encoder_input, bottleneck, name="encoder")
+        bottleneck_concateated = self._add_bottleneck_concatenation(bottleneck, decoder_cond)
+        self._model_input = [encoder_input, encoder_cond, decoder_cond]
+        self.encoder = Model([encoder_input, encoder_cond, decoder_cond], bottleneck_concateated, name="encoder")
+
+    '''def _add_encoder_input(self):
+        return Input(shape=self.input_shape, name="encoder_input")'''
 
     def _add_encoder_input(self):
-        return Input(shape=self.input_shape, name="encoder_input")
+        X = Input(shape=self.input_shape, name="encoder_input")
+        return X
+
+    def _add_encoder_cond(self):
+        cond_enc = Input(shape=self.input_shape, name="encoder_cond_input")
+        return cond_enc
+
+    def _add_encoder_concatenation(self, x, cond_enc):
+        inputs = Concatenate(axis=-1, name="encoder_concat_input")([x, cond_enc])
+        return inputs
+
+    def _add_decoder_cond(self):
+        cond_dec = Input(shape=2, name="decoder_cond_input")
+        return cond_dec
+
 
     def _add_conv_layers(self, encoder_input):
         """Create all convolutional blocks in encoder."""
@@ -347,14 +355,15 @@ class VAE:
             epsilon = K.random_normal(shape=K.shape(self.mu), mean=0.,
                                       stddev=1.)
             sampled_point = mu + K.exp(log_variance / 2) * epsilon
-            y = tf.constant([0, 1], dtype=float)
-            y = tf.expand_dims(y, axis=0)
-            sampled_point_concat = tf.concat((sampled_point, y), axis=-1)
-            return sampled_point_concat
+
+            return sampled_point
 
         x = Lambda(sample_point_from_normal_distribution,
                    name="encoder_output")([self.mu, self.log_variance])
+        return x
 
+    def _add_bottleneck_concatenation(self, z, cond_dec):
+        x = Concatenate(axis=-1, name="bottleneack_concat")([z, cond_dec])
         return x
 
     def tsne(self, x_train, perplexity, title, annotations, color):
@@ -422,7 +431,7 @@ class VAE:
 
 if __name__ == "__main__":
     autoencoder = VAE(
-        input_shape=(512, 64, 2),
+        input_shape=(512, 64, 1),
         conv_filters=(32, 32, 64, 64, 128),
         conv_kernels=(6, 6, 6, 6, 6),
         conv_strides=(2, 2, 2, 2, (2, 1)),

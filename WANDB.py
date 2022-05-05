@@ -17,7 +17,7 @@ wandb.config = {
     "kl_beta": 0.0001,
 
 
-    "input_shape": (512, 64, 2),
+    "input_shape": (512, 64, 1),
     "conv_filters": (32, 32, 64, 64, 128),
     "conv_kernels": (6, 6, 6, 6, 6),
     "conv_strides": (2, 2, 2, 2, (2, 1)),
