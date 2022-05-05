@@ -240,12 +240,12 @@ class VAE:
         self.decoder = Model(decoder_input, decoder_output, name="decoder")
 
     def _add_decoder_input(self):
-        X = Input(shape=self.latent_space_dim, name="decoder_input")
+        X = Input(shape=self.latent_space_dim + 2, name="decoder_input")
         return X
 
     def _add_dense_layer(self, decoder_input):
         num_neurons = np.prod(self._shape_before_bottleneck)  # [1, 2, 4] -> 8
-        dense_layer = Dense(num_neurons + 2, name="decoder_dense")(decoder_input)
+        dense_layer = Dense(num_neurons, name="decoder_dense")(decoder_input)
         return dense_layer
 
     def _add_reshape_layer(self, dense_layer):
