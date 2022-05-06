@@ -18,6 +18,9 @@ with open('/nas/home/spol/Thesis/last_date.txt') as f:
 
 normalised_flute_features_TEST = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/FW_normalised_flute_0605_TEST/"
 path_save_figures = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/IMAGES_0605/"
+SR =16000
+generated_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/GENERATED/GENERATED_0605/"
+
 # ---------------------------------------------------------------------------------------------------------------------
 # CREATE CONDITIONING LABELS
 # ---------------------------------------------------------------------------------------------------------------------
@@ -84,6 +87,31 @@ for idx, element in enumerate(spectrograms):
     plt.savefig(path_save_figures + str(idx))
     plt.show()
     plt.close()
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# DE-NORMALISE OUTPUTS
+# ---------------------------------------------------------------------------------------------------------------------
+
+min_max_keyboard = np.load('/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/keyboard_folder_min_max.npy')
+
+for idx, element in enumerate(spectrograms):
+    element = np.squeeze(element)
+    print(element.shape)
+    print(idx)
+    denormalised_spectrogram = denormalise(element, min_max_keyboard[0][1], min_max_keyboard[0][0])
+
+    fig = plt.figure()
+    img = plt.imshow(denormalised_spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 64, 0, 512], aspect='auto')
+    plt.title("denormalised_" + str(idx))
+    plt.colorbar()
+    plt.savefig(path_save_figures + "denormalised_" + str(idx))
+    plt.show()
+    plt.close()
+
+    spectrogram = 10 ** (denormalised_spectrogram / 10) - 1e-5
+    reconstructed = librosa.griffinlim(spectrogram, n_iter=32, hop_length=128)
+    scipy.io.wavfile.write(generated_path + "denormalised_" + str(idx) + '.wav', SR, reconstructed)
 
 
 print('debaggone')
