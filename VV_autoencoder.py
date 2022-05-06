@@ -117,13 +117,13 @@ class VAE:
 
     def train(self, x_train, y_train, x_val, y_val, batch_size, num_epochs):
         callback_list.append(WandbCallback())
-        '''
+
         def plot_and_save_while_training(epoch, logs):
 
             if epoch % 5 == 0:
-                a = self.model.predict(y_val)
+                a = self.model.predict(x_val)
 
-                for i in range(len(y_val)):
+                for i in range(len(x_val)):
                     element = a[i]
                     element = np.squeeze(element)
 
@@ -140,7 +140,7 @@ class VAE:
                         plt.close()
                         wandb.log({"Validation set plots": [wandb.Image(fig, caption=title)]})
 
-        callback_list.append(LambdaCallback(on_epoch_end=plot_and_save_while_training))'''
+        callback_list.append(LambdaCallback(on_epoch_end=plot_and_save_while_training))
         callback_list.append(callback)
         self.model.fit(x_train,
                        y_train,

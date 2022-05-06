@@ -1,4 +1,4 @@
-from functions import load_fsdd_concat, load_fsdd
+from functions import load_fsdd
 import pathlib
 from utils import *
 import wandb
@@ -6,12 +6,7 @@ from WANDB import config
 from datetime import datetime
 from VV_autoencoder import VAE
 import numpy as np
-from tensorflow.keras import Model
-from tensorflow.keras.layers import Input, Conv2D, ReLU, BatchNormalization, \
-    Flatten, Dense, Reshape, Conv2DTranspose, Activation, Lambda, Concatenate
-from tensorflow.keras import backend as K
-from tensorflow.keras.optimizers import Adam
-import os
+
 
 # ---------------------------------------------------------------------------------------------------------------------
 # SET UP WANDB, SELECT GPU AND INSTANTIATING DATE AND TIME TO SAVE MODEL WITH THAT NAME
@@ -56,6 +51,8 @@ CONV_FILTERS = config['conv_filters']
 CONV_KERNELS = config['conv_kernels']
 CONV_STRIDES = config['conv_strides']
 
+
+# ENCODER CONDITIONING MATRICES
 ones = np.ones([512, 64], dtype=float)
 ones = np.expand_dims(ones, (-1, 0))
 ones_train = np.repeat(ones, 824, axis=0)
@@ -69,6 +66,8 @@ zeros_val = np.repeat(zeros, 46, axis=0)
 cond_enc_train = np.concatenate((ones_train, zeros_train), axis=0)
 cond_enc_val = np.concatenate((ones_val, zeros_val), axis=0)
 
+
+# DECODER CONDITIONING VECTORS
 cond01 = np.asarray([0, 1])
 cond01 = np.expand_dims(cond01, axis=0)
 cond01_train = np.repeat(cond01, 824, axis=0)
