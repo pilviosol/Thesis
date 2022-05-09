@@ -56,7 +56,7 @@ cond_dec_test = np.concatenate((cond01_test, cond10_test), axis=0)
 
 
 # vae = VAE.load("/nas/home/spol/Thesis/saved_model/" + date)
-vae = VAE.load("/nas/home/spol/Thesis/saved_model/CVAE/06-05-2022_01:36")
+vae = VAE.load("/nas/home/spol/Thesis/saved_model/CVAE/09-05-2022_17:49")
 
 def generate(spectrograms):
     generated_spectrograms, latent_representations = vae.reconstruct(spectrograms)

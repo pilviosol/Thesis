@@ -58,6 +58,10 @@ ones = np.expand_dims(ones, (-1, 0))
 ones_train = np.repeat(ones, 824, axis=0)
 ones_val = np.repeat(ones, 46, axis=0)
 
+dues_train = np.add(ones_train, ones_train)
+dues_val = np.add(ones_val, ones_val)
+
+
 zeros = np.zeros([512, 64], dtype=float)
 zeros = np.expand_dims(zeros, (-1, 0))
 zeros_train = np.repeat(zeros, 824, axis=0)
@@ -66,6 +70,9 @@ zeros_val = np.repeat(zeros, 46, axis=0)
 cond_enc_train = np.concatenate((ones_train, zeros_train), axis=0)
 cond_enc_val = np.concatenate((ones_val, zeros_val), axis=0)
 
+'''
+cond_enc_train = np.concatenate((ones_train, dues_train), axis=0)
+cond_enc_val = np.concatenate((ones_val, dues_val), axis=0) '''
 
 # DECODER CONDITIONING VECTORS
 cond01 = np.asarray([0, 1])

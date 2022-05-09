@@ -22,7 +22,7 @@ train_loss = tf.keras.metrics.Mean(name="train_loss")
 train_kl_loss = tf.keras.metrics.Mean(name="train_kl_loss")
 train_reconstruction_loss = tf.keras.metrics.Mean(name="train_reconstruction_loss")
 
-callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=150, verbose=1, restore_best_weights=False)
+callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=50, verbose=1, restore_best_weights=False)
 
 # gpus = tf.config.list_logical_devices('GPU')
 # strategy = tf.distribute.MirroredStrategy(gpus)
@@ -123,11 +123,11 @@ class VAE:
             if epoch % 5 == 0:
                 a = self.model.predict(x_val)
 
-                for i in range(len(x_val)):
+                for i in range(len(x_val[0])):
                     element = a[i]
                     element = np.squeeze(element)
 
-                    if i % 10 == 0:
+                    if i % 2 == 0:
                         fig = plt.figure()
                         img = plt.imshow(element, cmap=plt.cm.viridis, origin='lower', extent=[0, 256, 0, 512],
                                          aspect='auto')
@@ -270,7 +270,7 @@ class VAE:
         )
         x = conv_transpose_layer(x)
         x = ReLU(name=f"decoder_relu_{layer_num}")(x)
-        x = BatchNormalization(name=f"decoder_bn_{layer_num}")(x)
+        # x = BatchNormalization(name=f"decoder_bn_{layer_num}")(x)
         return x
 
     def _add_decoder_output(self, x):
@@ -337,7 +337,7 @@ class VAE:
         )
         x = conv_layer(x)
         x = ReLU(name=f"encoder_relu_{layer_number}")(x)
-        x = BatchNormalization(name=f"encoder_bn_{layer_number}")(x)
+        # x = BatchNormalization(name=f"encoder_bn_{layer_number}")(x)
         return x
 
     def _add_bottleneck(self, x):

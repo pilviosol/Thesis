@@ -11,10 +11,10 @@ wandb.config = {
     "training_on_x_train_only": False,
     "epochs": 1000,
     "learning_rate": 0.0001,
-    "batch_size": 4,
+    "batch_size": 32,
     "latent_dim": 64,
     # "kl_alpha": 1000,
-    "kl_beta": 0.0001,
+    "kl_beta": 0.000001,
 
 
     "input_shape": (512, 64, 1),
