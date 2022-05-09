@@ -14,7 +14,7 @@ wandb.config = {
     "batch_size": 32,
     "latent_dim": 64,
     # "kl_alpha": 1000,
-    "kl_beta": 0.000001,
+    "kl_beta": 1,
 
 
     "input_shape": (512, 64, 1),

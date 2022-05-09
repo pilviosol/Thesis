@@ -127,7 +127,7 @@ class VAE:
                     element = a[i]
                     element = np.squeeze(element)
 
-                    if i % 2 == 0:
+                    if i % 5 == 0:
                         fig = plt.figure()
                         img = plt.imshow(element, cmap=plt.cm.viridis, origin='lower', extent=[0, 256, 0, 512],
                                          aspect='auto')
@@ -270,7 +270,7 @@ class VAE:
         )
         x = conv_transpose_layer(x)
         x = ReLU(name=f"decoder_relu_{layer_num}")(x)
-        # x = BatchNormalization(name=f"decoder_bn_{layer_num}")(x)
+        x = BatchNormalization(name=f"decoder_bn_{layer_num}")(x)
         return x
 
     def _add_decoder_output(self, x):
@@ -337,7 +337,7 @@ class VAE:
         )
         x = conv_layer(x)
         x = ReLU(name=f"encoder_relu_{layer_number}")(x)
-        # x = BatchNormalization(name=f"encoder_bn_{layer_number}")(x)
+        x = BatchNormalization(name=f"encoder_bn_{layer_number}")(x)
         return x
 
     def _add_bottleneck(self, x):
