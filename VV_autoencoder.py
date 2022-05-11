@@ -22,7 +22,7 @@ train_loss = tf.keras.metrics.Mean(name="train_loss")
 train_kl_loss = tf.keras.metrics.Mean(name="train_kl_loss")
 train_reconstruction_loss = tf.keras.metrics.Mean(name="train_reconstruction_loss")
 
-callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=50, verbose=1, restore_best_weights=False)
+callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=200, verbose=1, restore_best_weights=True)
 
 # gpus = tf.config.list_logical_devices('GPU')
 # strategy = tf.distribute.MirroredStrategy(gpus)
@@ -84,7 +84,7 @@ class VAE:
                                     self._calculate_kl_loss])
 
     def train_overfit(self, x_train, y_train, batch_size, num_epochs):
-        callback_list.append(WandbCallback())
+        # callback_list.append(WandbCallback())
 
         def plot_and_save_while_training_overfit(epoch, logs):
 
@@ -104,9 +104,9 @@ class VAE:
                     plt.tight_layout()
                     plt.savefig('/nas/home/spol/Thesis/saved_model/images_overfit/' + title)
                     plt.close()
-                    wandb.log({"Y_train plots": [wandb.Image(fig, caption=title)]})
+                    # wandb.log({"Y_train plots": [wandb.Image(fig, caption=title)]})
 
-        callback_list.append(LambdaCallback(on_epoch_end=plot_and_save_while_training_overfit))
+        # callback_list.append(LambdaCallback(on_epoch_end=plot_and_save_while_training_overfit))
 
         self.model.fit(x_train,
                        y_train,
@@ -120,7 +120,7 @@ class VAE:
 
         def plot_and_save_while_training(epoch, logs):
 
-            if epoch % 5 == 0:
+            if epoch % 20 == 0:
                 a = self.model.predict(x_val)
 
                 for i in range(len(x_val[0])):
@@ -146,7 +146,7 @@ class VAE:
                        y_train,
                        batch_size=batch_size,
                        epochs=num_epochs,
-                       shuffle=False,
+                       shuffle=True,
                        callbacks=callback_list,
                        validation_data=(x_val, y_val))
 
@@ -191,13 +191,13 @@ class VAE:
 
     def _calculate_reconstruction_loss(self, y_target, y_predicted):
         error = y_target - y_predicted
-        reconstruction_loss = K.mean(K.square(error), axis=[1, 2, 3])
+        reconstruction_loss = np.prod((512, 64))*K.mean(K.square(error), axis=[1, 2, 3])
         train_reconstruction_loss(reconstruction_loss)
         return reconstruction_loss
 
     def _calculate_kl_loss(self, y_target, y_predicted):
         kl_loss = -0.5 * K.sum(1 + self.log_variance - K.square(self.mu) -
-                               K.exp(self.log_variance), axis=1)
+                               K.exp(self.log_variance), axis=-1)
         train_kl_loss(kl_loss)
         return kl_loss
 
@@ -237,6 +237,7 @@ class VAE:
         reshape_layer = self._add_reshape_layer(dense_layer)
         conv_transpose_layers = self._add_conv_transpose_layers(reshape_layer)
         decoder_output = self._add_decoder_output(conv_transpose_layers)
+        # decoder_output2 = self._add_decoder_output2(decoder_output)
         self.decoder = Model(decoder_input, decoder_output, name="decoder")
 
     def _add_decoder_input(self):
@@ -270,7 +271,7 @@ class VAE:
         )
         x = conv_transpose_layer(x)
         x = ReLU(name=f"decoder_relu_{layer_num}")(x)
-        x = BatchNormalization(name=f"decoder_bn_{layer_num}")(x)
+        x = BatchNormalization(axis=-1, name=f"decoder_bn_{layer_num}")(x)
         return x
 
     def _add_decoder_output(self, x):
@@ -278,8 +279,21 @@ class VAE:
             filters=1,
             kernel_size=self.conv_kernels[0],
             strides=self.conv_strides[0],
+            # strides=1,
             padding="same",
             name=f"decoder_conv_transpose_layer_{self._num_conv_layers}"
+        )
+        x = conv_transpose_layer(x)
+        output_layer = Activation("sigmoid", name="sigmoid_layer")(x)
+        return output_layer
+
+    def _add_decoder_output2(self, x):
+        conv_transpose_layer = Conv2DTranspose(
+            filters=1,
+            kernel_size=self.conv_kernels[0],
+            strides=1,
+            padding="same",
+            name=f"decoder2_conv_transpose_layer_{self._num_conv_layers}"
         )
         x = conv_transpose_layer(x)
         output_layer = Activation("sigmoid", name="sigmoid_layer")(x)
@@ -337,7 +351,7 @@ class VAE:
         )
         x = conv_layer(x)
         x = ReLU(name=f"encoder_relu_{layer_number}")(x)
-        x = BatchNormalization(name=f"encoder_bn_{layer_number}")(x)
+        x = BatchNormalization(axis=-1, name=f"encoder_bn_{layer_number}")(x)
         return x
 
     def _add_bottleneck(self, x):

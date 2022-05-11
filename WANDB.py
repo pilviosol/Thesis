@@ -9,17 +9,18 @@ wandb.config = {
 
     "using_validation_set": True,
     "training_on_x_train_only": False,
-    "epochs": 1000,
+    "batch_norm_layers": True,
+    "epochs": 10000,
     "learning_rate": 0.0001,
-    "batch_size": 32,
+    "batch_size": 64,
     "latent_dim": 64,
     # "kl_alpha": 1000,
     "kl_beta": 1,
 
 
     "input_shape": (512, 64, 1),
-    "conv_filters": (32, 32, 64, 64, 128),
-    "conv_kernels": (6, 6, 6, 6, 6),
+    "conv_filters": (16, 16, 32, 32, 64),
+    "conv_kernels": (3, 3, 3, 3, 3),
     "conv_strides": (2, 2, 2, 2, (2, 1)),
 
     # "input_shape": (512, 256, 1),

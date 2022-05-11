@@ -19,7 +19,7 @@ with open('/nas/home/spol/Thesis/last_date.txt') as f:
 normalised_flute_features_TEST = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/FW_normalised_flute_0605_TEST/"
 path_save_figures = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/IMAGES_0605/"
 SR =16000
-generated_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/GENERATED/GENERATED_0605/"
+generated_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/GENERATED/GENERATED_1105/"
 
 # ---------------------------------------------------------------------------------------------------------------------
 # CREATE CONDITIONING LABELS
@@ -56,7 +56,7 @@ cond_dec_test = np.concatenate((cond01_test, cond10_test), axis=0)
 
 
 # vae = VAE.load("/nas/home/spol/Thesis/saved_model/" + date)
-vae = VAE.load("/nas/home/spol/Thesis/saved_model/CVAE/09-05-2022_21:47")
+vae = VAE.load("/nas/home/spol/Thesis/saved_model/CVAE/11-05-2022_12:30")
 
 def generate(spectrograms):
     generated_spectrograms, latent_representations = vae.reconstruct(spectrograms)

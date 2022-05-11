@@ -19,6 +19,7 @@ file2 = open(r"/nas/home/spol/Thesis/last_date.txt", "w+")
 file2.write(dt_string)
 file2.close()
 
+
 wandb.init(project="my-test-project", entity="pilviosol", name=dt_string, config=config)
 set_gpu(-1)
 
@@ -70,6 +71,7 @@ zeros_val = np.repeat(zeros, 46, axis=0)
 cond_enc_train = np.concatenate((ones_train, zeros_train), axis=0)
 cond_enc_val = np.concatenate((ones_val, zeros_val), axis=0)
 
+
 '''
 cond_enc_train = np.concatenate((ones_train, dues_train), axis=0)
 cond_enc_val = np.concatenate((ones_val, dues_val), axis=0) '''
@@ -87,6 +89,8 @@ cond10_val = np.repeat(cond10, 46, axis=0)
 
 cond_dec_train = np.concatenate((cond01_train, cond10_train), axis=0)
 cond_dec_val = np.concatenate((cond01_val, cond10_val), axis=0)
+
+
 
 
 # ---------------------------------------------------------------------------------------------------------------------
