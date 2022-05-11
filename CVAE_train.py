@@ -91,8 +91,6 @@ cond_dec_train = np.concatenate((cond01_train, cond10_train), axis=0)
 cond_dec_val = np.concatenate((cond01_val, cond10_val), axis=0)
 
 
-
-
 # ---------------------------------------------------------------------------------------------------------------------
 # DEFINE TRAIN FUNCTION
 # ---------------------------------------------------------------------------------------------------------------------
@@ -119,6 +117,8 @@ def train(x_train, y_train, x_val, y_val, learning_rate, batch_size, epochs):
 
 if __name__ == "__main__":
     print('ollare CVAE')
+
+
 
     # LOAD X_TRAIN, Y_TRAIN, X_VAL AND Y_VAL
     x_train0 = load_fsdd(x_train_SPECTROGRAMS_PATH)
@@ -149,3 +149,4 @@ if __name__ == "__main__":
     # TRAIN MODEL
     autoencoder = train(x_train, y_train, x_val, y_val, LEARNING_RATE, BATCH_SIZE, EPOCHS)
     autoencoder.save("/nas/home/spol/Thesis/saved_model/CVAE/" + dt_string)
+    encoded_x_val = autoencoder.tsne(x_val, perplexity=16, title='x_val', annotations=annotations, color='red')

@@ -38,7 +38,6 @@ except OSError:
 callback_list = []
 
 
-
 class VAE:
     """
     VAE represents a Deep Convolutional variational autoencoder architecture
@@ -191,7 +190,7 @@ class VAE:
 
     def _calculate_reconstruction_loss(self, y_target, y_predicted):
         error = y_target - y_predicted
-        reconstruction_loss = np.prod((512, 64))*K.mean(K.square(error), axis=[1, 2, 3])
+        reconstruction_loss = np.prod((512, 64)) * K.mean(K.square(error), axis=[1, 2, 3])
         train_reconstruction_loss(reconstruction_loss)
         return reconstruction_loss
 
@@ -329,7 +328,6 @@ class VAE:
         cond_dec = Input(shape=2, name="decoder_cond_input")
         return cond_dec
 
-
     def _add_conv_layers(self, encoder_input):
         """Create all convolutional blocks in encoder."""
         x = encoder_input
@@ -391,7 +389,7 @@ class VAE:
         vis_x = vis_data[:, 0]
         vis_y = vis_data[:, 1]
 
-        plt.scatter(vis_x, vis_y, cmap=plt.cm.get_cmap("jet", 10), s=1000, c=color)
+        plt.scatter(vis_x, vis_y, cmap=plt.cm.get_cmap("jet", 10), s=100, c=color)
         plt.colorbar(ticks=range(10))
         plt.clim(-0.5, 9.5)
         plt.title(title)
@@ -399,6 +397,38 @@ class VAE:
             plt.annotate(txt, (vis_x[i], vis_y[i]))
         plt.show()
         return encoded_inputs
+
+    def tsne_nuova(self, x_val0, x_val1, perplexity, title, annotations, colors):
+
+        encoded_inputs0 = self.encoder.predict(x_val0)
+        encoded_inputs1 = self.encoder.predict(x_val1)
+
+        # perform t-SNE embedding
+        vis_data0 = bh_sne(encoded_inputs0.astype('float64'), perplexity=perplexity)
+        vis_data1 = bh_sne(encoded_inputs1.astype('float64'), perplexity=perplexity)
+
+        # plot the result
+        vis_x0 = vis_data0[:, 0]
+        vis_y0 = vis_data0[:, 1]
+
+        vis_x1 = vis_data1[:, 0]
+        vis_y1 = vis_data1[:, 1]
+
+        fig, plot = plt.subplots(1, 1)
+
+        plot.scatter(vis_x0, vis_y0, s=100, c=colors[0])
+        plot.scatter(vis_x1, vis_y1, s=100, c=colors[1])
+        fig.title(title)
+        '''
+        for i, txt in enumerate(annotations[0]):
+            plt.annotate(txt, (vis_x0[i], vis_y0[i]))
+
+        for i, txt in enumerate(annotations[1]):
+            plt.annotate(txt, (vis_x1[i], vis_y1[i])) '''
+
+        fig.savefig('/nas/home/spol/Thesis/TSNE/')
+        fig.show()
+        return encoded_inputs0, encoded_inputs1
 
     def tsne_hq(self, x_train, interpolation_points, perplexity, title, annotations, color):
 
