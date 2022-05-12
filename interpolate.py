@@ -10,11 +10,11 @@ import scipy.io.wavfile
 # PATH, VARIABLES
 # ---------------------------------------------------------------------------------------------------------------------
 
-folder_number = str(9)
-spectrograms_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION/inputs/input" + folder_number + "/"
-spectrograms = pathlib.Path(spectrograms_path)
-images_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION/images/image" + folder_number + "/"
-wav_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION/wavs/wav" + folder_number + "/"
+folder_number = str(8)
+spectrogram_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION/1105/inputs/input" + folder_number + "/"
+spectrogram = pathlib.Path(spectrogram_path)
+images_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION/1105/images/image" + folder_number + "/"
+wav_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION/1105/wavs/wav" + folder_number + "/"
 min_max = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/string_folder_min_max.npy"
 SR = 16000
 annotations = []
@@ -27,7 +27,7 @@ for i in range(10):
 # ---------------------------------------------------------------------------------------------------------------------
 
 
-vae = VAE.load("/nas/home/spol/Thesis/saved_model/REDUCTED/30-04-2022_00:28")
+vae = VAE.load("/nas/home/spol/Thesis/saved_model/CVAE/11-05-2022_17:54")
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -35,8 +35,29 @@ vae = VAE.load("/nas/home/spol/Thesis/saved_model/REDUCTED/30-04-2022_00:28")
 # ---------------------------------------------------------------------------------------------------------------------
 
 
-spectrograms = load_fsdd(spectrograms)
-encoded_spectrograms = vae.encoder.predict(spectrograms)
+spectrogram = load_fsdd(spectrogram)
+spectrograms = np.concatenate((spectrogram, spectrogram), axis=0)
+
+
+ones = np.ones([512, 64], dtype=float)
+ones = np.expand_dims(ones, (-1, 0))
+
+zeros = np.zeros([512, 64], dtype=float)
+zeros = np.expand_dims(zeros, (-1, 0))
+
+cond_enc = np.concatenate((ones, zeros), axis=0)
+
+cond01 = np.asarray([0, 1])
+cond01 = np.expand_dims(cond01, axis=0)
+
+cond10 = np.asarray([1, 0])
+cond10 = np.expand_dims(cond10, axis=0)
+
+cond_dec = np.concatenate((cond01, cond10), axis=0)
+
+spectrograms_full = [spectrograms, cond_enc, cond_dec]
+
+encoded_spectrograms = vae.encoder.predict(spectrograms_full)
 generated_image_vectors = np.asarray(interpolate(encoded_spectrograms[0].flatten(), encoded_spectrograms[1].flatten()))
 generated_spectrograms = vae.decoder.predict(generated_image_vectors)
 
