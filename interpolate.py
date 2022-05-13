@@ -5,18 +5,23 @@ from functions import load_fsdd, interpolate, denormalise
 import matplotlib.pyplot as plt
 import librosa
 import scipy.io.wavfile
+from WANDB import config
+
 
 # ---------------------------------------------------------------------------------------------------------------------
 # PATH, VARIABLES
 # ---------------------------------------------------------------------------------------------------------------------
 
-folder_number = str(8)
-spectrogram_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION/1105/inputs/input" + folder_number + "/"
+
+folder_number = str(9)
+spectrogram_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION/1305/inputs/input" + folder_number + "/"
 spectrogram = pathlib.Path(spectrogram_path)
-images_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION/1105/images/image" + folder_number + "/"
-wav_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION/1105/wavs/wav" + folder_number + "/"
+images_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION/1305/images/image" + folder_number + "/"
+wav_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION/1305/wavs/wav" + folder_number + "/"
+tsne_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION/1305/TSNEs/"
 min_max = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/string_folder_min_max.npy"
-SR = 16000
+
+SR = config['sample_rate']
 annotations = []
 for i in range(10):
     annotations.append(str(i))
@@ -27,7 +32,7 @@ for i in range(10):
 # ---------------------------------------------------------------------------------------------------------------------
 
 
-vae = VAE.load("/nas/home/spol/Thesis/saved_model/CVAE/11-05-2022_17:54")
+vae = VAE.load("/nas/home/spol/Thesis/saved_model/CVAE/11-05-2022_12:30")
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -67,23 +72,28 @@ generated_spectrograms = vae.decoder.predict(generated_image_vectors)
 # ---------------------------------------------------------------------------------------------------------------------
 
 
-encoded_generated = vae.tsne_interpolation(generated_image_vectors, perplexity=3, title='x_val', annotations=annotations, color='red')
+encoded_generated = vae.tsne_interpolation(generated_image_vectors, perplexity=3, title='x_val',
+                                           annotations=annotations, color='red',
+                                           save_image_path=tsne_path + folder_number)
 
 
 # ---------------------------------------------------------------------------------------------------------------------
 # PLOT PREDICTIONS, SAVE IMAGES, RE-SYNTHESIZE AND SAVE AUDIO
 # ---------------------------------------------------------------------------------------------------------------------
+
+
 min_and_max = np.load(min_max)
 minimum = min_and_max[0][1]
 maximum = min_and_max[0][0]
 
 
-
 for idx, file in enumerate(generated_spectrograms):
     spectrogram = np.squeeze(file)
+
     fig = plt.figure()
     img = plt.imshow(spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 64, 0, 512], aspect='auto')
     plt.colorbar()
+    plt.tight_layout()
     plt.title(idx)
     plt.savefig(images_path + str(idx))
     plt.show()
@@ -92,7 +102,6 @@ for idx, file in enumerate(generated_spectrograms):
     spectrogram = 10 ** (denormalised_spectrogram / 10) - 1e-5
     reconstructed = librosa.griffinlim(spectrogram, n_iter=32, hop_length=128)
     scipy.io.wavfile.write(wav_path + str(idx) + '.wav', SR, reconstructed)
-
 
 
 print('debug')

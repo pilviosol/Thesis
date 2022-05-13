@@ -1,25 +1,28 @@
 from VV_autoencoder import VAE
-from functions import feature_calculation, denormalise, fw_normalise, min_max_array_saving
+from functions import denormalise
 import matplotlib.pyplot as plt
 import librosa.display
 import pathlib
 import numpy as np
 import scipy.io.wavfile
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 from WANDB import config
-import os
 from functions import load_fsdd
+
+
 # ---------------------------------------------------------------------------------------------------------------------
-# PATH, VARIABLES
+# PATH, VARIABLES, DATE
 # ---------------------------------------------------------------------------------------------------------------------
+
+
 with open('/nas/home/spol/Thesis/last_date.txt') as f:
     date = f.read()
     print('date: ', date)
 
 normalised_flute_features_TEST = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/FW_normalised_flute_0605_TEST/"
 path_save_figures = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/IMAGES/IMAGES_1105/"
-SR = 16000
 generated_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/GENERATED/GENERATED_11052/"
+SR = config['sample_rate']
+
 
 # ---------------------------------------------------------------------------------------------------------------------
 # CREATE CONDITIONING LABELS

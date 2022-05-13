@@ -16,6 +16,11 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 from tsne import bh_sne
 
+# ---------------------------------------------------------------------------------------------------------------------
+# DATE, LOSSES, EARLY STOPPING
+# ---------------------------------------------------------------------------------------------------------------------
+
+
 tf.compat.v1.disable_eager_execution()
 
 train_loss = tf.keras.metrics.Mean(name="train_loss")
@@ -23,9 +28,6 @@ train_kl_loss = tf.keras.metrics.Mean(name="train_kl_loss")
 train_reconstruction_loss = tf.keras.metrics.Mean(name="train_reconstruction_loss")
 
 callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=200, verbose=1, restore_best_weights=True)
-
-# gpus = tf.config.list_logical_devices('GPU')
-# strategy = tf.distribute.MirroredStrategy(gpus)
 
 
 now = datetime.now()
@@ -36,6 +38,11 @@ except OSError:
     print("Creation of the directory  failed")
 
 callback_list = []
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# CREATING CLASS VAE
+# ---------------------------------------------------------------------------------------------------------------------
 
 
 class VAE:
@@ -56,8 +63,6 @@ class VAE:
         self.conv_kernels = conv_kernels
         self.conv_strides = conv_strides
         self.latent_space_dim = latent_space_dim
-        # self.reconstruction_loss_weight = 1000000
-        # self.reconstruction_loss_weight = config['kl_alpha']
         self.kl_loss_weight = config['kl_beta']
 
         self.encoder = None
@@ -82,6 +87,7 @@ class VAE:
                            metrics=[self._calculate_reconstruction_loss,
                                     self._calculate_kl_loss])
 
+    """
     def train_overfit(self, x_train, y_train, batch_size, num_epochs):
         # callback_list.append(WandbCallback())
 
@@ -113,6 +119,8 @@ class VAE:
                        epochs=num_epochs,
                        shuffle=False,
                        callbacks=callback_list)
+
+    """
 
     def train(self, x_train, y_train, x_val, y_val, batch_size, num_epochs):
         callback_list.append(WandbCallback())
@@ -148,15 +156,6 @@ class VAE:
                        shuffle=True,
                        callbacks=callback_list,
                        validation_data=(x_val, y_val))
-
-        '''
-        t_loss = train_loss.result()
-        wandb.log({"train_loss": t_loss.numpy(), "global_step": num_epochs})
-        t_kl_loss = train_kl_loss.result()
-        wandb.log({"train_kl_loss": t_kl_loss.numpy(), "global_step": num_epochs})
-        t_reconstruction_loss = train_reconstruction_loss.result()
-        wandb.log({"reconstruction_loss": t_reconstruction_loss.numpy(), "global_step": num_epochs})
-        '''
 
     def save(self, save_folder="."):
         self._create_folder_if_it_doesnt_exist(save_folder)
@@ -453,7 +452,7 @@ class VAE:
         plt.show()
         return encoded_inputs
 
-    def tsne_interpolation(self, interpolation_points, perplexity, title, annotations, color):
+    def tsne_interpolation(self, interpolation_points, perplexity, title, annotations, color, save_image_path):
 
         # perform t-SNE embedding
         vis_data = bh_sne(interpolation_points.astype('float64'), perplexity=perplexity)
@@ -469,6 +468,7 @@ class VAE:
         plt.title(title)
         for i, txt in enumerate(annotations):
             plt.annotate(txt, (vis_x[i], vis_y[i]))
+        plt.savefig(save_image_path)
         plt.show()
         return vis_data
 

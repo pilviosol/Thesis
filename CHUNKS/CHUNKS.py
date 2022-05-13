@@ -213,3 +213,14 @@ def conditional_input(spectrograms_path, label):
 x_train0 = load_fsdd_concat(x_train_SPECTROGRAMS_PATH, 0)
 x_train1 = load_fsdd_concat(x_train_SPECTROGRAMS_PATH, 1)
 x_train = np.concatenate((x_train0, x_train1), axis=0)
+
+
+
+'''
+        t_loss = train_loss.result()
+        wandb.log({"train_loss": t_loss.numpy(), "global_step": num_epochs})
+        t_kl_loss = train_kl_loss.result()
+        wandb.log({"train_kl_loss": t_kl_loss.numpy(), "global_step": num_epochs})
+        t_reconstruction_loss = train_reconstruction_loss.result()
+        wandb.log({"reconstruction_loss": t_reconstruction_loss.numpy(), "global_step": num_epochs})
+        '''
