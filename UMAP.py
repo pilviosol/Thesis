@@ -1,24 +1,17 @@
 import numpy as np
-from VV_autoencoder import VAE
-from functions import load_fsdd
-import pathlib
-from CVAE_train import ones_val, zeros_val, cond01_val, cond10_val, cond_enc_val, cond_dec_val
-from tsne import bh_sne
+from sklearn.datasets import load_digits
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
+import seaborn as sns
+from VV_autoencoder import VAE
+import pathlib
+import pandas as pd
+import umap
+from functions import load_fsdd
+from CVAE_train import ones_val, zeros_val, cond01_val, cond10_val, cond_enc_val, cond_dec_val
 
-
-"""
-def bh_sne(
-    data,
-    pca_d=None,
-    d=2,
-    perplexity=30.0,
-    theta=0.5,
-    random_state=None,
-    copy_data=False,
-    verbose=False,
-):
-"""
+sns.set(style='white', context='notebook', rc={'figure.figsize':(14,10)})
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -54,7 +47,6 @@ for file in x_v:
 annotations = [annotations0, annotations1]
 annotations_new = annotations0 + annotations1
 
-perplexity = 6
 colors = ['red', 'blue']
 
 
@@ -73,7 +65,7 @@ vae = VAE.load("/nas/home/spol/Thesis/saved_model/CVAE/11-05-2022_12:30")
 
 
 if __name__ == "__main__":
-    print('ollare tsne')
+    print('ollare umap')
 
     x_val0 = load_fsdd(x_val_SPECTROGRAMS_PATH)
     x_val0 = [x_val0, ones_val, cond01_val]
@@ -82,36 +74,14 @@ if __name__ == "__main__":
 
     encoded_inputs0 = vae.encoder.predict(x_val0)
     encoded_inputs1 = vae.encoder.predict(x_val1)
+    reducer = umap.UMAP(random_state=42)
+    reducer.fit(encoded_inputs0)
+    reducer.fit(encoded_inputs1)
 
-    # perform t-SNE embedding DA RIVEDERE
-    vis_data0 = bh_sne(encoded_inputs0.astype('float64'), perplexity=perplexity)
-    vis_data1 = bh_sne(encoded_inputs1.astype('float64'), perplexity=perplexity)
+    embedding = reducer.transform(encoded_inputs0)
 
-    # plot the result
-    vis_x0 = vis_data0[:, 0]
-    vis_y0 = vis_data0[:, 1]
-
-    vis_x1 = vis_data1[:, 0]
-    vis_y1 = vis_data1[:, 1]
-
-    fig, plot = plt.subplots(1, 1)
-
-    plot.scatter(vis_x0, vis_y0, s=100, c=colors[0])
-    plot.scatter(vis_x1, vis_y1, s=100, c=colors[1])
-
-    for i, txt in enumerate(annotations[0]):
-        plt.annotate(txt, (vis_x0[i], vis_y0[i]))
-
-    for i, txt in enumerate(annotations[1]):
-        plt.annotate(txt, (vis_x1[i], vis_y1[i]))
-
+    plt.scatter(embedding[:, 0], embedding[:, 1], c='red', cmap='Spectral', s=5)
+    plt.gca().set_aspect('equal', 'datalim')
+    plt.colorbar(boundaries=np.arange(11) - 0.5).set_ticks(np.arange(10))
+    plt.title('UMAP projection of the Digits dataset', fontsize=24)
     plt.show()
-
-    """ ALTRA PROVA CON FUNZIONE TSNE DEL MODELLO"""
-    x_valA = load_fsdd(x_val_SPECTROGRAMS_PATH)
-    x_valB = np.concatenate((x_valA, x_valA))
-    x_val_new = [x_valB, cond_enc_val, cond_dec_val]
-    encoded_inputs = vae.tsne(x_val_new, perplexity=perplexity, title='prova', annotations=annotations_new, color='green')
-
-
-print('debug')

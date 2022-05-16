@@ -19,8 +19,8 @@ with open('/nas/home/spol/Thesis/last_date.txt') as f:
     print('date: ', date)
 
 normalised_flute_features_TEST = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/FW_normalised_flute_0605_TEST/"
-path_save_figures = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/IMAGES/IMAGES_1105/"
-generated_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/GENERATED/GENERATED_11052/"
+path_save_figures = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/IMAGES/IMAGES_16052/"
+generated_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/GENERATED/GENERATED_16052/"
 SR = config['sample_rate']
 
 
@@ -59,7 +59,7 @@ cond_dec_test = np.concatenate((cond01_test, cond10_test), axis=0)
 
 
 # vae = VAE.load("/nas/home/spol/Thesis/saved_model/" + date)
-vae = VAE.load("/nas/home/spol/Thesis/saved_model/CVAE/11-05-2022_17:54")
+vae = VAE.load("/nas/home/spol/Thesis/saved_model/CVAE/16-05-2022_22:54")
 
 def generate(spectrograms):
     generated_spectrograms, latent_representations = vae.reconstruct(spectrograms)

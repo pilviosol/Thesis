@@ -14,11 +14,11 @@ wandb.config = {
     "learning_rate": 0.0001,
     "batch_size": 64,
     "latent_dim": 64,
-    "kl_beta": 0.1,
+    "kl_beta": 2,
 
 
     "input_shape": (512, 64, 1),
-    "conv_filters": (16, 16, 32, 32, 64),
+    "conv_filters": (16, 32, 64, 128, 256),
     "conv_kernels": (3, 3, 3, 3, 3),
     "conv_strides": (2, 2, 2, 2, (2, 1)),
 
