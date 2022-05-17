@@ -14,11 +14,11 @@ from WANDB import config
 
 
 folder_number = str(9)
-spectrogram_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION/1305/inputs/input" + folder_number + "/"
+spectrogram_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION/16052/inputs/input" + folder_number + "/"
 spectrogram = pathlib.Path(spectrogram_path)
-images_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION/1305/images/image" + folder_number + "/"
-wav_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION/1305/wavs/wav" + folder_number + "/"
-tsne_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION/1305/TSNEs/"
+images_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION/16052/images/image" + folder_number + "/"
+wav_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION/16052/wavs/wav" + folder_number + "/"
+tsne_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION/16052/TSNEs/"
 min_max = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/string_folder_min_max.npy"
 
 SR = config['sample_rate']
@@ -32,7 +32,7 @@ for i in range(10):
 # ---------------------------------------------------------------------------------------------------------------------
 
 
-vae = VAE.load("/nas/home/spol/Thesis/saved_model/CVAE/11-05-2022_12:30")
+vae = VAE.load("/nas/home/spol/Thesis/saved_model/CVAE/16-05-2022_22:54")
 
 
 # ---------------------------------------------------------------------------------------------------------------------
