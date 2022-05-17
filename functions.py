@@ -37,6 +37,27 @@ def extract_subset(origin_path, destination_path, string):
             shutil.copyfile(origin_path + name, destination_path + string + '/' + name)
 
 
+def extract_subset_with_path(origin_path, destination_path, string, string_path):
+    files_dir = pathlib.Path(origin_path)
+    files_in_basepath = files_dir.iterdir()
+    try:
+        shutil.rmtree((destination_path + string_path))
+    except OSError:
+        print("Removal of the directory %s failed" % (destination_path + string_path))
+    else:
+        print("Successfully removed the directory %s " % (destination_path + string_path))
+
+    os.mkdir(destination_path + string_path)
+
+    for item in files_in_basepath:
+        name = item.name
+        pitch = str(name)[-11: -8]
+        if string in str(name):
+            print('Moving: ', name)
+            print('--------------------------------------------')
+            shutil.copyfile(origin_path + name, destination_path + string_path + '/' + pitch + '_' + name)
+
+
 def divider_256(origin_path, destination_path):
     """
 
@@ -181,7 +202,8 @@ def remove_files_if_pitch_not_matching(path, elimination_list):
     files_in_basepath = files_dir.iterdir()
     for file in files_in_basepath:
         name = file.name
-        if name[-11: -4] in elimination_list:
+        # print(name[-11: -8])
+        if name[-11: -8] in elimination_list:
             os.remove(path + '/' + name)
 
 

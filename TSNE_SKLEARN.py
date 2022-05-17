@@ -4,7 +4,7 @@ import numpy as np
 from VV_autoencoder import VAE
 from functions import load_fsdd
 import pathlib
-from CVAE_train import ones_val, zeros_val, cond01_val, cond10_val, cond_enc_val, cond_dec_val
+from CVAE_train import ones_val, zeros_val, cond01_val, cond10_val, ones_train, zeros_train, cond10_train, cond01_train
 import matplotlib.pyplot as plt
 from matplotlib import ticker
 import seaborn as sns
@@ -66,22 +66,47 @@ if __name__ == "__main__":
     x_val1 = load_fsdd(x_val_SPECTROGRAMS_PATH)
     x_val1 = [x_val1, zeros_val, cond10_val]
 
-    encoded_inputs0 = vae.encoder.predict(x_val0)
-    encoded_inputs1 = vae.encoder.predict(x_val1)
+    encoded_inputs_val0 = vae.encoder.predict(x_val0)
+    encoded_inputs_val1 = vae.encoder.predict(x_val1)
 
-    encoded_inputs = np.concatenate((encoded_inputs0, encoded_inputs1), axis=0)
-    labels = []
+    encoded_inputs_val = np.concatenate((encoded_inputs_val0, encoded_inputs_val1), axis=0)
+    labels_val = []
     for i in range(92):
         if i < 46:
-            labels.append("red")
+            labels_val.append("red")
         else:
-            labels.append("blue")
-    labels = np.asarray(labels)
+            labels_val.append("blue")
+    labels_val = np.asarray(labels_val)
 
-    X_embedded = TSNE(n_components=2,
-                      perplexity=2,
-                      learning_rate='auto',
-                      init='random').fit_transform(encoded_inputs)
+    X_embedded_val = TSNE(n_components=2,
+                          perplexity=2,
+                          learning_rate='auto',
+                          init='random').fit_transform(encoded_inputs_val)
+
+
+    x_train0 = load_fsdd(x_train_SPECTROGRAMS_PATH)
+    x_train0 = [x_train0, ones_train, cond01_train]
+    x_train1 = load_fsdd(x_train_SPECTROGRAMS_PATH)
+    x_train1 = [x_train1, zeros_train, cond10_train]
+
+    encoded_inputs_train0 = vae.encoder.predict(x_train0)
+    encoded_inputs_train1 = vae.encoder.predict(x_train1)
+
+    encoded_inputs_train = np.concatenate((encoded_inputs_train0, encoded_inputs_train1), axis=0)
+    labels_train = []
+    for i in range(1648):
+        if i < 824:
+            labels_train.append("red")
+        else:
+            labels_train.append("blue")
+    labels_train = np.asarray(labels_train)
+
+    X_embedded_train = TSNE(n_components=2,
+                          perplexity=30,
+                          learning_rate='auto',
+                          init='random').fit_transform(encoded_inputs_train)
+
+
 
 
     def plot_2d(points, points_color, title):
@@ -119,4 +144,5 @@ if __name__ == "__main__":
         plt.show()
 
 
-    plot_2d(X_embedded, labels, "TSNE-sklearn")
+    plot_2d(X_embedded_val, labels_val, "VAL")
+    plot_2d(X_embedded_train, labels_train, "TRAIN")
