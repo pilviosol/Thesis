@@ -287,7 +287,7 @@ class CVAEMulti:
         return inputs
 
     def _add_decoder_cond(self):
-        cond_dec = Input(shape=2, name="decoder_cond_input")
+        cond_dec = Input(shape=4, name="decoder_cond_input")
         return cond_dec
 
     def _add_conv_layers(self, encoder_input):
@@ -439,8 +439,8 @@ class CVAEMulti:
 if __name__ == "__main__":
     autoencoder = CVAEMulti(
         input_shape=(512, 64, 1),
-        conv_filters=(32, 32, 64, 64, 128),
-        conv_kernels=(6, 6, 6, 6, 6),
+        conv_filters=(16*4, 32*4, 64*4, 128*4, 256*4),
+        conv_kernels=(3, 3, 3, 3, 3),
         conv_strides=(2, 2, 2, 2, (2, 1)),
         latent_space_dim=64
     )

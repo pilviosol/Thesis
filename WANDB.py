@@ -18,7 +18,7 @@ wandb.config = {
 
 
     "input_shape": (512, 64, 1),
-    "conv_filters": (16, 32, 64, 128, 256),
+    "conv_filters": (16*4, 32*4, 64*4, 128*4, 256*4),
     "conv_kernels": (3, 3, 3, 3, 3),
     "conv_strides": (2, 2, 2, 2, (2, 1)),
 
