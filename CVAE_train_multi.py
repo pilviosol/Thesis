@@ -4,7 +4,7 @@ from utils import *
 import wandb
 from WANDB import config
 from datetime import datetime
-from CVAE_autoencoder_multi import VAE
+from CVAE_autoencoder_multi import CVAEMulti
 import numpy as np
 
 
@@ -121,7 +121,7 @@ cond_dec_val = np.concatenate((cond0001_val, cond0010_val, cond0100_val, cond100
 
 
 def train(x_train, y_train, x_val, y_val, learning_rate, batch_size, epochs):
-    autoencoder = VAE(
+    autoencoder = CVAEMulti(
         input_shape=INPUT_SHAPE,
         conv_filters=CONV_FILTERS,
         conv_kernels=CONV_KERNELS,

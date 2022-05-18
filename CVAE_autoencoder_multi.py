@@ -5,13 +5,12 @@ from tensorflow.keras.layers import Input, Conv2D, ReLU, BatchNormalization, \
     Flatten, Dense, Reshape, Conv2DTranspose, Activation, Lambda, Concatenate
 from tensorflow.keras import backend as K
 from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.losses import MeanSquaredError
 import numpy as np
 import tensorflow as tf
 import wandb
 from wandb.keras import WandbCallback
 from WANDB import config
-from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau, TensorBoard, LambdaCallback
+from tensorflow.keras.callbacks import EarlyStopping, LambdaCallback
 import matplotlib.pyplot as plt
 from datetime import datetime
 from tsne import bh_sne
@@ -27,7 +26,7 @@ train_loss = tf.keras.metrics.Mean(name="train_loss")
 train_kl_loss = tf.keras.metrics.Mean(name="train_kl_loss")
 train_reconstruction_loss = tf.keras.metrics.Mean(name="train_reconstruction_loss")
 
-callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=200, verbose=1, restore_best_weights=True)
+callback = EarlyStopping(monitor='val_loss', patience=200, verbose=1, restore_best_weights=True)
 
 
 now = datetime.now()
@@ -45,7 +44,7 @@ callback_list = []
 # ---------------------------------------------------------------------------------------------------------------------
 
 
-class VAE:
+class CVAEMulti:
     """
     VAE represents a Deep Convolutional variational autoencoder architecture
     with mirrored encoder and decoder components.
@@ -86,41 +85,6 @@ class VAE:
                            loss=self._calculate_combined_loss,
                            metrics=[self._calculate_reconstruction_loss,
                                     self._calculate_kl_loss])
-
-    """
-    def train_overfit(self, x_train, y_train, batch_size, num_epochs):
-        # callback_list.append(WandbCallback())
-
-        def plot_and_save_while_training_overfit(epoch, logs):
-
-            if epoch % 10 == 0:
-                a = self.model.predict(y_train)
-
-                for i in range(len(y_train)):
-                    element = a[i]
-                    element = np.squeeze(element)
-
-                    fig = plt.figure()
-                    img = plt.imshow(element, cmap=plt.cm.viridis, origin='lower', extent=[0, 256, 0, 512],
-                                     aspect='auto')
-                    title = str(epoch) + '_' + str(i)
-                    plt.title(title)
-                    plt.colorbar()
-                    plt.tight_layout()
-                    plt.savefig('/nas/home/spol/Thesis/saved_model/images_overfit/' + title)
-                    plt.close()
-                    # wandb.log({"Y_train plots": [wandb.Image(fig, caption=title)]})
-
-        # callback_list.append(LambdaCallback(on_epoch_end=plot_and_save_while_training_overfit))
-
-        self.model.fit(x_train,
-                       y_train,
-                       batch_size=batch_size,
-                       epochs=num_epochs,
-                       shuffle=False,
-                       callbacks=callback_list)
-
-    """
 
     def train(self, x_train, y_train, x_val, y_val, batch_size, num_epochs):
         callback_list.append(WandbCallback())
@@ -175,7 +139,7 @@ class VAE:
         parameters_path = os.path.join(save_folder, "parameters.pkl")
         with open(parameters_path, "rb") as f:
             parameters = pickle.load(f)
-        autoencoder = VAE(*parameters)
+        autoencoder = CVAEMulti(*parameters)
         weights_path = os.path.join(save_folder, "weights.h5")
         autoencoder.load_weights(weights_path)
         return autoencoder
@@ -239,7 +203,7 @@ class VAE:
         self.decoder = Model(decoder_input, decoder_output, name="decoder")
 
     def _add_decoder_input(self):
-        X = Input(shape=self.latent_space_dim + 2, name="decoder_input")
+        X = Input(shape=self.latent_space_dim + 4, name="decoder_input")
         return X
 
     def _add_dense_layer(self, decoder_input):
@@ -277,7 +241,6 @@ class VAE:
             filters=1,
             kernel_size=self.conv_kernels[0],
             strides=self.conv_strides[0],
-            # strides=1,
             padding="same",
             name=f"decoder_conv_transpose_layer_{self._num_conv_layers}"
         )
@@ -474,7 +437,7 @@ class VAE:
 
 
 if __name__ == "__main__":
-    autoencoder = VAE(
+    autoencoder = CVAEMulti(
         input_shape=(512, 64, 1),
         conv_filters=(32, 32, 64, 64, 128),
         conv_kernels=(6, 6, 6, 6, 6),
