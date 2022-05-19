@@ -5,8 +5,8 @@ import numpy as np
 import scipy
 
 # features_matching_flute = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/features_matching_flute/"
-features_matching_string = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/FW_normalised_flute_0305_VALID/"
-saving_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/IMAGES/0605/flute/"
+features_matching_string = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/FW_normalised_guitar_1805_TEST/"
+saving_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/IMAGES_SPECTROGRAMS/guitar/"
 flutes = []
 # vocals = []
 
