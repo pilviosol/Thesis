@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.manifold import TSNE
 import numpy as np
-from VV_autoencoder import VAE
+from CVAE_autoencoder_multi import CVAEMulti
 from functions import load_fsdd
 import pathlib
 from CVAE_train_multi import ones_val, zeros_val, twos_val, threes_val, cond0001_val, cond0010_val, cond0100_val, \
@@ -9,7 +9,7 @@ from CVAE_train_multi import ones_val, zeros_val, twos_val, threes_val, cond0001
     ones_train, zeros_train, twos_train, threes_train, cond0001_train, cond0010_train, cond0100_train, cond1000_train
 import matplotlib.pyplot as plt
 from matplotlib import ticker
-import seaborn as sns
+
 
 # ---------------------------------------------------------------------------------------------------------------------
 # PATH, VARIABLES, ANNOTATIONS
@@ -39,7 +39,7 @@ colors = ['red', 'blue']
 
 
 # vae = VAE.load("/nas/home/spol/Thesis/saved_model/" + date)
-vae = VAE.load("/nas/home/spol/Thesis/saved_model/CVAE/11-05-2022_12:30")
+vae = CVAEMulti.load("/nas/home/spol/Thesis/saved_model/CVAE_multi/18-05-2022_22:37")
 
 # ---------------------------------------------------------------------------------------------------------------------
 # RUN
@@ -47,13 +47,13 @@ vae = VAE.load("/nas/home/spol/Thesis/saved_model/CVAE/11-05-2022_12:30")
 
 
 if __name__ == "__main__":
-    print('ollare tsne')
+    print('ollare tsne_multi')
 
     x_val = load_fsdd(x_val_SPECTROGRAMS_PATH)
     x_val0 = [x_val, zeros_val, cond0001_val]
     x_val1 = [x_val, ones_val, cond0010_val]
     x_val2 = [x_val, twos_val, cond0100_val]
-    x_val3 = [x_val, threes_val, cond0010_val]
+    x_val3 = [x_val, threes_val, cond1000_val]
 
     encoded_inputs_val0 = vae.encoder.predict(x_val0)
     encoded_inputs_val1 = vae.encoder.predict(x_val1)
@@ -75,8 +75,8 @@ if __name__ == "__main__":
                      
     labels_val = np.asarray(labels_val)
 
-    X_embedded_val = TSNE(n_components=2,
-                          perplexity=2,
+    X_embedded_val = TSNE(n_components=3,
+                          perplexity=5,
                           learning_rate='auto',
                           init='random').fit_transform(encoded_inputs_val)
 
@@ -107,11 +107,10 @@ if __name__ == "__main__":
             labels_train.append("black")
     labels_train = np.asarray(labels_train)
 
-    X_embedded_train = TSNE(n_components=2,
-                            perplexity=30,
+    X_embedded_train = TSNE(n_components=3,
+                            perplexity=2,
                             learning_rate='auto',
                             init='random').fit_transform(encoded_inputs_train)
-
 
     def plot_2d(points, points_color, title):
         fig, ax = plt.subplots(figsize=(3, 3), facecolor="white", constrained_layout=True)
@@ -140,13 +139,15 @@ if __name__ == "__main__":
         fig.suptitle(title, size=16)
         col = ax.scatter(x, y, z, c=points_color, s=50, alpha=0.8)
         ax.view_init(azim=-60, elev=9)
-        ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
-        ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
-        ax.zaxis.set_major_locator(ticker.MultipleLocator(1))
+        # ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
+        # ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
+        # ax.zaxis.set_major_locator(ticker.MultipleLocator(1))
 
-        fig.colorbar(col, ax=ax, orientation="horizontal", shrink=0.6, aspect=60, pad=0.01)
+        # fig.colorbar(col, ax=ax, orientation="horizontal", shrink=0.6, aspect=60, pad=0.01)
         plt.show()
 
 
-    plot_2d(X_embedded_val, labels_val, "VAL")
-    plot_2d(X_embedded_train, labels_train, "TRAIN")
+    # plot_2d(X_embedded_val, labels_val, "VAL")
+    # plot_2d(X_embedded_train, labels_train, "TRAIN")
+    plot_3d(X_embedded_val, labels_val, "VAL")
+    plot_3d(X_embedded_train, labels_train, "TRAIN")
