@@ -14,11 +14,11 @@ import os
 
 
 folder_number = str(9)
-spectrogram_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION_multi/18052022_2237/inputs/input" + folder_number + "/"
+spectrogram_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION_multi/18052022_2237_2/inputs/input" + folder_number + "/"
 spectrogram = pathlib.Path(spectrogram_path)
-images_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION_multi/18052022_2237/images/image" + folder_number + "/"
-wav_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION_multi/18052022_2237/wavs/wav" + folder_number + "/"
-tsne_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION_multi/18052022_2237/TSNEs/"
+images_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION_multi/18052022_2237_2/images/image" + folder_number + "/"
+wav_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION_multi/18052022_2237_2/wavs/wav" + folder_number + "/"
+tsne_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION_multi/18052022_2237_2/TSNEs/"
 min_max = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/string_folder_min_max.npy"
 
 SR = config['sample_rate']
@@ -78,10 +78,25 @@ generated_image_vectors23 = np.asarray(
 generated_image_vectors30 = np.asarray(
     interpolate(encoded_spectrograms[3].flatten(), encoded_spectrograms[0].flatten(), n=4))
 
+generated_col1 = np.asarray(
+    interpolate(generated_image_vectors01[1].flatten(), generated_image_vectors23[2].flatten(), n=4))
+generated_col2 = np.asarray(
+    interpolate(generated_image_vectors01[2].flatten(), generated_image_vectors23[1].flatten(), n=4))
+
+generated_row1 = np.asarray(
+    interpolate(generated_image_vectors12[1].flatten(), generated_image_vectors30[2].flatten(), n=4))
+generated_row2 = np.asarray(
+    interpolate(generated_image_vectors12[2].flatten(), generated_image_vectors30[1].flatten(), n=4))
+
 generated_spectrograms01 = vae.decoder.predict(generated_image_vectors01)
 generated_spectrograms12 = vae.decoder.predict(generated_image_vectors12)
 generated_spectrograms23 = vae.decoder.predict(generated_image_vectors23)
 generated_spectrograms30 = vae.decoder.predict(generated_image_vectors30)
+
+generated_spectrograms_col1 = vae.decoder.predict(generated_col1)
+generated_spectrograms_col2 = vae.decoder.predict(generated_col2)
+generated_spectrograms_row1 = vae.decoder.predict(generated_row1)
+generated_spectrograms_row2 = vae.decoder.predict(generated_row2)
 
 # ---------------------------------------------------------------------------------------------------------------------
 # TSNE ON GENERATED POINTS
@@ -104,7 +119,6 @@ encoded_generated30 = vae.tsne_interpolation(generated_image_vectors30, perplexi
 # ---------------------------------------------------------------------------------------------------------------------
 # PLOT PREDICTIONS, SAVE IMAGES, RE-SYNTHESIZE AND SAVE AUDIO
 # ---------------------------------------------------------------------------------------------------------------------
-
 
 min_and_max = np.load(min_max)
 minimum = min_and_max[0][1]
@@ -152,5 +166,10 @@ plot_save_interpolations(generated_spectrograms01, '01')
 plot_save_interpolations(generated_spectrograms12, '12')
 plot_save_interpolations(generated_spectrograms23, '23')
 plot_save_interpolations(generated_spectrograms30, '30')
+
+plot_save_interpolations(generated_spectrograms_col1, 'col1')
+plot_save_interpolations(generated_spectrograms_col2, 'col2')
+plot_save_interpolations(generated_spectrograms_row1, 'row1')
+plot_save_interpolations(generated_spectrograms_row2, 'row2')
 
 print('debug')
