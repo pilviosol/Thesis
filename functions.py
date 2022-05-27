@@ -421,4 +421,17 @@ def interpolate(v1, v2, n=10):
 
     return int_vecs
 
+def interpolate_and_save(v1, v2, save_path, n=10):
+    """
+    interpolates between two vectors in latent space
+    """
+    ratios = np.linspace(0, 1, n)
+    int_vecs = list()
+    for ratio in ratios:
+        v = (1.0 - ratio) * v1 + ratio * v2
+        np.save(save_path + str(ratio), v)
+        int_vecs.append(v)
+
+    return int_vecs
+
 # print('debugg')

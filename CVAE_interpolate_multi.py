@@ -14,12 +14,13 @@ import os
 
 
 folder_number = str(9)
-spectrogram_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION_multi/18052022_2237_2/inputs/input" + folder_number + "/"
+spectrogram_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION_multi/18052022_2237_savings/inputs/input" + folder_number + "/"
 spectrogram = pathlib.Path(spectrogram_path)
-images_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION_multi/18052022_2237_2/images/image" + folder_number + "/"
-wav_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION_multi/18052022_2237_2/wavs/wav" + folder_number + "/"
-tsne_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION_multi/18052022_2237_2/TSNEs/"
+images_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION_multi/18052022_2237_savings/images/image" + folder_number + "/"
+wav_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION_multi/18052022_2237_savings/wavs/wav" + folder_number + "/"
+tsne_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION_multi/18052022_2237_savings/TSNEs/"
 min_max = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/string_folder_min_max.npy"
+save_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION_multi/18052022_2237_savings/INTERPOLATIONs/"
 
 SR = config['sample_rate']
 annotations = []
@@ -68,35 +69,55 @@ cond_dec = np.concatenate((cond0001, cond0010, cond0100, cond1000), axis=0)
 
 spectrograms_full = [spectrograms, cond_enc, cond_dec]
 
+
 encoded_spectrograms = vae.encoder.predict(spectrograms_full)
+
+
 generated_image_vectors01 = np.asarray(
-    interpolate(encoded_spectrograms[0].flatten(), encoded_spectrograms[1].flatten(), n=4))
+    interpolate(encoded_spectrograms[0].flatten(), encoded_spectrograms[1].flatten(), n=10))
 generated_image_vectors12 = np.asarray(
-    interpolate(encoded_spectrograms[1].flatten(), encoded_spectrograms[2].flatten(), n=4))
+    interpolate(encoded_spectrograms[1].flatten(), encoded_spectrograms[2].flatten(), n=10))
 generated_image_vectors23 = np.asarray(
-    interpolate(encoded_spectrograms[2].flatten(), encoded_spectrograms[3].flatten(), n=4))
+    interpolate(encoded_spectrograms[2].flatten(), encoded_spectrograms[3].flatten(), n=10))
 generated_image_vectors30 = np.asarray(
-    interpolate(encoded_spectrograms[3].flatten(), encoded_spectrograms[0].flatten(), n=4))
+    interpolate(encoded_spectrograms[3].flatten(), encoded_spectrograms[0].flatten(), n=10))
 
 generated_col1 = np.asarray(
-    interpolate(generated_image_vectors01[1].flatten(), generated_image_vectors23[2].flatten(), n=4))
+    interpolate(generated_image_vectors01[1].flatten(), generated_image_vectors23[2].flatten(), n=10))
 generated_col2 = np.asarray(
-    interpolate(generated_image_vectors01[2].flatten(), generated_image_vectors23[1].flatten(), n=4))
+    interpolate(generated_image_vectors01[2].flatten(), generated_image_vectors23[1].flatten(), n=10))
 
 generated_row1 = np.asarray(
-    interpolate(generated_image_vectors12[1].flatten(), generated_image_vectors30[2].flatten(), n=4))
+    interpolate(generated_image_vectors12[1].flatten(), generated_image_vectors30[2].flatten(), n=10))
 generated_row2 = np.asarray(
-    interpolate(generated_image_vectors12[2].flatten(), generated_image_vectors30[1].flatten(), n=4))
+    interpolate(generated_image_vectors12[2].flatten(), generated_image_vectors30[1].flatten(), n=10))
+
 
 generated_spectrograms01 = vae.decoder.predict(generated_image_vectors01)
+for idx, element in enumerate(generated_spectrograms01):
+    np.save(save_path + '01/' + str(idx), element)
 generated_spectrograms12 = vae.decoder.predict(generated_image_vectors12)
+for idx, element in enumerate(generated_spectrograms12):
+    np.save(save_path + '12/' + str(idx), element)
 generated_spectrograms23 = vae.decoder.predict(generated_image_vectors23)
+for idx, element in enumerate(generated_spectrograms23):
+    np.save(save_path + '23/' + str(idx), element)
 generated_spectrograms30 = vae.decoder.predict(generated_image_vectors30)
+for idx, element in enumerate(generated_spectrograms30):
+    np.save(save_path + '30/' + str(idx), element)
 
 generated_spectrograms_col1 = vae.decoder.predict(generated_col1)
+for idx, element in enumerate(generated_spectrograms_col1):
+    np.save(save_path + 'col1/' + str(idx), element)
 generated_spectrograms_col2 = vae.decoder.predict(generated_col2)
+for idx, element in enumerate(generated_spectrograms_col2):
+    np.save(save_path + 'col2/' + str(idx), element)
 generated_spectrograms_row1 = vae.decoder.predict(generated_row1)
+for idx, element in enumerate(generated_spectrograms_row1):
+    np.save(save_path + 'row1/' + str(idx), element)
 generated_spectrograms_row2 = vae.decoder.predict(generated_row2)
+for idx, element in enumerate(generated_spectrograms_row2):
+    np.save(save_path + 'row2/' + str(idx), element)
 
 # ---------------------------------------------------------------------------------------------------------------------
 # TSNE ON GENERATED POINTS

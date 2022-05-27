@@ -224,3 +224,50 @@ x_train = np.concatenate((x_train0, x_train1), axis=0)
         t_reconstruction_loss = train_reconstruction_loss.result()
         wandb.log({"reconstruction_loss": t_reconstruction_loss.numpy(), "global_step": num_epochs})
         '''
+
+
+
+
+
+generated_image_vectors01 = np.asarray(
+    interpolate_and_save(encoded_spectrograms[0].flatten(),
+                         encoded_spectrograms[1].flatten(),
+                         save_path + '01/',
+                         n=4))
+generated_image_vectors12 = np.asarray(
+    interpolate_and_save(encoded_spectrograms[1].flatten(),
+                         encoded_spectrograms[2].flatten(),
+                         save_path + '12/',
+                         n=4))
+generated_image_vectors23 = np.asarray(
+    interpolate_and_save(encoded_spectrograms[2].flatten(),
+                         encoded_spectrograms[3].flatten(),
+                         save_path + '23/',
+                         n=4))
+generated_image_vectors30 = np.asarray(
+    interpolate_and_save(encoded_spectrograms[3].flatten(),
+                         encoded_spectrograms[0].flatten(),
+                         save_path + '30/',
+                         n=4))
+
+generated_col1 = np.asarray(
+    interpolate_and_save(generated_image_vectors01[1].flatten(),
+                         generated_image_vectors23[2].flatten(),
+                         save_path + 'col1/',
+                         n=4))
+generated_col2 = np.asarray(
+    interpolate_and_save(generated_image_vectors01[2].flatten(),
+                         generated_image_vectors23[1].flatten(),
+                         save_path + 'col2/',
+                         n=4))
+
+generated_row1 = np.asarray(
+    interpolate_and_save(generated_image_vectors12[1].flatten(),
+                         generated_image_vectors30[2].flatten(),
+                         save_path + 'row1/',
+                         n=4))
+generated_row2 = np.asarray(
+    interpolate_and_save(generated_image_vectors12[2].flatten(),
+                         generated_image_vectors30[1].flatten(),
+                         save_path + 'row2/',
+                         n=4))

@@ -24,8 +24,19 @@ keyboard_val_path = pathlib.Path(keyboard_val_path)
 guitar_val_path = pathlib.Path(guitar_val_path)
 organ_val_path = pathlib.Path(organ_val_path)
 
+path_01 = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION_multi/18052022_2237_savings/INTERPOLATIONs/01/"
+path_12 = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION_multi/18052022_2237_savings/INTERPOLATIONs/12/"
+path_23 = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION_multi/18052022_2237_savings/INTERPOLATIONs/23/"
+path_30 = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION_multi/18052022_2237_savings/INTERPOLATIONs/30/"
+
+path_col1 = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION_multi/18052022_2237_savings/INTERPOLATIONs/col1/"
+path_col2 = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION_multi/18052022_2237_savings/INTERPOLATIONs/col2/"
+path_row1 = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION_multi/18052022_2237_savings/INTERPOLATIONs/row1/"
+path_row2 = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION_multi/18052022_2237_savings/INTERPOLATIONs/row2/"
 
 classes = [0, 1, 2, 3]
+
+
 # ---------------------------------------------------------------
 #  IMPORT AND ORGANIZE THE DATA
 # ---------------------------------------------------------------
@@ -79,17 +90,17 @@ y_val = np.asarray(y_val)
 model = tf.keras.Sequential([
     tf.keras.layers.Flatten(input_shape=(512, 64)),
     tf.keras.layers.Dense(128, activation='relu'),
-    tf.keras.layers.Dense(10)
+    tf.keras.layers.Dense(4)
 ])
 
 model.compile(optimizer='adam',
               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
               metrics=['accuracy'])
 
-model.fit(x_train, y_train, epochs=10)
+model.fit(x_train, y_train, epochs=20)
 
 
-test_loss, test_acc = model.evaluate(x_val,  y_val, verbose=2)
+test_loss, test_acc = model.evaluate(x_val, y_val, verbose=2)
 
 print('\nTest accuracy:', test_acc)
 
@@ -98,9 +109,13 @@ print('\nTest accuracy:', test_acc)
 # ---------------------------------------------------------------
 probability_model = tf.keras.Sequential([model, tf.keras.layers.Softmax()])
 
-predictions = probability_model.predict(x_val)
+interpolation_12 = load_fsdd(path_30)
 
-print('predictions[0]', predictions[0])
-print('np.argmax(predictions[0])', np.argmax(predictions[0]))
+predictions = probability_model.predict(interpolation_12)
+
+
+for i in range(10):
+    print(i, 'predictions: ', predictions[i], 'class: ', np.argmax(predictions[i]))
+
 
 
