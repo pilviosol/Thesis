@@ -99,7 +99,6 @@ model.compile(optimizer='adam',
 
 model.fit(x_train, y_train, epochs=20)
 
-
 test_loss, test_acc = model.evaluate(x_val, y_val, verbose=2)
 
 print('\nTest accuracy:', test_acc)

@@ -215,7 +215,7 @@ def how_many_pitches(path, temp_pitch):
     temp_pitch = temp_pitch
     for file in sorted(files_in_basepath):
         name = file.name
-        pitch = name[0:3]
+        pitch = name[14:17]
         if pitch == temp_pitch:
             count += 1
             temp_pitch = pitch
