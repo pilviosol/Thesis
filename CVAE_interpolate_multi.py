@@ -1,7 +1,7 @@
 import numpy as np
 from CVAE_autoencoder_multi import CVAEMulti
 import pathlib
-from functions import load_fsdd, interpolate, denormalise
+from functions import load_fsdd, interpolate, denormalise, parabolic_interpolate, spheric_interpolate
 import matplotlib.pyplot as plt
 import librosa
 import scipy.io.wavfile
@@ -100,9 +100,9 @@ encoded_spectrograms = vae.encoder.predict(spectrograms_full)
 
 # BOUNDARIES (UPPER AND LOWER)
 generated_image_vectors01 = np.asarray(
-    interpolate(encoded_spectrograms[0].flatten(), encoded_spectrograms[1].flatten(), n=n_points))
+    spheric_interpolate(encoded_spectrograms[0].flatten(), encoded_spectrograms[1].flatten(), n=n_points))
 generated_image_vectors23 = np.asarray(
-    interpolate(encoded_spectrograms[2].flatten(), encoded_spectrograms[3].flatten(), n=n_points))
+    spheric_interpolate(encoded_spectrograms[2].flatten(), encoded_spectrograms[3].flatten(), n=n_points))
 
 # COLUMNS
 for i in range(n_points):
@@ -118,7 +118,7 @@ for i in range(n_points):
     except OSError:
         print("Creation of the directory  failed")
 
-    generated_col = np.asarray(interpolate(generated_image_vectors01[i].flatten(),
+    generated_col = np.asarray(spheric_interpolate(generated_image_vectors01[i].flatten(),
                                            generated_image_vectors23[n_points - 1 - i].flatten(), n=n_points))
     generated_spectrograms = vae.decoder.predict(generated_col)
     for idx, element in enumerate(generated_spectrograms):
@@ -144,9 +144,9 @@ for i in range(n_points):
 # BOUNDARIES (LEFT AND RIGHT)
 
 generated_image_vectors12 = np.asarray(
-    interpolate(encoded_spectrograms[1].flatten(), encoded_spectrograms[2].flatten(), n=n_points))
+    spheric_interpolate(encoded_spectrograms[1].flatten(), encoded_spectrograms[2].flatten(), n=n_points))
 generated_image_vectors30 = np.asarray(
-    interpolate(encoded_spectrograms[3].flatten(), encoded_spectrograms[0].flatten(), n=n_points))
+    spheric_interpolate(encoded_spectrograms[3].flatten(), encoded_spectrograms[0].flatten(), n=n_points))
 
 # ROWS
 for i in range(n_points):
@@ -162,7 +162,7 @@ for i in range(n_points):
     except OSError:
         print("Creation of the directory  failed")
 
-    generated_row = np.asarray(interpolate(generated_image_vectors12[i].flatten(),
+    generated_row = np.asarray(spheric_interpolate(generated_image_vectors12[i].flatten(),
                                            generated_image_vectors30[n_points - 1 - i].flatten(), n=n_points))
     generated_spectrograms = vae.decoder.predict(generated_row)
     for idx, element in enumerate(generated_spectrograms):
