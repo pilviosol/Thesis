@@ -8,21 +8,6 @@ import scipy.io.wavfile
 from WANDB import config
 import os
 
-
-"""
-
-RIFARE FACENDO BENE LE CARTELLE E SALVANDO DECENTEMENTE LE COSE IN MANIERA AUTOMATIZZATA
-
-"""
-
-
-
-
-
-
-
-
-
 # ---------------------------------------------------------------------------------------------------------------------
 # PATH, VARIABLES
 # ---------------------------------------------------------------------------------------------------------------------
