@@ -421,6 +421,26 @@ def interpolate(v1, v2, n=10):
 
     return int_vecs
 
+def parabolic_interpolate(v1, v2, n=10):
+    """
+    interpolates between two vectors in latent space
+    """
+    ratios = np.linspace(0, 1, n)
+    ceil = int(np.ceil(n/2))
+    floor = int(np.floor(n/2))
+    y = -2 * (ratios ** 2) + 2 * ratios
+    first_half = y[0:ceil]
+    second_half = 1-np.flip(y[0:floor])
+    ratios = np.concatenate((first_half, second_half))
+
+    int_vecs = list()
+    for ratio in ratios:
+        v = (1.0 - ratio) * v1 + ratio * v2
+        int_vecs.append(v)
+
+    return int_vecs
+
+
 def interpolate_and_save(v1, v2, save_path, n=10):
     """
     interpolates between two vectors in latent space

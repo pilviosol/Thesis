@@ -2,7 +2,7 @@ import shutil
 import pathlib
 
 origin_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/OLD_SPLIT_reducted_flutes/"
-destination_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/OLD_SPLIT_flutes_backup/"
+destination_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/OLD_split_flutes_backup/"
 
 origin = pathlib.Path(origin_path).iterdir()
 destination = pathlib.Path(destination_path)
