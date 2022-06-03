@@ -411,7 +411,7 @@ def load_fsdd_concat(spectrograms_path, label):
 
 def interpolate(v1, v2, n=10):
     """
-    interpolates between two vectors in latent space
+    interpolates between two vectors in latent space in linear fashion
     """
     ratios = np.linspace(0, 1, n)
     int_vecs = list()
@@ -423,7 +423,7 @@ def interpolate(v1, v2, n=10):
 
 def parabolic_interpolate(v1, v2, n=10):
     """
-    interpolates between two vectors in latent space
+    interpolates between two vectors in latent space following parabolic function
     """
     ratios = np.linspace(0, 1, n)
     ceil = int(np.ceil(n/2))
@@ -431,6 +431,28 @@ def parabolic_interpolate(v1, v2, n=10):
     y = -2 * (ratios ** 2) + 2 * ratios
     first_half = y[0:ceil]
     second_half = 1-np.flip(y[0:floor])
+    ratios = np.concatenate((first_half, second_half))
+
+    int_vecs = list()
+    for ratio in ratios:
+        v = (1.0 - ratio) * v1 + ratio * v2
+        int_vecs.append(v)
+
+    return int_vecs
+
+def spheric_interpolate(v1, v2, n=10):
+    """
+    interpolates between two vectors in latent space in spheric fashion
+    """
+    sampling = n
+    R = 0.5
+    ceil = int(np.ceil(n / 2))
+    floor = int(np.floor(n / 2))
+
+    x = R * np.linspace(-1, 1, sampling)
+    y = np.sqrt(R ** 2 - x ** 2)
+    first_half = y[0:ceil]
+    second_half = 1 - np.flip(y[0:floor])
     ratios = np.concatenate((first_half, second_half))
 
     int_vecs = list()
