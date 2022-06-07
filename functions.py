@@ -115,8 +115,7 @@ def extract_features(file_name):
         # n_mels=128)
         stft_mag = np.abs(librosa.stft(y=audio, n_fft=N_FFT, hop_length=HOP_LENGTH, win_length=WIN_LENGTH))
         log_spectrogram = 10 * np.log10(stft_mag + 1e-5)
-        log_spectrogram = log_spectrogram[0:512, 0:64]
-        # cambiare 1e-5 FARE PROVE
+        log_spectrogram = log_spectrogram[0:512, 0:256]
 
     except Exception as e:
         print("Error encountered while parsing file: ", file_name)
@@ -147,7 +146,7 @@ def feature_calculation(path_songs, store_features_path):
             # Saving all features in one folder (.npy format)
             # np.save(store_features_path + name + "_CQT", cqt)
             # np.save(store_features_path + name + "_STFTFULL", stft_full)
-            np.save(store_features_path + name + "_STFTMAG_NEW", stft_mag)
+            np.save(store_features_path + name + "_STFTMAG", stft_mag)
             # np.save(store_features_path + name + "_STFTMAG_REAL", stft_mag_real)
             # np.save(store_features_path + name + "_STFTMAG_IMAG", stft_mag_imag)
             # np.save(store_features_path + name + "_STFTPHASE", stft_phase)

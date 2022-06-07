@@ -8,18 +8,13 @@ import scipy.io.wavfile
 from WANDB import config
 import os
 
-"""
-
-RIFARE FACENDO BENE LE CARTELLE E SALVANDO DECENTEMENTE LE COSE IN MANIERA AUTOMATIZZATA
-
-"""
 
 # ---------------------------------------------------------------------------------------------------------------------
 # PATH, VARIABLES
 # ---------------------------------------------------------------------------------------------------------------------
-main_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION_multi/"
-date = "03062022/"
-folder_number = str(9)
+main_path = "/nas/home/spol/Thesis/INTERPOLATIONS/"
+folder_number = str(1)
+date = "change_07062022_" + folder_number + "/"
 n_points = 5
 
 try:
@@ -100,9 +95,9 @@ encoded_spectrograms = vae.encoder.predict(spectrograms_full)
 
 # BOUNDARIES (UPPER AND LOWER)
 generated_image_vectors01 = np.asarray(
-    spheric_interpolate(encoded_spectrograms[0].flatten(), encoded_spectrograms[1].flatten(), n=n_points))
+    interpolate(encoded_spectrograms[0].flatten(), encoded_spectrograms[1].flatten(), n=n_points))
 generated_image_vectors23 = np.asarray(
-    spheric_interpolate(encoded_spectrograms[2].flatten(), encoded_spectrograms[3].flatten(), n=n_points))
+    interpolate(encoded_spectrograms[2].flatten(), encoded_spectrograms[3].flatten(), n=n_points))
 
 # COLUMNS
 for i in range(n_points):
@@ -118,7 +113,7 @@ for i in range(n_points):
     except OSError:
         print("Creation of the directory  failed")
 
-    generated_col = np.asarray(spheric_interpolate(generated_image_vectors01[i].flatten(),
+    generated_col = np.asarray(interpolate(generated_image_vectors01[i].flatten(),
                                            generated_image_vectors23[n_points - 1 - i].flatten(), n=n_points))
     generated_spectrograms = vae.decoder.predict(generated_col)
     for idx, element in enumerate(generated_spectrograms):
@@ -144,9 +139,9 @@ for i in range(n_points):
 # BOUNDARIES (LEFT AND RIGHT)
 
 generated_image_vectors12 = np.asarray(
-    spheric_interpolate(encoded_spectrograms[1].flatten(), encoded_spectrograms[2].flatten(), n=n_points))
+    interpolate(encoded_spectrograms[1].flatten(), encoded_spectrograms[2].flatten(), n=n_points))
 generated_image_vectors30 = np.asarray(
-    spheric_interpolate(encoded_spectrograms[3].flatten(), encoded_spectrograms[0].flatten(), n=n_points))
+    interpolate(encoded_spectrograms[3].flatten(), encoded_spectrograms[0].flatten(), n=n_points))
 
 # ROWS
 for i in range(n_points):
@@ -162,7 +157,7 @@ for i in range(n_points):
     except OSError:
         print("Creation of the directory  failed")
 
-    generated_row = np.asarray(spheric_interpolate(generated_image_vectors12[i].flatten(),
+    generated_row = np.asarray(interpolate(generated_image_vectors12[i].flatten(),
                                            generated_image_vectors30[n_points - 1 - i].flatten(), n=n_points))
     generated_spectrograms = vae.decoder.predict(generated_row)
     for idx, element in enumerate(generated_spectrograms):

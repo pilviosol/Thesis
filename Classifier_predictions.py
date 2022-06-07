@@ -8,13 +8,15 @@ from tensorflow.keras.models import load_model
 #  PATH and VARIABLES
 # ---------------------------------------------------------------
 model_path = "/nas/home/spol/Thesis/Classifier.h5"
+conv_model_path = "/nas/home/spol/Thesis/Conv_classifier.h5"
 
-path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/INTERPOLATION_multi/03062022_SPHERIC/INTERPOLATIONs/column4/"
+
+path = "/nas/home/spol/Thesis/INTERPOLATIONS/07062022_2/INTERPOLATIONs/column3/"
 # ---------------------------------------------------------------
 #  LOAD CLASSIFIER
 # ---------------------------------------------------------------
 
-model = load_model(model_path)
+model = load_model(conv_model_path)
 
 # ---------------------------------------------------------------
 #  PREVISIONI
