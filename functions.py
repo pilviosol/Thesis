@@ -7,6 +7,9 @@ import librosa
 import librosa.display
 import scipy.io.wavfile
 from WANDB import config
+import matplotlib.pyplot as plt
+from matplotlib import ticker
+
 
 # ---------------------------------------------------------------------------------------------------------------------
 # VARIABLES
@@ -476,4 +479,36 @@ def interpolate_and_save(v1, v2, save_path, n=10):
 
     return int_vecs
 
+
+def plot_2d(points, points_color, title, save_path):
+    fig, ax = plt.subplots(figsize=(3, 3), facecolor="white", constrained_layout=True)
+    fig.suptitle(title, size=16)
+    add_2d_scatter(ax, points, points_color)
+    # plt.show()
+    fig.savefig(save_path + title)
+    plt.close()
+
+def add_2d_scatter(ax, points, points_color, title=None):
+    x, y = points.T
+    ax.scatter(x, y, c=points_color, s=10, alpha=0.8)
+    ax.set_title(title)
+    ax.xaxis.set_major_formatter(ticker.NullFormatter())
+    ax.yaxis.set_major_formatter(ticker.NullFormatter())
+
+def plot_3d(points, points_color, title):
+    x, y, z = points.T
+    fig, ax = plt.subplots(
+        figsize=(6, 6),
+        facecolor="white",
+        tight_layout=True,
+        subplot_kw={"projection": "3d"},
+    )
+    fig.suptitle(title, size=16)
+    col = ax.scatter(x, y, z, c=points_color, s=50, alpha=0.8)
+    ax.view_init(azim=-60, elev=9)
+    # ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
+    # ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
+    # ax.zaxis.set_major_locator(ticker.MultipleLocator(1))
+    # fig.colorbar(col, ax=ax, orientation="horizontal", shrink=0.6, aspect=60, pad=0.01)
+    plt.show()
 # print('debugg')

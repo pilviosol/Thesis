@@ -70,13 +70,13 @@ CONV_STRIDES = config['conv_strides']
 
 zeros = np.zeros([512, 64], dtype=float)
 zeros = np.expand_dims(zeros, (-1, 0))
-zeros_train = np.repeat(zeros, 824, axis=0)
-zeros_val = np.repeat(zeros, 46, axis=0)
+zeros_train = np.repeat(zeros, 708, axis=0)
+zeros_val = np.repeat(zeros, 88, axis=0)
 
 ones = np.ones([512, 64], dtype=float)
 ones = np.expand_dims(ones, (-1, 0))
-ones_train = np.repeat(ones, 824, axis=0)
-ones_val = np.repeat(ones, 46, axis=0)
+ones_train = np.repeat(ones, 708, axis=0)
+ones_val = np.repeat(ones, 88, axis=0)
 
 twos_train = np.add(ones_train, ones_train)
 twos_val = np.add(ones_val, ones_val)
@@ -92,23 +92,23 @@ cond_enc_val = np.concatenate((ones_val, zeros_val, twos_val, threes_val), axis=
 # DECODER CONDITIONING VECTORS
 cond0001 = np.asarray([0, 0, 0, 1])
 cond0001 = np.expand_dims(cond0001, axis=0)
-cond0001_train = np.repeat(cond0001, 824, axis=0)
-cond0001_val = np.repeat(cond0001, 46, axis=0)
+cond0001_train = np.repeat(cond0001, 708, axis=0)
+cond0001_val = np.repeat(cond0001, 88, axis=0)
 
 cond0010 = np.asarray([0, 0, 1, 0])
 cond0010 = np.expand_dims(cond0010, axis=0)
-cond0010_train = np.repeat(cond0010, 824, axis=0)
-cond0010_val = np.repeat(cond0010, 46, axis=0)
+cond0010_train = np.repeat(cond0010, 708, axis=0)
+cond0010_val = np.repeat(cond0010, 88, axis=0)
 
 cond0100 = np.asarray([0, 1, 0, 0])
 cond0100 = np.expand_dims(cond0100, axis=0)
-cond0100_train = np.repeat(cond0100, 824, axis=0)
-cond0100_val = np.repeat(cond0100, 46, axis=0)
+cond0100_train = np.repeat(cond0100, 708, axis=0)
+cond0100_val = np.repeat(cond0100, 88, axis=0)
 
 cond1000 = np.asarray([1, 0, 0, 0])
 cond1000 = np.expand_dims(cond1000, axis=0)
-cond1000_train = np.repeat(cond1000, 824, axis=0)
-cond1000_val = np.repeat(cond1000, 46, axis=0)
+cond1000_train = np.repeat(cond1000, 708, axis=0)
+cond1000_val = np.repeat(cond1000, 88, axis=0)
 
 
 cond_dec_train = np.concatenate((cond0001_train, cond0010_train, cond0100_train, cond1000_train), axis=0)
