@@ -6,6 +6,8 @@ import pathlib
 from CVAE_train_multi import ones_val, zeros_val, twos_val, threes_val, cond0001_val, cond0010_val, cond0100_val, \
     cond1000_val, \
     ones_train, zeros_train, twos_train, threes_train, cond0001_train, cond0010_train, cond0100_train, cond1000_train
+import tensorflow.keras
+
 
 # ---------------------------------------------------------------------------------------------------------------------
 # PATH, VARIABLES, ANNOTATIONS
@@ -15,8 +17,7 @@ from CVAE_train_multi import ones_val, zeros_val, twos_val, threes_val, cond0001
 path_features_matching_flute_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/reducted_flutes/'
 path_features_matching_flute_val = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/FW_normalised_flute_0305_VALID/"
 
-
-path_save_tsne_images = "/nas/home/spol/Thesis/TSNE_images_early_exageration1/"
+path_save_tsne_images = "/nas/home/spol/Thesis/TSNE_GIUSTA/"
 
 x_train_SPECTROGRAMS_PATH = pathlib.Path(path_features_matching_flute_train)
 x_val_SPECTROGRAMS_PATH = pathlib.Path(path_features_matching_flute_val)
@@ -30,7 +31,6 @@ annotations_new = annotations0 + annotations1
 perplexity_val = 30
 perplexity_train = 30
 
-
 # ---------------------------------------------------------------------------------------------------------------------
 # IMPORT THE MODEL
 # ---------------------------------------------------------------------------------------------------------------------
@@ -38,6 +38,14 @@ perplexity_train = 30
 
 # vae = VAE.load("/nas/home/spol/Thesis/saved_model/" + date)
 vae = CVAEMulti.load("/nas/home/spol/Thesis/saved_model/CVAE_multi/18-05-2022_22:37")
+
+
+mu_layer_name = 'mu'
+mu_layer_model = tensorflow.keras.Model(inputs=vae._model_input, outputs=vae.encoder.get_layer(mu_layer_name).output)
+
+lv_layer_name = 'log_variance'
+lv_layer_model = tensorflow.keras.Model(inputs=vae._model_input, outputs=vae.encoder.get_layer(lv_layer_name).output)
+
 
 # ---------------------------------------------------------------------------------------------------------------------
 # RUN
@@ -57,10 +65,10 @@ if __name__ == "__main__":
     x_val2 = [x_val, twos_val, cond0100_val]
     x_val3 = [x_val, threes_val, cond1000_val]
 
-    encoded_inputs_val0 = vae.encoder.predict(x_val0)
-    encoded_inputs_val1 = vae.encoder.predict(x_val1)
-    encoded_inputs_val2 = vae.encoder.predict(x_val2)
-    encoded_inputs_val3 = vae.encoder.predict(x_val3)
+    encoded_inputs_val0 = mu_layer_model.predict(x_val0)
+    encoded_inputs_val1 = mu_layer_model.predict(x_val1)
+    encoded_inputs_val2 = mu_layer_model.predict(x_val2)
+    encoded_inputs_val3 = mu_layer_model.predict(x_val3)
 
     encoded_inputs_val = np.concatenate(
         (encoded_inputs_val0, encoded_inputs_val1, encoded_inputs_val2, encoded_inputs_val3), axis=0)
@@ -75,9 +83,8 @@ if __name__ == "__main__":
             labels_val.append("green")
         else:
             labels_val.append("black")
-                     
-    labels_val = np.asarray(labels_val)
 
+    labels_val = np.asarray(labels_val)
 
     # ------------------------------------
     # TRAIN
@@ -89,14 +96,14 @@ if __name__ == "__main__":
     x_train2 = [x_train, twos_train, cond0100_train]
     x_train3 = [x_train, threes_train, cond1000_train]
 
-    encoded_inputs_train0 = vae.encoder.predict(x_train0)
-    encoded_inputs_train1 = vae.encoder.predict(x_train1)
-    encoded_inputs_train2 = vae.encoder.predict(x_train2)
-    encoded_inputs_train3 = vae.encoder.predict(x_train3)
+    encoded_inputs_train0 = mu_layer_model.predict(x_train0)
+    encoded_inputs_train1 = mu_layer_model.predict(x_train1)
+    encoded_inputs_train2 = mu_layer_model.predict(x_train2)
+    encoded_inputs_train3 = mu_layer_model.predict(x_train3)
 
     encoded_inputs_train = np.concatenate(
         (encoded_inputs_train0, encoded_inputs_train1, encoded_inputs_train2, encoded_inputs_train3), axis=0)
-    
+
     labels_train = []
     for i in range(2832):
         if i < 708:
@@ -112,7 +119,6 @@ if __name__ == "__main__":
     for perplexity in range(20):
         print(perplexity)
         if perplexity > 2:
-
             X_embedded_val = TSNE(n_components=2,
                                   perplexity=perplexity,
                                   early_exaggeration=12,

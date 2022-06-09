@@ -18,9 +18,9 @@ with open('/nas/home/spol/Thesis/last_date.txt') as f:
     date = f.read()
     print('date: ', date)
 
-normalised_flute_features_TEST = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/FW_normalised_flute_0605_TEST/"
-path_save_figures = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/IMAGES/IMAGES_1905_1101/"
-generated_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/GENERATED/GENERATED_1905_1101/"
+normalised_flute_features_TEST = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/07062022/NORMALIZED_flute/"
+path_save_figures = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/07062022/IMAGES/IMAGES_0906_0101/"
+generated_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/07062022/GENERATED/GENERATED_0906_0101/"
 SR = config['sample_rate']
 
 
@@ -30,13 +30,13 @@ SR = config['sample_rate']
 
 
 # ENCODER CONDITIONING MATRICES
-zeros = np.zeros([512, 64], dtype=float)
+zeros = np.zeros([512, 256], dtype=float)
 zeros = np.expand_dims(zeros, (-1, 0))
-zeros_test = np.repeat(zeros, 14, axis=0)
+zeros_test = np.repeat(zeros, 88, axis=0)
 
-ones = np.ones([512, 64], dtype=float)
+ones = np.ones([512, 256], dtype=float)
 ones = np.expand_dims(ones, (-1, 0))
-ones_test = np.repeat(ones, 14, axis=0)
+ones_test = np.repeat(ones, 88, axis=0)
 
 twos_test = np.add(ones_test, ones_test)
 
@@ -48,19 +48,19 @@ cond_enc_test = np.concatenate((ones_test, zeros_test, twos_test, threes_test), 
 # DECODER CONDITIONING VECTORS
 cond0001 = np.asarray([0, 0, 0, 1])
 cond0001 = np.expand_dims(cond0001, axis=0)
-cond0001_test = np.repeat(cond0001, 14, axis=0)
+cond0001_test = np.repeat(cond0001, 88, axis=0)
 
 cond0010 = np.asarray([0, 0, 1, 0])
 cond0010 = np.expand_dims(cond0010, axis=0)
-cond0010_test = np.repeat(cond0010, 14, axis=0)
+cond0010_test = np.repeat(cond0010, 88, axis=0)
 
 cond0100 = np.asarray([0, 1, 0, 0])
 cond0100 = np.expand_dims(cond0100, axis=0)
-cond0100_test = np.repeat(cond0100, 14, axis=0)
+cond0100_test = np.repeat(cond0100, 88, axis=0)
 
 cond1000 = np.asarray([1, 0, 0, 0])
 cond1000 = np.expand_dims(cond1000, axis=0)
-cond1000_test = np.repeat(cond1000, 14, axis=0)
+cond1000_test = np.repeat(cond1000, 88, axis=0)
 
 cond_dec_test = np.concatenate((cond0001_test, cond0010_test, cond0100_test, cond1000_test), axis=0)
 
@@ -71,7 +71,7 @@ cond_dec_test = np.concatenate((cond0001_test, cond0010_test, cond0100_test, con
 
 
 # vae = VAE.load("/nas/home/spol/Thesis/saved_model/" + date)
-vae = CVAEMulti.load("/nas/home/spol/Thesis/saved_model/CVAE_multi/19-05-2022_11:01")
+vae = CVAEMulti.load("/nas/home/spol/Thesis/saved_model/CVAE_multi/09-06-2022_01:01")
 
 def generate(spectrograms):
     generated_spectrograms, latent_representations = vae.reconstruct(spectrograms)
@@ -95,11 +95,11 @@ for idx, element in enumerate(spectrograms):
     print(idx)
 
     fig = plt.figure()
-    img = plt.imshow(element, cmap=plt.cm.viridis, origin='lower', extent=[0, 64, 0, 512], aspect='auto')
+    img = plt.imshow(element, cmap=plt.cm.viridis, origin='lower', extent=[0, 256, 0, 512], aspect='auto')
     plt.title(str(idx))
     plt.colorbar()
-    plt.savefig(path_save_figures + str(idx))
-    plt.show()
+    # plt.savefig(path_save_figures + str(idx))
+    # plt.show()
     plt.close()
 
 
@@ -116,7 +116,7 @@ for idx, element in enumerate(spectrograms):
     denormalised_spectrogram = denormalise(element, min_max_keyboard[0][1], min_max_keyboard[0][0])
 
     fig = plt.figure()
-    img = plt.imshow(denormalised_spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 64, 0, 512], aspect='auto')
+    img = plt.imshow(denormalised_spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 256, 0, 512], aspect='auto')
     plt.title("denormalised_" + str(idx))
     plt.colorbar()
     plt.savefig(path_save_figures + "denormalised_" + str(idx))

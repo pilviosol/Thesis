@@ -27,17 +27,17 @@ set_gpu(-1)
 # PATH, VARIABLES
 # ---------------------------------------------------------------------------------------------------------------------
 
-path_features_matching_flute_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/reducted_flutes/'
-path_features_matching_string_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/reducted_strings/'
-path_features_matching_keyboard_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/reducted_keyboards/'
-path_features_matching_guitar_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/reducted_guitars/'
-path_features_matching_organ_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/reducted_organs/'
+path_features_matching_flute_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/07062022/NORMALIZED_flute/'
+path_features_matching_string_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/07062022/NORMALIZED_string/'
+path_features_matching_keyboard_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/07062022/NORMALIZED_keyboard/'
+path_features_matching_guitar_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/07062022/NORMALIZED_guitar/'
+path_features_matching_organ_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/07062022/NORMALIZED_organ/'
 
-path_features_matching_flute_val = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/FW_normalised_flute_0305_VALID/"
-path_features_matching_string_val = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/FW_normalised_string_0305_VALID/"
-path_features_matching_keyboard_val = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/FW_normalised_keyboard_0305_VALID/"
-path_features_matching_guitar_val = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/FW_normalised_guitar_1805_VALID/"
-path_features_matching_organ_val = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/FW_normalised_organ_1805_VALID/"
+path_features_matching_flute_val = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/07062022/NORMALIZED_flute/"
+path_features_matching_string_val = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/07062022/NORMALIZED_flute/"
+path_features_matching_keyboard_val = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/07062022/NORMALIZED_flute/"
+path_features_matching_guitar_val = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/07062022/NORMALIZED_flute/"
+path_features_matching_organ_val = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/07062022/NORMALIZED_flute/"
 
 
 x_train_SPECTROGRAMS_PATH = pathlib.Path(path_features_matching_flute_train)
@@ -68,12 +68,12 @@ CONV_STRIDES = config['conv_strides']
 
 # ENCODER CONDITIONING MATRICES
 
-zeros = np.zeros([512, 64], dtype=float)
+zeros = np.zeros([512, 256], dtype=float)
 zeros = np.expand_dims(zeros, (-1, 0))
 zeros_train = np.repeat(zeros, 708, axis=0)
 zeros_val = np.repeat(zeros, 88, axis=0)
 
-ones = np.ones([512, 64], dtype=float)
+ones = np.ones([512, 256], dtype=float)
 ones = np.expand_dims(ones, (-1, 0))
 ones_train = np.repeat(ones, 708, axis=0)
 ones_val = np.repeat(ones, 88, axis=0)

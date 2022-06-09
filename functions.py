@@ -350,7 +350,7 @@ def fw_normalise(original_path, new_path, min_max_array):
     for file in sorted(files_in_basepath):
         name = file.name
         loaded_file = np.load(file)
-        loaded_file = loaded_file[0:512, 0:64]
+        loaded_file = loaded_file[0:512, 0:256]
         normalised_loaded_file = normalise_given_min_max(loaded_file, minimum, maximum)
         np.save(new_path + 'normalised_FW_' + name, normalised_loaded_file)
     return folder_min_max

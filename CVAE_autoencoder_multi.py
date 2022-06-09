@@ -26,7 +26,7 @@ train_loss = tf.keras.metrics.Mean(name="train_loss")
 train_kl_loss = tf.keras.metrics.Mean(name="train_kl_loss")
 train_reconstruction_loss = tf.keras.metrics.Mean(name="train_reconstruction_loss")
 
-callback = EarlyStopping(monitor='val_loss', patience=200, verbose=1, restore_best_weights=True)
+earlystopping = EarlyStopping(monitor='loss', patience=50, verbose=1, restore_best_weights=True)
 
 
 now = datetime.now()
@@ -57,7 +57,7 @@ class CVAEMulti:
                  conv_kernels,
                  conv_strides,
                  latent_space_dim):
-        self.input_shape = input_shape  # [512, 64, 1]
+        self.input_shape = input_shape  # [512, 256, 1]
         self.conv_filters = conv_filters
         self.conv_kernels = conv_kernels
         self.conv_strides = conv_strides
@@ -102,21 +102,21 @@ class CVAEMulti:
                         fig = plt.figure()
                         img = plt.imshow(element, cmap=plt.cm.viridis, origin='lower', extent=[0, 256, 0, 512],
                                          aspect='auto')
-                        title = str(epoch) + '_' + str(i)
+                        title = 'epoch_' + str(epoch) + '_spectrogram_' + str(i)
                         plt.title(title)
                         plt.colorbar()
                         plt.tight_layout()
                         plt.savefig('/nas/home/spol/Thesis/saved_model/images/' + dt_string + '/' + title)
-
                         plt.close()
                         wandb.log({"Validation set plots": [wandb.Image(fig, caption=title)]})
 
         callback_list.append(LambdaCallback(on_epoch_end=plot_and_save_while_training))
-        callback_list.append(callback)
+        callback_list.append(earlystopping)
+
         self.model.fit(x_train,
                        y_train,
                        batch_size=batch_size,
-                       epochs=num_epochs,
+                       epochs=70,
                        shuffle=True,
                        callbacks=callback_list,
                        validation_data=(x_val, y_val))
@@ -153,7 +153,7 @@ class CVAEMulti:
 
     def _calculate_reconstruction_loss(self, y_target, y_predicted):
         error = y_target - y_predicted
-        reconstruction_loss = np.prod((512, 64)) * K.mean(K.square(error), axis=[1, 2, 3])
+        reconstruction_loss = np.prod((512, 256)) * K.mean(K.square(error), axis=[1, 2, 3])
         train_reconstruction_loss(reconstruction_loss)
         return reconstruction_loss
 

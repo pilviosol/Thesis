@@ -1,8 +1,9 @@
-import umap
+from sklearn.decomposition import PCA
 import numpy as np
 from CVAE_autoencoder_multi import CVAEMulti
 from functions import load_fsdd, plot_3d, plot_2d
 import pathlib
+import tensorflow.keras
 
 # ---------------------------------------------------------------------------------------------------------------------
 # PATH, VARIABLES, ANNOTATIONS
@@ -12,10 +13,14 @@ import pathlib
 path_features_matching_flute_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/reducted_flutes/'
 path_features_matching_flute_val = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/FW_normalised_flute_0305_VALID/"
 
-path_save_umap_images = "/nas/home/spol/Thesis/UMAP/"
+
+path_save_pca_images = "/nas/home/spol/Thesis/PCA/"
 
 x_train_SPECTROGRAMS_PATH = pathlib.Path(path_features_matching_flute_train)
 x_val_SPECTROGRAMS_PATH = pathlib.Path(path_features_matching_flute_val)
+
+
+
 
 # ENCODER CONDITIONING MATRICES
 
@@ -35,8 +40,10 @@ twos_val = np.add(ones_val, ones_val)
 threes_train = np.add(ones_train, twos_train)
 threes_val = np.add(ones_val, twos_val)
 
+
 cond_enc_train = np.concatenate((ones_train, zeros_train, twos_train, threes_train), axis=0)
 cond_enc_val = np.concatenate((ones_val, zeros_val, twos_val, threes_val), axis=0)
+
 
 # DECODER CONDITIONING VECTORS
 cond0001 = np.asarray([0, 0, 0, 1])
@@ -59,8 +66,11 @@ cond1000 = np.expand_dims(cond1000, axis=0)
 cond1000_train = np.repeat(cond1000, 708, axis=0)
 cond1000_val = np.repeat(cond1000, 88, axis=0)
 
+
 cond_dec_train = np.concatenate((cond0001_train, cond0010_train, cond0100_train, cond1000_train), axis=0)
 cond_dec_val = np.concatenate((cond0001_val, cond0010_val, cond0100_val, cond1000_val), axis=0)
+
+
 
 # ---------------------------------------------------------------------------------------------------------------------
 # IMPORT THE MODEL
@@ -69,6 +79,12 @@ cond_dec_val = np.concatenate((cond0001_val, cond0010_val, cond0100_val, cond100
 
 # vae = VAE.load("/nas/home/spol/Thesis/saved_model/" + date)
 vae = CVAEMulti.load("/nas/home/spol/Thesis/saved_model/CVAE_multi/18-05-2022_22:37")
+
+mu_layer_name = 'mu'
+mu_layer_model = tensorflow.keras.Model(inputs=vae._model_input, outputs=vae.encoder.get_layer(mu_layer_name).output)
+
+lv_layer_name = 'log_variance'
+lv_layer_model = tensorflow.keras.Model(inputs=vae._model_input, outputs=vae.encoder.get_layer(lv_layer_name).output)
 
 # ---------------------------------------------------------------------------------------------------------------------
 # RUN
@@ -88,16 +104,15 @@ if __name__ == "__main__":
     x_val2 = [x_val, twos_val, cond0100_val]
     x_val3 = [x_val, threes_val, cond1000_val]
 
-    encoded_inputs_val0 = vae.encoder.predict(x_val0)
-    encoded_inputs_val1 = vae.encoder.predict(x_val1)
-    encoded_inputs_val2 = vae.encoder.predict(x_val2)
-    encoded_inputs_val3 = vae.encoder.predict(x_val3)
+    encoded_inputs_val0 = lv_layer_model.predict(x_val0)
+    encoded_inputs_val1 = lv_layer_model.predict(x_val1)
+    encoded_inputs_val2 = lv_layer_model.predict(x_val2)
+    encoded_inputs_val3 = lv_layer_model.predict(x_val3)
 
     encoded_inputs_val = np.concatenate(
         (encoded_inputs_val0, encoded_inputs_val1, encoded_inputs_val2, encoded_inputs_val3), axis=0)
 
-    encoded_inputs_val_reducted = encoded_inputs_val[:, [-6, -5, -4, -3, -2, -1]]
-
+    # encoded_inputs_val_reducted = encoded_inputs_val[:, [-6, -5, -4, -3, -2, -1]]
 
     labels_val = []
     for i in range(352):
@@ -122,16 +137,15 @@ if __name__ == "__main__":
     x_train2 = [x_train, twos_train, cond0100_train]
     x_train3 = [x_train, threes_train, cond1000_train]
 
-    encoded_inputs_train0 = vae.encoder.predict(x_train0)
-    encoded_inputs_train1 = vae.encoder.predict(x_train1)
-    encoded_inputs_train2 = vae.encoder.predict(x_train2)
-    encoded_inputs_train3 = vae.encoder.predict(x_train3)
+    encoded_inputs_train0 = lv_layer_model.predict(x_train0)
+    encoded_inputs_train1 = lv_layer_model.predict(x_train1)
+    encoded_inputs_train2 = lv_layer_model.predict(x_train2)
+    encoded_inputs_train3 = lv_layer_model.predict(x_train3)
 
     encoded_inputs_train = np.concatenate(
         (encoded_inputs_train0, encoded_inputs_train1, encoded_inputs_train2, encoded_inputs_train3), axis=0)
 
-    encoded_inputs_train_reducted = encoded_inputs_train[:, [-6, -5, -4, -3, -2, -1]]
-
+    # encoded_inputs_train_reducted = encoded_inputs_train[:, [-6, -5, -4, -3, -2, -1]]
 
     labels_train = []
     for i in range(2832):
@@ -145,17 +159,11 @@ if __name__ == "__main__":
             labels_train.append("black")
     labels_train = np.asarray(labels_train)
 
+    X_embedded_val = PCA(n_components=2, svd_solver='randomized').fit_transform(encoded_inputs_val)
 
-    reducer = umap.UMAP(n_neighbors=50,
-                        min_dist=0.1,
-                        n_components=2,
-                        metric='euclidean')
+    X_embedded_train = PCA(n_components=2, svd_solver='randomized').fit_transform(encoded_inputs_train)
 
-    X_embedded_val = reducer.fit_transform(encoded_inputs_val_reducted)
-
-    X_embedded_train = reducer.fit_transform(encoded_inputs_train_reducted)
-
-    plot_2d(X_embedded_val, labels_val, "REDUCTED_VAL_UMAP_nn_50_", path_save_umap_images)
-    plot_2d(X_embedded_train, labels_train, "REDUCTED_TRAIN_UMAP_nn_", path_save_umap_images)
+    plot_2d(X_embedded_val, labels_val, "LV_GIUSTA_VAL_PCA_randomized", path_save_pca_images)
+    plot_2d(X_embedded_train, labels_train, "LV_GIUSTA_TRAIN_PCA_randomized", path_save_pca_images)
     # plot_3d(X_embedded_val, labels_val, "VAL")
     # plot_3d(X_embedded_train, labels_train, "TRAIN")
