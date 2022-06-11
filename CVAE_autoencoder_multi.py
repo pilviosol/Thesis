@@ -26,7 +26,7 @@ train_loss = tf.keras.metrics.Mean(name="train_loss")
 train_kl_loss = tf.keras.metrics.Mean(name="train_kl_loss")
 train_reconstruction_loss = tf.keras.metrics.Mean(name="train_reconstruction_loss")
 
-earlystopping = EarlyStopping(monitor='loss', patience=50, verbose=1, restore_best_weights=True)
+earlystopping = EarlyStopping(monitor='_calculate_reconstruction_loss', patience=50, verbose=1, restore_best_weights=True)
 
 
 now = datetime.now()
@@ -116,7 +116,7 @@ class CVAEMulti:
         self.model.fit(x_train,
                        y_train,
                        batch_size=batch_size,
-                       epochs=70,
+                       epochs=num_epochs,
                        shuffle=True,
                        callbacks=callback_list,
                        validation_data=(x_val, y_val))

@@ -19,8 +19,8 @@ with open('/nas/home/spol/Thesis/last_date.txt') as f:
     print('date: ', date)
 
 normalised_flute_features_TEST = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/07062022/NORMALIZED_flute/"
-path_save_figures = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/07062022/IMAGES/IMAGES_0906_0101/"
-generated_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/07062022/GENERATED/GENERATED_0906_0101/"
+path_save_figures = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/07062022/IMAGES/IMAGES_0906_0101_NAMES_ok/"
+generated_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/07062022/GENERATED/GENERATED_0906_0101_NAMES_ok/"
 SR = config['sample_rate']
 
 
@@ -82,8 +82,22 @@ def generate(spectrograms):
 # LOAD NORMALIZED TEST SPECTROGRAMS AND ORGANIZE THEM
 # ---------------------------------------------------------------------------------------------------------------------
 normalised_features_path = pathlib.Path(normalised_flute_features_TEST)
-
 x_test0 = load_fsdd(normalised_features_path)
+
+names_string = []
+names_keyboard = []
+names_guitar = []
+names_organ = []
+
+for element in sorted(normalised_features_path.iterdir()):
+    name = element.name
+    names_string.append("STRING_" + name[0:-4])
+    names_keyboard.append("KEYBOARD_" + name[0:-4])
+    names_guitar.append("GUITAR_" + name[0:-4])
+    names_organ.append("ORGAN_" + name[0:-4])
+
+names = np.concatenate((names_string, names_keyboard, names_guitar, names_organ), axis=0)
+
 x_test = np.concatenate((x_test0, x_test0, x_test0, x_test0), axis=0)
 x_test = [x_test, cond_enc_test, cond_dec_test]
 
@@ -117,15 +131,15 @@ for idx, element in enumerate(spectrograms):
 
     fig = plt.figure()
     img = plt.imshow(denormalised_spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 256, 0, 512], aspect='auto')
-    plt.title("denormalised_" + str(idx))
+    plt.title(names[idx])
     plt.colorbar()
-    plt.savefig(path_save_figures + "denormalised_" + str(idx))
-    plt.show()
+    plt.savefig(path_save_figures + names[idx])
+    # plt.show()
     plt.close()
 
     spectrogram = 10 ** (denormalised_spectrogram / 10) - 1e-5
     reconstructed = librosa.griffinlim(spectrogram, n_iter=32, hop_length=128)
-    scipy.io.wavfile.write(generated_path + "denormalised_" + str(idx) + '.wav', SR, reconstructed)
+    scipy.io.wavfile.write(generated_path + names[idx] + '.wav', SR, reconstructed)
 
 
 print('debaggone')

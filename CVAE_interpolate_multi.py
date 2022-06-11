@@ -13,8 +13,8 @@ import os
 # PATH, VARIABLES
 # ---------------------------------------------------------------------------------------------------------------------
 main_path = "/nas/home/spol/Thesis/INTERPOLATIONS/"
-folder_number = str(1)
-date = "change_07062022_" + folder_number + "/"
+folder_number = str(9)
+date = "11062022_" + folder_number + "/"
 n_points = 5
 
 try:
@@ -22,7 +22,7 @@ try:
 except OSError:
     print("Creation of the directory  failed")
 
-spectrogram_path = main_path + "inputs/input" + folder_number + "/"
+spectrogram_path = main_path + "inputs_256/input" + folder_number + "/"
 spectrogram = pathlib.Path(spectrogram_path)
 
 images_path = main_path + date + "images/"
@@ -51,7 +51,7 @@ for i in range(10):
 # ---------------------------------------------------------------------------------------------------------------------
 
 
-vae = CVAEMulti.load("/nas/home/spol/Thesis/saved_model/CVAE_multi/18-05-2022_22:37")
+vae = CVAEMulti.load("/nas/home/spol/Thesis/saved_model/CVAE_multi/09-06-2022_01:01")
 
 # ---------------------------------------------------------------------------------------------------------------------
 # FEED THE MODEL, INTERPOLATE AND PREDICT INTERPOLATION_multi
@@ -60,10 +60,10 @@ vae = CVAEMulti.load("/nas/home/spol/Thesis/saved_model/CVAE_multi/18-05-2022_22
 spectrogram = load_fsdd(spectrogram)
 spectrograms = np.concatenate((spectrogram, spectrogram, spectrogram, spectrogram), axis=0)
 
-zeros = np.zeros([512, 64], dtype=float)
+zeros = np.zeros([512, 256], dtype=float)
 zeros = np.expand_dims(zeros, (-1, 0))
 
-ones = np.ones([512, 64], dtype=float)
+ones = np.ones([512, 256], dtype=float)
 ones = np.expand_dims(ones, (-1, 0))
 
 twos = np.add(ones, ones)
@@ -124,7 +124,7 @@ for i in range(n_points):
         ax = plt.Axes(fig, [0., 0., 1., 1.])
         ax.set_axis_off()
         fig.add_axes(ax)
-        ax.imshow(spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 64, 0, 512], aspect='auto')
+        ax.imshow(spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 256, 0, 512], aspect='auto')
         fig.savefig(path_images + "/" + str(idx))
         plt.close()
 
@@ -168,7 +168,7 @@ for i in range(n_points):
         ax = plt.Axes(fig, [0., 0., 1., 1.])
         ax.set_axis_off()
         fig.add_axes(ax)
-        ax.imshow(spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 64, 0, 512], aspect='auto')
+        ax.imshow(spectrogram, cmap=plt.cm.viridis, origin='lower', extent=[0, 256, 0, 512], aspect='auto')
         fig.savefig(path_images + "/" + str(idx))
         plt.close()
 
