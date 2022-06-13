@@ -7,11 +7,11 @@ from tensorflow.keras.models import load_model
 # ---------------------------------------------------------------
 #  PATH and VARIABLES
 # ---------------------------------------------------------------
-model_path = "/nas/home/spol/Thesis/Classifier.h5"
-conv_model_path = "/nas/home/spol/Thesis/Conv_classifier.h5"
+model_path = "/nas/home/spol/Thesis/Classifier_256.h5"
+conv_model_path = "/nas/home/spol/Thesis/Conv_classifier_256.h5"
 
 
-path = "/nas/home/spol/Thesis/INTERPOLATIONS/07062022_2/INTERPOLATIONs/column3/"
+path = "/nas/home/spol/Thesis/INTERPOLATIONS/11062022_3/INTERPOLATIONs/row0/"
 # ---------------------------------------------------------------
 #  LOAD CLASSIFIER
 # ---------------------------------------------------------------
