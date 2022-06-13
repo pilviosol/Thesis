@@ -6,19 +6,19 @@ import tensorflow as tf
 # ---------------------------------------------------------------
 #  PATHS, VARIABLES
 # ---------------------------------------------------------------
-string_train_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/reducted_strings/'
-keyboard_train_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/reducted_keyboards/'
-guitar_train_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/reducted_guitars/'
-organ_train_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/reducted_organs/'
+string_train_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/07062022/NORMALIZED_string/'
+keyboard_train_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/07062022/NORMALIZED_keyboard/'
+guitar_train_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/07062022/NORMALIZED_guitar/'
+organ_train_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/07062022/NORMALIZED_organ/'
 string_train_path = pathlib.Path(string_train_path)
 keyboard_train_path = pathlib.Path(keyboard_train_path)
 guitar_train_path = pathlib.Path(guitar_train_path)
 organ_train_path = pathlib.Path(organ_train_path)
 
-string_val_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/FW_normalised_string_0305_VALID/'
-keyboard_val_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/FW_normalised_keyboard_0305_VALID/'
-guitar_val_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/FW_normalised_guitar_1805_VALID/'
-organ_val_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/FW_normalised_organ_1805_VALID/'
+string_val_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/07062022/NORMALIZED_string/'
+keyboard_val_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/07062022/NORMALIZED_keyboard/'
+guitar_val_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/07062022/NORMALIZED_guitar/'
+organ_val_path = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/07062022/NORMALIZED_organ/'
 string_val_path = pathlib.Path(string_val_path)
 keyboard_val_path = pathlib.Path(keyboard_val_path)
 guitar_val_path = pathlib.Path(guitar_val_path)
@@ -27,7 +27,7 @@ organ_val_path = pathlib.Path(organ_val_path)
 
 classes = [0, 1, 2, 3]
 
-model_path = "/nas/home/spol/Thesis/Conv_classifier.h5"
+model_path = "/nas/home/spol/Thesis/Conv_classifier_256.h5"
 # ---------------------------------------------------------------
 #  IMPORT AND ORGANIZE THE DATA
 # ---------------------------------------------------------------
@@ -79,7 +79,7 @@ y_val = np.asarray(y_val)
 # ---------------------------------------------------------------
 
 model = tf.keras.Sequential([
-    tf.keras.layers.Input(shape=(512, 64, 1)),
+    tf.keras.layers.Input(shape=(512, 256, 1)),
     tf.keras.layers.Conv2D(32, 3, strides=2, padding='same', activation='relu'),
     tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
     tf.keras.layers.Conv2D(64, 3, padding='same', activation='relu'),
