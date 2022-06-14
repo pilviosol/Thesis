@@ -11,7 +11,7 @@ model_path = "/nas/home/spol/Thesis/Classifier_256.h5"
 conv_model_path = "/nas/home/spol/Thesis/Conv_classifier_256.h5"
 
 
-path = "/nas/home/spol/Thesis/INTERPOLATIONS/11062022_0/INTERPOLATIONs/row4/"
+path = "/nas/home/spol/Thesis/INTERPOLATIONS/11062022_8/INTERPOLATIONs/row4/"
 # ---------------------------------------------------------------
 #  LOAD CLASSIFIER
 # ---------------------------------------------------------------
