@@ -20,6 +20,7 @@ with open('/nas/home/spol/Thesis/last_date.txt') as f:
 
 normalised_flute_features_TEST = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/07062022/NORMALIZED_flute/"
 path_save_figures = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/07062022/IMAGES/IMAGES_0906_0101_NAMES_ok/"
+path_save_generated_spectrograms = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/07062022/GENERATED_SPECTROGRAMS/GENERATED_SPECTROGRAMS_0906_0101/"
 generated_path = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/07062022/GENERATED/GENERATED_0906_0101_NAMES_ok/"
 SR = config['sample_rate']
 
@@ -102,6 +103,9 @@ x_test = np.concatenate((x_test0, x_test0, x_test0, x_test0), axis=0)
 x_test = [x_test, cond_enc_test, cond_dec_test]
 
 spectrograms, latent_representations = vae.reconstruct(x_test)
+
+for idx, spectrogram in enumerate(spectrograms):
+    np.save(path_save_generated_spectrograms + names[idx], spectrogram)
 
 for idx, element in enumerate(spectrograms):
     element = np.squeeze(element)
