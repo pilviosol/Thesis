@@ -3,6 +3,7 @@ import pathlib
 from functions import load_fsdd
 import tensorflow as tf
 from tensorflow.keras.models import load_model
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 # ---------------------------------------------------------------
 #  PATH and VARIABLES
@@ -19,6 +20,24 @@ path =  "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/07062022/GENERATED_SPEC
 model = load_model(conv_model_path)
 
 # ---------------------------------------------------------------
+#  LABELS
+# ---------------------------------------------------------------
+classes = [0, 1, 2, 3]
+
+y_val = []
+for i in range(352):
+    if i < 88:
+        y_val.append(classes[0])
+    elif 88 <= i < 176:
+        y_val.append(classes[1])
+    elif 176 <= i < 264:
+        y_val.append(classes[2])
+    else:
+        y_val.append(classes[3])
+y_val = np.asarray(y_val)
+
+labels=["string", "keyboard", "guitar", "organ"]
+# ---------------------------------------------------------------
 #  PREVISIONI
 # ---------------------------------------------------------------
 probability_model = tf.keras.Sequential([model, tf.keras.layers.Softmax()])
@@ -30,3 +49,10 @@ predictions = probability_model.predict(generated_spectrograms)
 
 for i in range(352):
     print(i, 'predictions: ', np.around(predictions[i], 3), 'class: ', np.argmax(predictions[i]))
+
+y_true = y_val
+y_pred = predictions
+cm = confusion_matrix(y_true, y_pred, labels=classes)
+
+disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=classes)
+disp.plot()

@@ -8,6 +8,10 @@ from functions import resample
 SR_16kHz = 16000
 violin_4sec_path = "/nas/home/spol/Thesis/violin_4sec/"
 
+nsynth = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST/nsynth-test/audio/bass_electronic_018-023-025.wav"
+y, sr = librosa.load(nsynth, sr=None)
+stft = np.abs(librosa.stft(y, n_fft=1024, hop_length=128, win_length=1024))
+
 
 # -------------------------------------------------------------------------------------------------------------------
 # RESAMPLING

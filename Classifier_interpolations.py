@@ -9,6 +9,7 @@ from tensorflow.keras.models import load_model
 # ---------------------------------------------------------------
 model_path = "/nas/home/spol/Thesis/Classifier_256.h5"
 conv_model_path = "/nas/home/spol/Thesis/Conv_classifier_256.h5"
+conv_reducted_model_path = "/nas/home/spol/Thesis/Conv_classifier_reducted.h5"
 
 
 path = "/nas/home/spol/Thesis/INTERPOLATIONS/11062022_8/INTERPOLATIONs/row4/"
@@ -16,7 +17,7 @@ path = "/nas/home/spol/Thesis/INTERPOLATIONS/11062022_8/INTERPOLATIONs/row4/"
 #  LOAD CLASSIFIER
 # ---------------------------------------------------------------
 
-model = load_model(conv_model_path)
+model = load_model(conv_reducted_model_path)
 
 # ---------------------------------------------------------------
 #  PREVISIONI
