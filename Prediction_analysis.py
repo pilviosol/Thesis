@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 # ---------------------------------------------------------------
 #  PATH and VARIABLES
@@ -276,5 +277,12 @@ print('all_3_end_VAR', all_3_end_VAR)
 print('all_4_start_VAR: ', all_4_start_VAR)
 print('all_4_end_VAR', all_4_end_VAR)
 
+
+
+
+
+
 print('debig')
+
+
 
