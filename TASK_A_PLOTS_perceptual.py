@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import seaborn as sns
+
 
 df = pd.read_excel('/nas/home/spol/Thesis/risposte_TASK_A.xlsx')
 datas = df.to_numpy(dtype=None, copy=False)
@@ -12,6 +14,7 @@ guitars = np.concatenate((datas[:, 10], datas[:, 11], datas[:, 12], datas[:, 13]
 organs = np.concatenate((datas[:, 15], datas[:, 16], datas[:, 17], datas[:, 19], datas[:, 19]))
 
 all = [strings, keyboards, guitars, organs]
+all_string = ['strings', 'keyboards', 'guitars', 'organs']
 
 # ---------------------------------------------------------------
 #  BOX PLOTS - ALL TOGETHER
@@ -20,6 +23,16 @@ all = [strings, keyboards, guitars, organs]
 fig1, ax1 = plt.subplots()
 ax1.set_title('ALL')
 ax1.boxplot(all, showmeans=True)
+plt.show()
+
+# ---------------------------------------------------------------
+#  BOX PLOTS - SEABORN
+# ---------------------------------------------------------------
+
+sns.set_theme(style="darkgrid")
+ax = sns.boxplot(data= all, showmeans=True)
+ax.set_xticklabels(['STRING', 'KEYBOARD', 'GUITAR', 'ORGAN'])
+ax.set(xlabel='Timbral class', ylabel='Rate')
 plt.show()
 
 
