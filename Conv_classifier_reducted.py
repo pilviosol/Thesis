@@ -80,10 +80,10 @@ y_val = np.asarray(y_val)
 
 model = tf.keras.Sequential([
     tf.keras.layers.Input(shape=(512, 256, 1)),
-    tf.keras.layers.Conv2D(16, 3, padding='same', activation='relu'),
+    tf.keras.layers.Conv2D(32, 3, padding='same', activation='relu'),
     tf.keras.layers.MaxPooling2D(pool_size=(4, 4)),
     tf.keras.layers.Flatten(),
-    tf.keras.layers.Dense(28, activation='relu'),
+    tf.keras.layers.Dense(32, activation='relu'),
     tf.keras.layers.Dropout(0.5),
     tf.keras.layers.Dense(4)
 ])
@@ -94,7 +94,7 @@ model.compile(optimizer='adam',
               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
               metrics=['accuracy'])
 
-model.fit(x_train, y_train, epochs=40)
+model.fit(x_train, y_train, epochs=100)
 
 test_loss, test_acc = model.evaluate(x_val, y_val, verbose=2)
 
