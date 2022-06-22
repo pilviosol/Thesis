@@ -2,13 +2,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-df = pd.read_excel('/nas/home/spol/Thesis/risposte_.xlsx')
-df_t = df.transpose()
-a = df.to_numpy(dtype=None, copy=False)
+df = pd.read_excel('/nas/home/spol/Thesis/risposte_TASK_B.xlsx')
+datas = df.to_numpy(dtype=None, copy=False)
 
-point_2 = np.concatenate((a[:, 0], a[:, 3], a[:, 6], a[:, 9]))
-point_3 = np.concatenate((a[:, 1], a[:, 4], a[:, 7], a[:, 10]))
-point_4 = np.concatenate((a[:, 2], a[:, 5], a[:, 8], a[:, 11]))
+point_2 = np.concatenate((datas[:, 0], datas[:, 3], datas[:, 6], datas[:, 9]))
+point_3 = np.concatenate((datas[:, 1], datas[:, 4], datas[:, 7], datas[:, 10]))
+point_4 = np.concatenate((datas[:, 2], datas[:, 5], datas[:, 8], datas[:, 11]))
 
 all = [point_2, point_3, point_4]
 
