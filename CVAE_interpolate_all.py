@@ -30,13 +30,6 @@ KG_path = main_path + "KG/"
 GO_path = main_path + "GO/"
 SO_path = main_path + "SO/"
 
-min_max = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/string_folder_min_max.npy"
-min_and_max = np.load(min_max)
-minimum = min_and_max[0][1]
-maximum = min_and_max[0][0]
-
-SR = config['sample_rate']
-
 n_points = 5
 
 
@@ -96,20 +89,26 @@ for idx, spectrogram in enumerate(spectrograms):
     encoded_spectrograms = vae.encoder.predict(spectrogram_full)
 
     row0 = np.asarray(interpolate(encoded_spectrograms[1].flatten(), encoded_spectrograms[0].flatten(), n=n_points))
-    for i, element in enumerate(row0):
+    generated_row0 = vae.decoder.predict(row0)
+    for i, element in enumerate(generated_row0):
         i = str(i)
         np.save(KS_path + index + "_KS_" + i, element)
+
     row4 = np.asarray(interpolate(encoded_spectrograms[2].flatten(), encoded_spectrograms[3].flatten(), n=n_points))
-    for i, element in enumerate(row4):
+    generated_row4 = vae.decoder.predict(row4)
+    for i, element in enumerate(generated_row4):
         i = str(i)
         np.save(GO_path + index + "_GO_" + i, element)
 
     column0 = np.asarray(interpolate(encoded_spectrograms[0].flatten(), encoded_spectrograms[3].flatten(), n=n_points))
-    for i, element in enumerate(column0):
+    generated_column0 = vae.decoder.predict(column0)
+    for i, element in enumerate(generated_column0):
         i = str(i)
         np.save(SO_path + index + "_SO_" + i, element)
+
     column4 = np.asarray(interpolate(encoded_spectrograms[1].flatten(), encoded_spectrograms[2].flatten(), n=n_points))
-    for i, element in enumerate(column0):
+    generated_column4 = vae.decoder.predict(column4)
+    for i, element in enumerate(generated_column4):
         i = str(i)
         np.save(KG_path + index + "_KG_" + i, element)
 
