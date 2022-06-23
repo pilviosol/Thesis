@@ -4,8 +4,19 @@ from CVAE_autoencoder_multi import CVAEMulti
 from functions import load_fsdd, plot_3d, plot_2d
 import pathlib
 import tensorflow.keras
+import seaborn as sns
+import matplotlib.pyplot as plt
+import matplotlib.colors as colors
 
 
+def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
+    new_cmap = colors.LinearSegmentedColormap.from_list(
+        'trunc({n},{a:.2f},{b:.2f})'.format(n=cmap.name, a=minval, b=maxval),
+        cmap(np.linspace(minval, maxval, n)))
+    return new_cmap
+
+cmap = plt.get_cmap('hsv')
+my_cmap = truncate_colormap(cmap, 0, 1, 4)
 # ---------------------------------------------------------------------------------------------------------------------
 # PATH, VARIABLES, ANNOTATIONS
 # ---------------------------------------------------------------------------------------------------------------------
@@ -148,7 +159,7 @@ if __name__ == "__main__":
 
     encoded_inputs_train = np.concatenate(
         (encoded_inputs_train0, encoded_inputs_train1, encoded_inputs_train2, encoded_inputs_train3), axis=0)
-
+    """
     labels_train = []
     for i in range(2832):
         if i < 708:
@@ -159,7 +170,22 @@ if __name__ == "__main__":
             labels_train.append("green")
         else:
             labels_train.append("black")
+    labels_train = np.asarray(labels_train) """
+
+    labels_train = []
+    for i in range(2832):
+        if i < 708:
+            labels_train.append(cmap(0.2))
+        elif 708 <= i < 1416:
+            labels_train.append(cmap(0.4))
+        elif 1416 <= i < 2124:
+            labels_train.append(cmap(0.6))
+        else:
+            labels_train.append(cmap(0.8))
     labels_train = np.asarray(labels_train)
+
+
+
 
     for perplexity in range(20):
         print(perplexity)
@@ -178,5 +204,10 @@ if __name__ == "__main__":
 
             plot_2d(X_embedded_val, labels_val, "LV_VAL_perplexity_" + str(perplexity), path_save_tsne_images)
             plot_2d(X_embedded_train, labels_train, "LV_TRAIN_perplexity_" + str(perplexity), path_save_tsne_images)
+
             # plot_3d(X_embedded_val, labels_val, "VAL")
             # plot_3d(X_embedded_train, labels_train, "TRAIN")
+            """
+            sns.set_theme(style="darkgrid")
+            ax = sns.scatterplot(data=X_embedded_train)
+            plt.show()"""
