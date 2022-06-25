@@ -1,16 +1,19 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pathlib
-from functions import load_fsdd
+from functions import load_fsdd, PLOT_PRINT_OPTIONS
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+import matplotlib.colors as colors
+
 
 # ---------------------------------------------------------------
 #  PATH and VARIABLES
 # ---------------------------------------------------------------
 model_path = "/nas/home/spol/Thesis/Classifier_256.h5"
 conv_model_path = "/nas/home/spol/Thesis/Conv_classifier_256.h5"
+save_path = "/nas/home/spol/Thesis/plots_thesis/"
 
 
 path =  "/nas/home/spol/Thesis/NSYNTH/NSYNTH_TEST_SUBSET/07062022/GENERATED_SPECTROGRAMS/GENERATED_SPECTROGRAMS_0906_0101/"
@@ -60,7 +63,19 @@ y_true = y_val
 y_pred = np.asarray(arg_pred_all)
 cm = confusion_matrix(y_true, y_pred, labels=classes)
 
+
+def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
+    new_cmap = colors.LinearSegmentedColormap.from_list(
+        'trunc({n},{a:.2f},{b:.2f})'.format(n=cmap.name, a=minval, b=maxval),
+        cmap(np.linspace(minval, maxval, n)))
+    return new_cmap
+
+cmap = plt.get_cmap('Set1')
+my_cmap = truncate_colormap(cmap, 0, 0.33, 4)
+
+
 fig, ax = plt.subplots()
-fig = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=("S", "K", "G", "O"))
-fig.plot()
+fig = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=("S", "K", "G", "O") )
+fig.plot(cmap='Blues', colorbar=False)
+plt.savefig(save_path + 'confusion_matrix_Blues', **PLOT_PRINT_OPTIONS)
 plt.show()

@@ -478,19 +478,28 @@ def interpolate_and_save(v1, v2, save_path, n=10):
 
     return int_vecs
 
+PLOT_PRINT_OPTIONS = {'dpi': 300,
+                      'pad_inches': 0.05,
+                      'bbox_inches': 'tight',
+                      }
 
 def plot_2d(points, points_color, title, save_path):
-    fig, ax = plt.subplots(figsize=(3, 3), facecolor="white", constrained_layout=True)
-    fig.suptitle(title, size=16)
+    fig, ax = plt.subplots(figsize=(10, 10), facecolor="white", constrained_layout=True)
     add_2d_scatter(ax, points, points_color)
+    plt.tick_params(
+        right=False,
+        left=False,
+        bottom=False,  # ticks along the bottom edge are off
+        top=False,  # ticks along the top edge are off
+        labelbottom=False)
     plt.show()
-    fig.savefig(save_path + title)
+    fig.savefig(save_path + title, **PLOT_PRINT_OPTIONS)
     plt.close()
 
 def add_2d_scatter(ax, points, points_color, title=None):
     x, y = points.T
-    ax.scatter(x, y, c=points_color, s=10, alpha=0.8)
-    ax.set_title(title)
+    ax.scatter(x, y, c=points_color, s=50, alpha=0.8)
+    # ax.set_title(title)
     ax.xaxis.set_major_formatter(ticker.NullFormatter())
     ax.yaxis.set_major_formatter(ticker.NullFormatter())
 

@@ -15,7 +15,7 @@ def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
         cmap(np.linspace(minval, maxval, n)))
     return new_cmap
 
-cmap = plt.get_cmap('hsv')
+cmap = plt.get_cmap('Set1')
 my_cmap = truncate_colormap(cmap, 0, 1, 4)
 # ---------------------------------------------------------------------------------------------------------------------
 # PATH, VARIABLES, ANNOTATIONS
@@ -25,7 +25,7 @@ my_cmap = truncate_colormap(cmap, 0, 1, 4)
 path_features_matching_flute_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/reducted_flutes/'
 path_features_matching_flute_val = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/FW_normalised_flute_0305_VALID/"
 
-path_save_tsne_images = "/nas/home/spol/Thesis/TSNE_IMAGES/TSNE_GIUSTA/"
+path_save_tsne_images = "/nas/home/spol/Thesis/TSNE_IMAGES/23_06_2022/"
 
 x_train_SPECTROGRAMS_PATH = pathlib.Path(path_features_matching_flute_train)
 x_val_SPECTROGRAMS_PATH = pathlib.Path(path_features_matching_flute_val)
@@ -152,10 +152,10 @@ if __name__ == "__main__":
     x_train2 = [x_train, twos_train, cond0100_train]
     x_train3 = [x_train, threes_train, cond1000_train]
 
-    encoded_inputs_train0 = lv_layer_model.predict(x_train0)
-    encoded_inputs_train1 = lv_layer_model.predict(x_train1)
-    encoded_inputs_train2 = lv_layer_model.predict(x_train2)
-    encoded_inputs_train3 = lv_layer_model.predict(x_train3)
+    encoded_inputs_train0 = mu_layer_model.predict(x_train0)
+    encoded_inputs_train1 = mu_layer_model.predict(x_train1)
+    encoded_inputs_train2 = mu_layer_model.predict(x_train2)
+    encoded_inputs_train3 = mu_layer_model.predict(x_train3)
 
     encoded_inputs_train = np.concatenate(
         (encoded_inputs_train0, encoded_inputs_train1, encoded_inputs_train2, encoded_inputs_train3), axis=0)
@@ -175,39 +175,32 @@ if __name__ == "__main__":
     labels_train = []
     for i in range(2832):
         if i < 708:
-            labels_train.append(cmap(0.2))
+            labels_train.append(cmap(0.1))
         elif 708 <= i < 1416:
-            labels_train.append(cmap(0.4))
+            labels_train.append(cmap(0.2))
         elif 1416 <= i < 2124:
-            labels_train.append(cmap(0.6))
+            labels_train.append(cmap(0.3))
         else:
-            labels_train.append(cmap(0.8))
+            labels_train.append(cmap(0.5))
     labels_train = np.asarray(labels_train)
 
-
-
-
-    for perplexity in range(20):
-        print(perplexity)
-        if perplexity > 2:
-            X_embedded_val = TSNE(n_components=2,
-                                  perplexity=perplexity,
-                                  early_exaggeration=12,
-                                  learning_rate='auto',
-                                  init='random').fit_transform(encoded_inputs_val)
-
-            X_embedded_train = TSNE(n_components=2,
-                                    perplexity=perplexity,
-                                    early_exaggeration=12,
-                                    learning_rate='auto',
-                                    init='random').fit_transform(encoded_inputs_train)
-
-            plot_2d(X_embedded_val, labels_val, "LV_VAL_perplexity_" + str(perplexity), path_save_tsne_images)
-            plot_2d(X_embedded_train, labels_train, "LV_TRAIN_perplexity_" + str(perplexity), path_save_tsne_images)
-
-            # plot_3d(X_embedded_val, labels_val, "VAL")
-            # plot_3d(X_embedded_train, labels_train, "TRAIN")
-            """
-            sns.set_theme(style="darkgrid")
-            ax = sns.scatterplot(data=X_embedded_train)
-            plt.show()"""
+    perplexity = 40
+    if perplexity > 2:
+        X_embedded_val = TSNE(n_components=2,
+                              perplexity=perplexity,
+                              early_exaggeration=12,
+                              learning_rate='auto',
+                              init='random').fit_transform(encoded_inputs_val)
+        X_embedded_train = TSNE(n_components=2,
+                                perplexity=perplexity,
+                                early_exaggeration=12,
+                                learning_rate='auto',
+                                init='random').fit_transform(encoded_inputs_train)
+        # plot_2d(X_embedded_val, labels_val, "LV_VAL_perplexity_" + str(perplexity), path_save_tsne_images)
+        plot_2d(X_embedded_train, labels_train, "MU_T-SNE" + str(perplexity), path_save_tsne_images)
+        # plot_3d(X_embedded_val, labels_val, "VAL")
+        # plot_3d(X_embedded_train, labels_train, "TRAIN")
+        """
+        sns.set_theme(style="darkgrid")
+        ax = sns.scatterplot(data=X_embedded_train)
+        plt.show()"""

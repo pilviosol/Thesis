@@ -1,13 +1,19 @@
 import matplotlib.pyplot as plt
+from functions import PLOT_PRINT_OPTIONS
 
 from Prediction_analysis import all_2_start, all_2_end, all_3_start, all_3_end, all_4_start, all_4_end, \
     ks_k_2, ks_s_2, ks_k_3, ks_s_3, ks_k_4, ks_s_4, kg_k_2, kg_g_2, kg_k_3, kg_g_3, kg_k_4, kg_g_4, \
     go_g_2, go_o_2, go_g_3, go_o_3, go_g_4, go_o_4, so_s_2, so_o_2, so_s_3, so_o_3, so_s_4, so_o_4, \
-    ks_k_1_MEAN, ks_s_1_MEAN, ks_k_2_MEAN, ks_s_2_MEAN, ks_k_3_MEAN, ks_s_3_MEAN, ks_k_4_MEAN, ks_s_4_MEAN, ks_k_5_MEAN, ks_s_5_MEAN, \
-    kg_k_1_MEAN, kg_g_1_MEAN, kg_k_2_MEAN, kg_g_2_MEAN, kg_k_3_MEAN, kg_g_3_MEAN, kg_k_4_MEAN, kg_g_4_MEAN, kg_k_5_MEAN, kg_g_5_MEAN, \
-    go_g_1_MEAN, go_o_1_MEAN, go_g_2_MEAN, go_o_2_MEAN, go_g_3_MEAN, go_o_3_MEAN, go_g_4_MEAN, go_o_4_MEAN, go_g_5_MEAN, go_o_5_MEAN, \
-    so_s_1_MEAN, so_o_1_MEAN, so_s_2_MEAN, so_o_2_MEAN, so_s_3_MEAN, so_o_3_MEAN, so_s_4_MEAN, so_o_4_MEAN, so_s_5_MEAN, so_o_5_MEAN
+    ks_k_1_MEAN, ks_s_1_MEAN, ks_k_2_MEAN, ks_s_2_MEAN, ks_k_3_MEAN, ks_s_3_MEAN, ks_k_4_MEAN, ks_s_4_MEAN, ks_k_5_MEAN, \
+    ks_s_5_MEAN, \
+    kg_k_1_MEAN, kg_g_1_MEAN, kg_k_2_MEAN, kg_g_2_MEAN, kg_k_3_MEAN, kg_g_3_MEAN, kg_k_4_MEAN, kg_g_4_MEAN, kg_k_5_MEAN, \
+    kg_g_5_MEAN, \
+    go_g_1_MEAN, go_o_1_MEAN, go_g_2_MEAN, go_o_2_MEAN, go_g_3_MEAN, go_o_3_MEAN, go_g_4_MEAN, go_o_4_MEAN, go_g_5_MEAN, \
+    go_o_5_MEAN, \
+    so_s_1_MEAN, so_o_1_MEAN, so_s_2_MEAN, so_o_2_MEAN, so_s_3_MEAN, so_o_3_MEAN, so_s_4_MEAN, so_o_4_MEAN, so_s_5_MEAN, \
+    so_o_5_MEAN
 
+save_path = "/nas/home/spol/Thesis/plots_thesis/"
 """
 # ---------------------------------------------------------------
 #  BOX PLOTS -OVERALL
@@ -84,6 +90,8 @@ ks_s = [ks_s_1_MEAN, ks_s_2_MEAN, ks_s_3_MEAN, ks_s_4_MEAN, ks_s_5_MEAN]
 x1 = [1, 2, 3, 4, 5]
 y1 = ks_k
 y2 = ks_s
+
+fig, ax = plt.subplots()
 plt.plot(x1, y1, label="keyboard probability")
 plt.plot(x1, y2, label="string probability")
 
@@ -91,8 +99,12 @@ plt.xlabel('Interpolation Points')
 plt.ylabel('Probability')
 plt.title('Keyboard to String')
 plt.legend()
+ax.set_xticks([1, 2, 3, 4, 5])
+ax.set_xticklabels(['1', '2', '3', '4', '5'], horizontalalignment='right')
+plt.savefig(save_path + 'task_b_ks', **PLOT_PRINT_OPTIONS)
 plt.show()
 
+"""
 # ---------------------------------------------------------------
 #  ALTRI GRAFICI - KEYBOARD TO GUITAR
 # ---------------------------------------------------------------
@@ -110,6 +122,7 @@ plt.xlabel('Interpolation Points')
 plt.ylabel('Probability')
 plt.title('Keyboard to Guitar')
 plt.legend()
+plt.savefig(save_path + 'task_b_kg', **PLOT_PRINT_OPTIONS)
 plt.show()
 
 # ---------------------------------------------------------------
@@ -129,6 +142,7 @@ plt.xlabel('Interpolation Points')
 plt.ylabel('Probability')
 plt.title('Guitar to Organ')
 plt.legend()
+plt.savefig(save_path + 'task_b_go', **PLOT_PRINT_OPTIONS)
 plt.show()
 
 # ---------------------------------------------------------------
@@ -148,6 +162,8 @@ plt.xlabel('Interpolation Points')
 plt.ylabel('Probability')
 plt.title('String to Organ')
 plt.legend()
-plt.show()
 
+plt.savefig(save_path + 'task_b_so', **PLOT_PRINT_OPTIONS)
+plt.show()
+"""
 print('debug')
