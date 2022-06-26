@@ -2,7 +2,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from functions import PLOT_PRINT_OPTIONS
 
+save_path = "/nas/home/spol/Thesis/plots_thesis/"
 
 df = pd.read_excel('/nas/home/spol/Thesis/risposte_TASK_B.xlsx')
 datas = df.to_numpy(dtype=None, copy=False)
@@ -60,9 +62,12 @@ plt.show()
 # ---------------------------------------------------------------
 
 sns.set_theme(style="darkgrid")
-ax = sns.boxplot(data= all, showmeans=True)
+ax = sns.boxplot(data=all, showmeans=True,
+                 meanprops={"marker": "^", "markerfacecolor": "white", "markeredgecolor":"white"},
+                 showfliers=False)
 ax.set_xticklabels(['POINT 2', 'POINT 3', 'POINT 4'])
-ax.set(xlabel='Interpolation points', ylabel='Score')
+ax.set(xlabel='Interpolation point', ylabel='Score')
+plt.savefig(save_path + 'task_b_perceptual', **PLOT_PRINT_OPTIONS)
 plt.show()
 
 

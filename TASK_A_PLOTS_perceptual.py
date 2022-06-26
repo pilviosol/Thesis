@@ -9,7 +9,6 @@ save_path = "/nas/home/spol/Thesis/plots_thesis/"
 df = pd.read_excel('/nas/home/spol/Thesis/risposte_TASK_A.xlsx')
 datas = df.to_numpy(dtype=None, copy=False)
 
-
 strings = np.concatenate((datas[:, 0], datas[:, 1], datas[:, 2], datas[:, 3], datas[:, 4]))
 keyboards = np.concatenate((datas[:, 5], datas[:, 6], datas[:, 7], datas[:, 8], datas[:, 9]))
 guitars = np.concatenate((datas[:, 10], datas[:, 11], datas[:, 12], datas[:, 13], datas[:, 14]))
@@ -32,11 +31,10 @@ plt.show()
 # ---------------------------------------------------------------
 
 sns.set_theme(style="darkgrid")
-ax = sns.boxplot(data= all, showmeans=True)
+ax = sns.boxplot(data=all, showmeans=True, meanprops={"marker": "^", "markerfacecolor": "white", "markeredgecolor":"white"})
 ax.set_xticklabels(['STRING', 'KEYBOARD', 'GUITAR', 'ORGAN'])
-ax.set(xlabel='Timbral class', ylabel='Rate')
+ax.set(xlabel='Timbral class', ylabel='Score')
 plt.savefig(save_path + 'task_a_perceptual', **PLOT_PRINT_OPTIONS)
 plt.show()
-
 
 print('debug')

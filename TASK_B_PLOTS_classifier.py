@@ -95,7 +95,7 @@ fig, ax = plt.subplots()
 plt.plot(x1, y1, label="keyboard probability")
 plt.plot(x1, y2, label="string probability")
 
-plt.xlabel('Interpolation Points')
+plt.xlabel('Interpolation Point')
 plt.ylabel('Probability')
 plt.title('Keyboard to String')
 plt.legend()
@@ -104,7 +104,7 @@ ax.set_xticklabels(['1', '2', '3', '4', '5'], horizontalalignment='right')
 plt.savefig(save_path + 'task_b_ks', **PLOT_PRINT_OPTIONS)
 plt.show()
 
-"""
+
 # ---------------------------------------------------------------
 #  ALTRI GRAFICI - KEYBOARD TO GUITAR
 # ---------------------------------------------------------------
@@ -115,13 +115,17 @@ kg_g = [kg_g_1_MEAN, kg_g_2_MEAN, kg_g_3_MEAN, kg_g_4_MEAN, kg_g_5_MEAN]
 x1 = [1, 2, 3, 4, 5]
 y1 = kg_k
 y2 = kg_g
+
+fig, ax = plt.subplots()
 plt.plot(x1, y1, label="keyboard probability")
 plt.plot(x1, y2, label="guitar probability")
 
-plt.xlabel('Interpolation Points')
+plt.xlabel('Interpolation Point')
 plt.ylabel('Probability')
 plt.title('Keyboard to Guitar')
 plt.legend()
+ax.set_xticks([1, 2, 3, 4, 5])
+ax.set_xticklabels(['1', '2', '3', '4', '5'], horizontalalignment='right')
 plt.savefig(save_path + 'task_b_kg', **PLOT_PRINT_OPTIONS)
 plt.show()
 
@@ -135,13 +139,17 @@ go_o = [go_o_1_MEAN, go_o_2_MEAN, go_o_3_MEAN, go_o_4_MEAN, go_o_5_MEAN]
 x1 = [1, 2, 3, 4, 5]
 y1 = go_g
 y2 = go_o
+
+fig, ax = plt.subplots()
 plt.plot(x1, y1, label="guitar probability")
 plt.plot(x1, y2, label="organ probability")
 
-plt.xlabel('Interpolation Points')
+plt.xlabel('Interpolation Point')
 plt.ylabel('Probability')
 plt.title('Guitar to Organ')
 plt.legend()
+ax.set_xticks([1, 2, 3, 4, 5])
+ax.set_xticklabels(['1', '2', '3', '4', '5'], horizontalalignment='right')
 plt.savefig(save_path + 'task_b_go', **PLOT_PRINT_OPTIONS)
 plt.show()
 
@@ -155,15 +163,18 @@ so_o = [so_o_1_MEAN, so_o_2_MEAN, so_o_3_MEAN, so_o_4_MEAN, so_o_5_MEAN]
 x1 = [1, 2, 3, 4, 5]
 y1 = so_s
 y2 = so_o
+
+fig, ax = plt.subplots()
 plt.plot(x1, y1, label="string probability")
 plt.plot(x1, y2, label="organ probability")
 
-plt.xlabel('Interpolation Points')
+plt.xlabel('Interpolation Point')
 plt.ylabel('Probability')
 plt.title('String to Organ')
 plt.legend()
-
+ax.set_xticks([1, 2, 3, 4, 5])
+ax.set_xticklabels(['1', '2', '3', '4', '5'], horizontalalignment='right')
 plt.savefig(save_path + 'task_b_so', **PLOT_PRINT_OPTIONS)
 plt.show()
-"""
+
 print('debug')
