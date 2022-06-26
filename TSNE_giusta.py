@@ -25,7 +25,7 @@ my_cmap = truncate_colormap(cmap, 0, 1, 4)
 path_features_matching_flute_train = '/nas/home/spol/Thesis/NSYNTH/NSYNTH_TRAIN_SUBSET/reducted_flutes/'
 path_features_matching_flute_val = "/nas/home/spol/Thesis/NSYNTH/NSYNTH_VALID_SUBSET/FW_normalised_flute_0305_VALID/"
 
-path_save_tsne_images = "/nas/home/spol/Thesis/TSNE_IMAGES/23_06_2022/"
+path_save_tsne_images = "/nas/home/spol/Thesis/TSNE_IMAGES/26_06_2022/"
 
 x_train_SPECTROGRAMS_PATH = pathlib.Path(path_features_matching_flute_train)
 x_val_SPECTROGRAMS_PATH = pathlib.Path(path_features_matching_flute_val)

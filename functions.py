@@ -492,6 +492,7 @@ def plot_2d(points, points_color, title, save_path):
         bottom=False,  # ticks along the bottom edge are off
         top=False,  # ticks along the top edge are off
         labelbottom=False)
+    plt.legend()
     plt.show()
     fig.savefig(save_path + title, **PLOT_PRINT_OPTIONS)
     plt.close()
