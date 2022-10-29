@@ -1,7 +1,0 @@
-evaluators = [
-    @BasicEvaluator,
-    @MidiAutoencoderEvaluator,
-]
-
-evaluate.evaluator_classes = %evaluators
-sample.evaluator_classes = %evaluators
